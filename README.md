@@ -1,4 +1,4 @@
-# ✈️ fly router
+# 🪶 fly router
 
 Fly router API is inspired by [wouter](https://github.com/molefrog/wouter),
 [solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts) and
