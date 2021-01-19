@@ -1,10 +1,11 @@
 {
-  "name": "fly-router",
+  "name": "@cher-ami/fly-router",
   "version": "0.1.0",
   "description": "A fresh react router built for route transitions flexibility",
   "author": "Willy Brauner",
   "license": "MIT",
   "main": "src/index.ts",
+  "private": false,
   "keywords": [
     "router",
     "react",
@@ -13,6 +14,9 @@
   "repository": {
     "type": "git",
     "url": "git://github.com/cher-ami/fly-router.git"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "dev": "parcel example/index.html --out-dir example/dist --open",
