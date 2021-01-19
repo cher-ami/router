@@ -1,0 +1,14 @@
+body {
+  font-size: 1.2rem;
+  font-family: sans-serif;
+  background: #222;
+  color: #eee;
+}
+
+.Link {
+  color: #999;
+}
+
+.active {
+  color: orangered;
+}
