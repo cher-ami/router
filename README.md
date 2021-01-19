@@ -302,4 +302,4 @@ $ npm run dev
 
 ## Credits
 
-Willy Brauner
+[Willy Brauner](https://github.com/willybrauner)
