@@ -48,13 +48,15 @@ export function getUrlByPath(
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const match = getUrlByPath(route.children, path, formatPath(localPath));
+      const matchChildrenPath = getUrlByPath(route.children, path, formatPath(localPath));
 
+      debug("getUrlByPath > match children path", matchChildrenPath);
       // return recursive Fn only if match, else continue to next iteration
-      if (match) {
+      if (matchChildrenPath) {
         // keep path in local array
         localPath.push(route.path);
-        return match;
+        // Return the function after localPath push
+        return getUrlByPath(route.children, path, formatPath(localPath));
       }
     }
   }
@@ -85,8 +87,12 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
 
         // get full URL
         const urlByPath = getUrlByPath(pRoutes, route.path);
+        debug("getUrlByRouteName > urlByPath", urlByPath);
+
         // build URL with param and return
-        return buildUrl(urlByPath, params.params);
+        const url = buildUrl(urlByPath, params.params);
+        debug("getUrlByRouteName > url", url);
+        return url;
       }
 
       // if route has children
