@@ -1,6 +1,6 @@
-# 🪶 fly router
+# 🪶 cher-ami Router
 
-Fly router API is inspired by [wouter](https://github.com/molefrog/wouter),
+cher-ami Router API is inspired by [wouter](https://github.com/molefrog/wouter),
 [solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts) and
 [vue router](https://router.vuejs.org/) API. This repository started from a copy of [willybrauner/react-router](https://github.com/willybrauner/react-router/).
 
@@ -130,7 +130,7 @@ Trig new route.
 
 **Props:**
 
-- **to** `string` Path ex: "/foo". Can Be absolute `/path/foo` or relative `path/foo`
+- **to** `string` Path ex: "/foo". Can be absolute `/path/foo` or relative `path/foo`
 - **className** `string` _(optional)_ Class name added to component root DOM element
 
 ## <a name="Stack"></a>Stack
@@ -210,8 +210,8 @@ const { currentRoute, previousRoute } = useRoute();
 
 An object with these properties:
 
-- **currentRoute** `(TRoute)` Current route object
-- **previousRoute** `(TRoute)` Previous route object
+- **currentRoute** `TRoute` Current route object
+- **previousRoute** `TRoute` Previous route object
 
 ```ts
 type TRoute = {
@@ -302,4 +302,4 @@ $ npm run dev
 
 ## Credits
 
-[Willy Brauner](https://github.com/willybrauner)
+[Willy Brauner](https://github.com/willybrauner) & [cher-ami](https://cher-ami.tv)
