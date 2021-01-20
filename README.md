@@ -37,8 +37,8 @@ TODO
 ```jsx
 // create a route object
 const routesList = [
+  { path: "/", component: HomePage },
   { path: "/foo", component: FooPage },
-  { path: "/bar", component: BarPage },
 ];
 
 // wrap render with <Router /> component
@@ -46,8 +46,8 @@ function App() {
   return (
     <Router routes={routesList} base={"/"}>
       <nav>
+        <Link href={"/"} />
         <Link href={"/foo"} />
-        <Link href={"/bar"} />
       </nav>
       <Stack manageTransitions={manageTransitions} />
     </Router>
@@ -95,6 +95,63 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## Nested Router
 
+cher-ami router accept nested router! To create a nested router:
+
+1. define children routes:
+
+```js
+// create a route object
+const routesList = [
+  {
+    path: "/",
+    component: HomePage,
+  },
+  {
+    path: "/foo",
+    component: FooPage,
+
+    // define children routes here
+    children: [
+      {
+        path: "/people",
+        component: PeoplePage,
+      },
+      {
+        path: "/yolo",
+        component: YoloPage,
+      },
+    ],
+  },
+];
+```
+
+2. Create new router instance in `FooPage` component:
+
+```jsx
+const FooPage = forwardRef((props, handleRef) => {
+  // ...
+
+  // Nested router must specify a base what depends of it's own instance location
+  // in this new Stack will be render `/foo/people` and `/foo/yolo`
+  return (
+    <div
+      className="FooPage"
+      // ...
+    >
+      <Router base={"/foo"}>
+        <Stack manageTransitions={()=> { ... }} />
+      </Router>
+    </div>
+  );
+});
+```
+
+## Dynamic routes
+
+TODO
+
+## Not Found route
+
 TODO
 
 ## Manage transition examples
@@ -109,7 +166,7 @@ TODO
 Router component create a new router instance.
 
 ```jsx
-<Router routes={} base={} id={}>
+<Router routes={} base={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -118,7 +175,6 @@ Router component create a new router instance.
 
 - **routes** `TRoute[]` Routes list
 - **base** `string` Base URL - default: `"/"`
-- **id** `number | string` _(optional)_ Router instance ID - default: `1`
 
 ## <a name="Link"></a>Link
 

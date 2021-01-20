@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { RouterContext, rootRouter } from "../components/Router";
+import { RouterContext, ROUTERS } from "../components/Router";
 import { RouterInstance } from "..";
 
 /**
@@ -11,4 +11,4 @@ export const useRouter = () => useContext(RouterContext);
 /**
  * Returns root router instance
  */
-export const useRootRouter = (): RouterInstance => rootRouter.root;
+export const useRootRouter = (): RouterInstance => ROUTERS?.[0];

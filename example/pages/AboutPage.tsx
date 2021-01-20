@@ -4,8 +4,6 @@ import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { Link } from "../../src";
 import { Stack, TManageTransitions } from "../../src";
-import { useRouter } from "../../src";
-import { routesList } from "../index";
 const componentName: string = "AboutPage";
 const debug = require("debug")(`front:${componentName}`);
 
@@ -65,7 +63,7 @@ const AboutPage = forwardRef((props: IProps, handleRef: MutableRefObject<any>) =
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <AboutPageNestedRouter base={"/about"}>
+      <Router base={"/about"}>
         <div className={componentName}>
           <nav>
             <ul>
@@ -82,27 +80,10 @@ const AboutPage = forwardRef((props: IProps, handleRef: MutableRefObject<any>) =
           </nav>
           <Stack manageTransitions={manageTransitions} key={"stack-2"} />
         </div>
-      </AboutPageNestedRouter>
+      </Router>
     </div>
   );
 });
-
-/**
- * AboutPage nested router
- * @param props
- * TODO On aura plus besoin de cette logique qui sera intégrée à <Router />
- */
-const AboutPageNestedRouter = (props) => {
-  const router = useRouter();
-  const nestedBase = `${router.base}${props.base}`.replace("//", "/");
-  const routes = routesList.find((el) => el.path === props.base).children;
-
-  return (
-    <Router base={nestedBase} key={nestedBase} routes={routes} id={2}>
-      {props.children}
-    </Router>
-  );
-};
 
 AboutPage.displayName = componentName;
 export default AboutPage;
