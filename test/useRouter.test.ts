@@ -1,4 +1,4 @@
-import { useRouter } from "../../src";
+import { useRouter } from "../src";
 
 describe("useRouter", () => {
   it("should be defined", () => {

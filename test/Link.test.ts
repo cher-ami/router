@@ -1,4 +1,4 @@
-import { Link } from "../../src";
+import { Link } from "../src";
 
 describe("Link", () => {
   it("should be defined", () => {

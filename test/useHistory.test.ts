@@ -1,4 +1,4 @@
-import { useHistory } from "../../src";
+import { useHistory } from "../src";
 
 describe("useHistory", () => {
   it("should be defined", () => {

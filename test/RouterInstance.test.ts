@@ -1,4 +1,4 @@
-import { RouterInstance } from "../../src";
+import { RouterInstance } from "../src";
 
 describe("RouterInstance", () => {
   it("should be defined", () => {

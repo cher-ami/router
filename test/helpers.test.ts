@@ -3,7 +3,7 @@ import {
   getUrlByPath,
   getUrlByRouteName,
   joinPaths,
-} from "../../src/api/helpers";
+} from "../src/api/helpers";
 
 describe("helpers", () => {
   describe("joinPaths", () => {

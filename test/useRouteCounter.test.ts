@@ -1,4 +1,4 @@
-import { useRouteCounter } from "../../src";
+import { useRouteCounter } from "../src";
 
 describe("useRouteCounter", () => {
   it("should be defined", () => {

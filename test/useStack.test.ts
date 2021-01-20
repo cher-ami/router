@@ -1,4 +1,4 @@
-import { useStack } from "../../src";
+import { useStack } from "../src";
 
 describe("useStack", () => {
   it("should be defined", () => {
