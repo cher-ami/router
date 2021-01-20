@@ -63,7 +63,7 @@ const AboutPage = forwardRef((props: IProps, handleRef: MutableRefObject<any>) =
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <Router base={"/about"} id={2}>
+      <Router base={"/about"}>
         <div className={componentName}>
           <nav>
             <ul>

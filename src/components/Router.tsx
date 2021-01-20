@@ -4,7 +4,6 @@ import React, {
   memo,
   ReactElement,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useState,
 } from "react";
@@ -19,7 +18,6 @@ interface IProps {
   routes?: TRoute[];
   middlewares?: (e: any) => void[];
   children: ReactElement;
-  id?: number | string;
 }
 
 // Router instance will be keep on this context
@@ -28,8 +26,8 @@ interface IProps {
 export const RouterContext = createContext<RouterInstance>(null);
 RouterContext.displayName = componentName;
 
-// keep root router instance needed for some cases
-export const rootRouter: { root: RouterInstance } = { root: undefined };
+// keep router instance needed for some cases
+export const ROUTERS: RouterInstance[] = [];
 
 /**
  * Router
@@ -43,39 +41,53 @@ export const Router = memo((props: IProps) => {
   // we need to join each parent router base
   const base = useMemo(() => joinPaths([parentRouter?.base, props.base]), [props.base]);
 
-  // if there is no props "routes", we deduce that we are on a subrouter
-  const routes = useMemo(
-    () =>
+  // prepare routes list
+  const routes = useMemo(() => {
+    // get routes list by props first
+    return (
       props.routes ||
-      rootRouter?.root?.routes?.find((el) => el.path === props.base).children,
-    [props.routes, props.base]
-  );
+      // if there is no props.routes, we deduce that we are on a subrouter
+      ROUTERS?.[0]?.routes?.find((el) => el.path === props.base).children
+    );
+  }, [props.routes, props.base]);
 
-  // keep routerManager instance
-  const [routerManager] = useState<RouterInstance>(() => {
-    const router = new RouterInstance({
+  // deduce router ID
+  const id = ROUTERS?.length > 0 ? ROUTERS.length + 1 : 1;
+
+  // keep router instance in state
+  const [routerState] = useState<RouterInstance>(() => {
+    const newRouter = new RouterInstance({
       base,
       routes,
-      id: props.id,
+      id,
       middlewares: props.middlewares,
     });
 
-    // keep root rooter instance reference in singleton
-    if (rootRouter.root === undefined) {
-      rootRouter.root = router;
-    }
-    return router;
+    // keep new router in global constant
+    ROUTERS.push(newRouter);
+
+    // return it as state
+    return newRouter;
   });
 
   useEffect(() => {
-    return () => routerManager.destroyEvents();
-  }, [routerManager]);
+    debug(`${componentName} > routers array`, ROUTERS);
 
-  return (
-    <RouterContext.Provider value={routerManager}>
-      {props.children}
-    </RouterContext.Provider>
-  );
+    // on destroy, we need to remove this current router instance from ROUTERS array
+    return () => {
+      // remove 1 element from specific index
+      ROUTERS.splice(
+        ROUTERS.findIndex((el) => el.id === routerState.id),
+        1
+      );
+      debug(`${componentName} > routers array after splice`, ROUTERS);
+
+      // stop to listen events
+      routerState.destroyEvents();
+    };
+  }, [routerState]);
+
+  return <RouterContext.Provider value={routerState} children={props.children} />;
 });
 
 Router.displayName = componentName;
