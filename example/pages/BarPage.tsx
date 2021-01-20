@@ -19,13 +19,22 @@ export const BarPage = forwardRef((props: IProps, handleRef: MutableRefObject<an
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
-  // test of redirection
   const [location, setLocation] = useLocation();
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <button onClick={() => setLocation("/")}>back to /</button>
+
+      <br />
+      <br />
+      <button
+        onClick={() => {
+          setLocation({ name: "ArticlePage", params: { id: "form-sub-router" } });
+        }}
+      >
+        {`navigate to ArticlePage (1st level)`}
+      </button>
+      <code>{`  setLocation({ name: "ArticlePage", params: { id: "form-sub-router" } })`}</code>
     </div>
   );
 });

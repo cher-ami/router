@@ -43,7 +43,7 @@ export default function App() {
             <Link to={"/about"}>About</Link>{" "}
           </li>
           <li>
-            <Link to={"/blog/article-1"}>blog article param id "article-1"</Link>
+            <Link to={"/blog/article-1"}>Blog id:article-1</Link>
           </li>
         </ul>
       </nav>

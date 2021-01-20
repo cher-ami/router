@@ -21,12 +21,10 @@ export const routesList: TRoute[] = [
     path: "/",
     component: HomePage,
   },
-
   {
     path: "/blog/:id",
     component: ArticlePage,
     props: {
-      name: "article",
       color: "red",
     },
   },
