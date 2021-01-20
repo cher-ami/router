@@ -19,13 +19,13 @@ export const BarPage = forwardRef((props: IProps, handleRef: MutableRefObject<an
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
-  // test of redirection
   const [location, setLocation] = useLocation();
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
+      <br />
       <br />
       <button
         onClick={() => {

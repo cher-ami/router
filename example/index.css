@@ -5,10 +5,39 @@ body {
   color: #eee;
 }
 
+code {
+  color: #999;
+  font-size: 0.9em;
+  display: block;
+  margin-top: 0.3em;
+}
+
+button {
+  cursor: pointer;
+  background: #000;
+  border: none;
+  border-radius: 0.5em;
+  color: #eee;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  outline: none;
+}
+button:hover {
+  background: #444;
+}
+
 .Link {
   color: #999;
 }
 
 .active {
-  color: orangered;
+  color: orange;
+}
+
+.Stack {
+  padding-left: 1rem;
+}
+
+.Stack > * {
+  padding-left: 2rem;
 }
