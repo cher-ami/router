@@ -14,7 +14,7 @@ export default {
   // cacheDirectory: "/private/var/folders/2j/j0r16jqj56x0wx3mqnb4ndkh0000gn/T/jest_dx",
 
   // Automatically clear mock calls and instances between every test
-  clearMocks: true,
+  // clearMocks: false,
 
   // Indicates whether the coverage information should be collected while executing the test
   // collectCoverage: false,
@@ -31,7 +31,7 @@ export default {
   // ],
 
   // Indicates which provider should be used to instrument code for coverage
-  coverageProvider: "v8",
+  // coverageProvider: "babel",
 
   // A list of reporter names that Jest uses when writing coverage reports
   // coverageReporters: [
@@ -40,17 +40,6 @@ export default {
   //   "lcov",
   //   "clover"
   // ],
-
-  // A map from regular expressions to paths to transformers
-  transform: {
-    ".(ts|tsx)": "ts-jest"
-  },
-
-  // The regexp pattern or array of patterns that Jest uses to detect test files
-  testRegex: "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-
-  // An array of file extensions your modules use
-  moduleFileExtensions: ["ts", "tsx", "js"],
 
   // An object that configures minimum threshold enforcement for coverage results
   // coverageThreshold: undefined,
@@ -81,7 +70,15 @@ export default {
   //   "node_modules"
   // ],
 
-
+  // An array of file extensions your modules use
+  // moduleFileExtensions: [
+  //   "js",
+  //   "json",
+  //   "jsx",
+  //   "ts",
+  //   "tsx",
+  //   "node"
+  // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   // moduleNameMapper: {},
@@ -140,7 +137,7 @@ export default {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "node",
+  // testEnvironment: "jest-environment-jsdom",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -159,6 +156,9 @@ export default {
   //   "/node_modules/"
   // ],
 
+  // The regexp pattern or array of patterns that Jest uses to detect test files
+  // testRegex: [],
+
   // This option allows the use of a custom results processor
   // testResultsProcessor: undefined,
 
@@ -170,6 +170,9 @@ export default {
 
   // Setting this value to "fake" allows the use of fake timers for functions such as "setTimeout"
   // timers: "real",
+
+  // A map from regular expressions to paths to transformers
+  // transform: undefined,
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: [
