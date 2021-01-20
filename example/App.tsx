@@ -5,7 +5,8 @@ import {
   useLocation,
   useRouteCounter,
   useRouter,
-  Stack, useHistory
+  Stack,
+  useHistory,
 } from "../src";
 import { useRootRouter } from "../src";
 
@@ -25,7 +26,6 @@ export default function App() {
   useEffect(() => {
     debug("history", history);
   }, [history]);
-
 
   const count = useRouteCounter();
   useEffect(() => {
@@ -81,7 +81,7 @@ const manageTransitions = ({
       debug("previousPage unmount");
     }
 
-    await currentPage.isReadyPromise?.();
+    await currentPage?.isReadyPromise?.();
 
     if ($current) $current.style.visibility = "visible";
 

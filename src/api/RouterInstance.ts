@@ -66,6 +66,10 @@ export class RouterInstance {
     this.id = id;
     this.middlewares = middlewares;
 
+    if (!routes) {
+      throw new Error(`Router id ${id} > no routes array is set.`);
+    }
+
     // patch: create root path '/' if doesn't exist
     const rootPathExist = routes.some((route) => route.path === "/");
     if (!rootPathExist) {

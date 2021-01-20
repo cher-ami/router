@@ -9,6 +9,13 @@ export type TOpenRouteParams = {
   params?: TParams;
 };
 
+export function joinPaths(paths: string[]): string {
+  return paths
+    ?.filter((e) => e)
+    .join("")
+    .replace("//", "/");
+}
+
 /**
  * Build an URL with path and params
  */
@@ -31,9 +38,6 @@ export function getUrlByPath(
   // prepare local path
   let localPath: string[] = [basePath];
 
-  // join and format paths string array
-  const formatPath = (paths: string[]): string => paths?.join("").replace("//", "/");
-
   for (let i in routes) {
     const route = routes[i];
 
@@ -42,13 +46,13 @@ export function getUrlByPath(
       // keep path in local array
       localPath.push(route.path);
       // return it
-      return formatPath(localPath);
+      return joinPaths(localPath);
     }
 
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = getUrlByPath(route.children, path, formatPath(localPath));
+      const matchChildrenPath = getUrlByPath(route.children, path, joinPaths(localPath));
 
       debug("getUrlByPath > match children path", matchChildrenPath);
       // return recursive Fn only if match, else continue to next iteration
@@ -56,7 +60,7 @@ export function getUrlByPath(
         // keep path in local array
         localPath.push(route.path);
         // Return the function after localPath push
-        return getUrlByPath(route.children, path, formatPath(localPath));
+        return getUrlByPath(route.children, path, joinPaths(localPath));
       }
     }
   }
