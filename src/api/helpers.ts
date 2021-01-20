@@ -47,10 +47,15 @@ export function getUrlByPath(
 
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
-      // keep path in local array
-      localPath.push(route.path);
       // no match, recall recursively on children
-      return getUrlByPath(route.children, path, formatPath(localPath));
+      const match = getUrlByPath(route.children, path, formatPath(localPath));
+
+      // return recursive Fn only if match, else continue to next iteration
+      if (match) {
+        // keep path in local array
+        localPath.push(route.path);
+        return match;
+      }
     }
   }
 }
@@ -87,7 +92,9 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
       // if route has children
       else if (route.children?.length > 0) {
         // getUrlByRouteName > no match, recall recursively on children
-        return recursiveFn(route.children, params);
+        const match = recursiveFn(route.children, params);
+        // return recursive Fn only if match, else, continue to next iteration
+        if (match) return match;
       }
     }
   };

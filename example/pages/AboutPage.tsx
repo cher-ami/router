@@ -75,6 +75,9 @@ const AboutPage = forwardRef((props: IProps, handleRef: MutableRefObject<any>) =
               <li>
                 <Link to={"/about/bar"}>Bar</Link>{" "}
               </li>
+              <li>
+                <Link to={`/error`}>NotFound route</Link>{" "}
+              </li>
             </ul>
           </nav>
           <Stack manageTransitions={manageTransitions} key={"stack-2"} />

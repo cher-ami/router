@@ -143,6 +143,7 @@ export class RouterInstance {
    * Get current route from URL using path-parser
    * @doc https://www.npmjs.com/package/path-parser
    */
+
   protected getRouteFromUrl({
     pUrl,
     pRoutes = this.routes,
@@ -176,7 +177,7 @@ export class RouterInstance {
       // prettier-ignore
       debug(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!pathParser.test(pUrl));
       // set new matcher
-      match = pathParser.test(pUrl) || null;
+      match = pathParser.test(pUrl);
       // if current route path match with the param url
       if (match) {
         // prepare route obj
@@ -197,21 +198,24 @@ export class RouterInstance {
 
         debug(this.id, "getRouteFromUrl: > MATCH routeObj", routeObj);
         return routeObj;
+      }
 
-        // if not match
-      } else {
-        const children = currentRoute?.children;
-        // if there is no child, continue to next iteration
-        if (!children) continue;
+      // if not match
+      else if (currentRoute?.children) {
         // else, call recursively this same method with new params
-        return this.getRouteFromUrl({
+        const matchingChildren = this.getRouteFromUrl({
           pUrl: pUrl,
-          pRoutes: children,
+          pRoutes: currentRoute?.children,
           pBase: currentRoutePath, // parent base
           pCurrentRoute: currentRoute,
           pPathParser: pathParser,
           pMatch: match,
         });
+
+        debug(this.id, "matchingChildren", matchingChildren);
+
+        // only if matching, return this match, else continue to next itération
+        if (matchingChildren) return matchingChildren;
       }
     }
   }
