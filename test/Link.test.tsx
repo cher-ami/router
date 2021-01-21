@@ -43,5 +43,4 @@ describe("Link", () => {
     expect(history.action).toBe("PUSH");
   });
 
-
 });
