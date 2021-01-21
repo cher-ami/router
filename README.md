@@ -40,7 +40,9 @@ Hooks:
 
 ## Installation
 
-TODO
+````shell
+npm i @cher-ami/router -s
+````
 
 ## Simple usage
 
