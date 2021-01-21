@@ -3,10 +3,11 @@
 .github
 node_modules
 src
+src/**
 test
 example
 .babelrc
 .prettierignore
-.prettierc
-jest.config
+.prettierrc
+jest.config.ts
 tsconfig.json
