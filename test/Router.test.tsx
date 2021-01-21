@@ -1,4 +1,4 @@
-import React from "React";
+import React from "react";
 import { Router, TRoute } from "../src";
 import { render } from "@testing-library/react";
 

@@ -44,9 +44,10 @@ function Stack(props: IProps) {
       return;
     }
 
-    router.events.emit(ERouterEvent.STACK_IS_ANIMATING, true);
     // prepare unmount function
     const unmountPreviousPage = () => setPreviousRoute(null);
+
+    router.events.emit(ERouterEvent.STACK_IS_ANIMATING, true);
 
     // execute transitions function from outside the stack
     props
