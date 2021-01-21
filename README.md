@@ -144,11 +144,50 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## Dynamic routes
 
-TODO
+[path-parser](https://github.com/troch/path-parser) accept path parameters. (check this [documentation](https://github.com/troch/path-parser#defining-parameters))
+
+```js
+const routesList = [{ path: "/blog/:id", component: ArticlePage }];
+```
+
+For example, `/blog/my-article` will matched with this route object.
+
+You can access route parameters by page component props or by `useRoute()` hook.
+
+```jsx
+import { useRoute } from "./useRoute";
+import React, { useEffect, forwardRef } from "react";
+
+const ArticlePage = forwardRef((props, handleRef) => {
+  useEffect(() => {
+    console.log(props.params); // { id: "my-article" }
+  }, [props]);
+
+  // or from nested components
+  const { currentRoute } = useRoute();
+  useEffect(() => {
+    console.log(currentRoute.props.params); // { id: "my-article" }
+  }, [props]);
+
+  // ...
+});
+```
 
 ## Not Found route
 
-TODO
+It is possible to match a specific route by a simple dynamic route parameter, if all the others do not match.
+
+```js
+const routesList = [
+  { path: "/", component: HomePage },
+  { path: "/foo", component: FooPage },
+  // this route will be rendered if "/" and "/foo" doesn't match with the current URL
+  { path: "/:rest", component: NotFoundPage },
+];
+```
+
+In this case, the routes object order declaration is important. `/:rest` path route need to be
+the last of the `routesList` array.
 
 ## Manage transitions
 
@@ -177,16 +216,11 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
 };
 ```
 
-But it's possible to create a custom transitions senario function and pass to Stack `manageTransitions` props.
+But it's possible to create a custom transitions senario function and pass it to the Stack `manageTransitions` props.
 
 ```jsx
 const App = (props, handleRef) => {
-
-  const customSenario = ({
-    previousPage,
-    currentPage,
-    unmountPreviousPage,
-  }) => {
+  const customSenario = ({ previousPage, currentPage, unmountPreviousPage }) => {
     return new Promise(async (resolve) => {
       // write a custom senario ...
       resolve();
@@ -194,9 +228,9 @@ const App = (props, handleRef) => {
   };
 
   return (
-      <Router base={"/foo"}>
-        <Stack manageTransitions={customSenario} />
-      </Router>
+    <Router base={"/foo"}>
+      <Stack manageTransitions={customSenario} />
+    </Router>
   );
 };
 ```
