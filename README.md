@@ -41,7 +41,8 @@ const routesList = [
   { path: "/foo", component: FooPage },
 ];
 
-// wrap render with <Router /> component
+// wrap render with Router component
+// Link and Stack components are available inside a Router
 function App() {
   return (
     <Router routes={routesList} base={"/"}>
@@ -49,18 +50,10 @@ function App() {
         <Link href={"/"} />
         <Link href={"/foo"} />
       </nav>
-      <Stack manageTransitions={manageTransitions} />
+      <Stack />
     </Router>
   );
 }
-
-// manage transitions function is a Stack props
-const manageTransitions = ({ previousPage, currentPage }) =>
-  new Promise(async (resolve) => {
-    if (previousPage) await previousPage.playOut();
-    if (currentPage) await currentPage.playIn();
-    resolve();
-  });
 ```
 
 Page component need to be wrap by `React.forwardRef`. The `handleRef` lets hold transitions, ref, etc. used by `<Stack />` component.
@@ -95,9 +88,9 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## Nested Router
 
-cher-ami router accept nested router! To create a nested router:
+cher-ami router accept nested routers! To create a nested router,
 
-1. define children routes:
+1. define children routes.
 
 ```js
 // create a route object
@@ -125,7 +118,10 @@ const routesList = [
 ];
 ```
 
-2. Create new router instance in `FooPage` component:
+2. Create new router instance in `FooPage` component.
+
+**Only if it's a nested router**, you did not pass `routes` Router props again.
+The previous routes array, passed to the root component, will be used.
 
 ```jsx
 const FooPage = forwardRef((props, handleRef) => {
@@ -139,7 +135,7 @@ const FooPage = forwardRef((props, handleRef) => {
       // ...
     >
       <Router base={"/foo"}>
-        <Stack manageTransitions={()=> { ... }} />
+        <Stack />
       </Router>
     </div>
   );
@@ -154,12 +150,56 @@ TODO
 
 TODO
 
-## Manage transition examples
+## Manage transitions
 
-TODO
+By default, cher-ami router will executed a "sequential" transitions senario:
 
-- isReadyPromise example
-- crossed transition example
+```js
+const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }) => {
+  return new Promise(async (resolve) => {
+    const $current = currentPage?.$element;
+    // hide new page
+    if ($current) $current.style.visibility = "hidden";
+    // play out and unmount previous page
+    if (previousPage) {
+      await previousPage.playOut();
+      unmountPreviousPage();
+    }
+    // wait page isReady promise
+    await currentPage?.isReadyPromise?.();
+    // show and play in new page
+    if (currentPage) {
+      if ($current) $current.style.visibility = "visible";
+      await currentPage?.playIn?.();
+    }
+    resolve();
+  });
+};
+```
+
+But it's possible to create a custom transitions senario function and pass to Stack `manageTransitions` props.
+
+```jsx
+const App = (props, handleRef) => {
+
+  const customSenario = ({
+    previousPage,
+    currentPage,
+    unmountPreviousPage,
+  }) => {
+    return new Promise(async (resolve) => {
+      // write a custom senario ...
+      resolve();
+    });
+  };
+
+  return (
+      <Router base={"/foo"}>
+        <Stack manageTransitions={customSenario} />
+      </Router>
+  );
+};
+```
 
 ## <a name="Router"></a>Router
 
@@ -199,8 +239,9 @@ Render previous and current page component.
 
 **Props:**
 
-- **manageTransitions** `(T:TManageTransitions) => Promise<void>`
-  This function allow to create the transition scenario.
+- **manageTransitions** `(T:TManageTransitions) => Promise<void>` _(optional)_
+  This function allow to create the transition scenario. If no props is filled, a sequential
+  transition will be executed.
 - **className** `string` _(optional)_ className added to component root DOM element
 
 ```ts
