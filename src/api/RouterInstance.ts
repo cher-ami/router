@@ -218,7 +218,7 @@ export class RouterInstance {
 
         debug(this.id, "matchingChildren", matchingChildren);
 
-        // only if matching, return this match, else continue to next itération
+        // only if matching, return this match, else continue to next iteration
         if (matchingChildren) return matchingChildren;
       }
     }
