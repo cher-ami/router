@@ -1,6 +1,13 @@
 <h1 align="center">🚃<br>cher-ami router</h1>
 
-<p align="center">A fresh react router designed for flexible route transitions</p>
+<p align="center">
+A fresh react router designed for flexible route transitions
+<br>
+<img alt="npm" src="https://img.shields.io/npm/v/@cher-ami/router">
+<img alt="build" src="https://github.com/cher-ami/router/workflows/CI/badge.svg">
+</p>
+
+
 <br>
 
 cher-ami router API is inspired by [wouter](https://github.com/molefrog/wouter),
