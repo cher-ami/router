@@ -1,5 +1,4 @@
-dist
-node_modules
-src/mixins/_mixins-lib.less
 .cache
+node_modules
+dist
 example/dist/*
