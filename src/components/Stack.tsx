@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useRoute, IRouteStack, ERouterEvent } from "..";
 
 export type TManageTransitions = {
@@ -9,7 +9,7 @@ export type TManageTransitions = {
 
 interface IProps {
   className?: string;
-  manageTransitions: (T: TManageTransitions) => Promise<void>;
+  manageTransitions?: (T: TManageTransitions) => Promise<void>;
 }
 
 const componentName = "Stack";
@@ -29,6 +29,35 @@ function Stack(props: IProps) {
   const prevRef = useRef(null);
   const currentRef = useRef(null);
 
+  // Create the default sequential transition used
+  // if manageTransitions props doesn't exist
+  const sequencialTransition = ({
+    previousPage,
+    currentPage,
+    unmountPreviousPage,
+  }: TManageTransitions): Promise<void> => {
+    debug(router.id, "start default sequencial transition");
+
+    return new Promise(async (resolve) => {
+      const $current = currentPage?.$element;
+      if ($current) $current.style.visibility = "hidden";
+      if (previousPage) {
+        await previousPage?.playOut?.();
+        unmountPreviousPage();
+      }
+      await currentPage?.isReadyPromise?.();
+      if ($current) $current.style.visibility = "visible";
+      await currentPage?.playIn?.();
+      resolve();
+    });
+  };
+
+  // choose transition
+  const selectedTransition = useMemo(
+    () => (props.manageTransitions ? props.manageTransitions : sequencialTransition),
+    [props.manageTransitions]
+  );
+
   // 1 get routes
   const { previousRoute, setPreviousRoute, currentRoute } = useRoute(() => {
     setIndex(index + 1);
@@ -45,23 +74,26 @@ function Stack(props: IProps) {
     }
 
     // prepare unmount function
-    const unmountPreviousPage = () => setPreviousRoute(null);
+    const unmountPreviousPage = (): void => {
+      setPreviousRoute(null);
+    };
 
+    // emit to router event stack animating start state
     router.events.emit(ERouterEvent.STACK_IS_ANIMATING, true);
 
-    // execute transitions function from outside the stack
-    props
-      .manageTransitions({
-        previousPage: prevRef.current,
-        currentPage: currentRef.current,
-        unmountPreviousPage,
-      } as TManageTransitions)
-
+    // start selected transition
+    selectedTransition({
+      previousPage: prevRef.current,
+      currentPage: currentRef.current,
+      unmountPreviousPage,
+    } as TManageTransitions)
       // when transitions are ended
       .then(() => {
         debug(router.id, "manageTransitions promise resolve!");
         // if previous page wasn't unmount manually, we force unmount here
         unmountPreviousPage();
+
+        // emit to router event stack animating end state
         router.events.emit(ERouterEvent.STACK_IS_ANIMATING, false);
       });
   }, [currentRoute]);

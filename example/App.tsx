@@ -1,14 +1,5 @@
 import React, { useEffect } from "react";
-import {
-  Link,
-  TManageTransitions,
-  useLocation,
-  useRouteCounter,
-  useRouter,
-  Stack,
-  useHistory,
-} from "../src";
-import { useRootRouter } from "../src";
+import { Link, useRouteCounter, Stack, useHistory } from "../src";
 
 const componentName = "App";
 const debug = require("debug")(`front:${componentName}`);
@@ -17,12 +8,7 @@ const debug = require("debug")(`front:${componentName}`);
  * @name App
  */
 export default function App() {
-  const router = useRouter();
-  const { currentRoute } = useRouter();
-  const rootRouter = useRootRouter();
-  const location = useLocation();
   const history = useHistory();
-
   useEffect(() => {
     debug("history", history);
   }, [history]);
@@ -47,47 +33,7 @@ export default function App() {
           </li>
         </ul>
       </nav>
-      <Stack manageTransitions={manageTransitions} key={"stack-1"} />
+      <Stack />
     </div>
   );
 }
-
-/**
- * Manage Router Stack Transitions
- * @param previousPage
- * @param currentPage
- * @param unmountPreviousPage
- */
-const manageTransitions = ({
-  previousPage,
-  currentPage,
-  unmountPreviousPage,
-}: TManageTransitions): Promise<void> => {
-  return new Promise(async (resolve) => {
-    debug("> previousPage", previousPage);
-    debug("> currentPage", currentPage);
-
-    const $prev = previousPage?.$element;
-    const $current = currentPage?.$element;
-    debug("> $elements", { $prev, $current });
-
-    if ($current) $current.style.visibility = "hidden";
-
-    if (previousPage) {
-      await previousPage?.playOut?.();
-      debug("> previousPage playOut ended");
-
-      unmountPreviousPage();
-      debug("previousPage unmount");
-    }
-
-    await currentPage?.isReadyPromise?.();
-
-    if ($current) $current.style.visibility = "visible";
-
-    await currentPage?.playIn?.();
-    debug("> currentPage playIn ended");
-
-    resolve();
-  });
-};
