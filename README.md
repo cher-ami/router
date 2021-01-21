@@ -1,6 +1,9 @@
-# 🪶 cher-ami Router
+<h1 align="center">🚃<br>cher-ami router</h1>
 
-cher-ami Router API is inspired by [wouter](https://github.com/molefrog/wouter),
+<p align="center">A fresh react router designed for flexible route transitions</p>
+<br>
+
+cher-ami router API is inspired by [wouter](https://github.com/molefrog/wouter),
 [solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts) and
 [vue router](https://router.vuejs.org/) API. This repository started from a copy of [willybrauner/react-router](https://github.com/willybrauner/react-router/).
 
