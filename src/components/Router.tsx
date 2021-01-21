@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { joinPaths } from "../api/helpers";
+import { ROUTERS } from "../api/routers";
 
 const componentName = "Router";
 const debug = require("debug")(`front:${componentName}`);
@@ -18,10 +19,8 @@ interface IProps {
   routes?: TRoute[];
   middlewares?: (e: any) => void[];
   children: ReactElement;
+  noHistory?: boolean;
 }
-
-// keep router instances as global
-export const ROUTERS: RouterInstance[] = [];
 
 // Router instance will be keep on this context
 // Big thing is you can access this context from the closest provider in the tree.
@@ -45,12 +44,12 @@ export const Router = memo((props: IProps) => {
       // get routes list by props first
       props.routes ||
       // if there is no props.routes, we deduce that we are on a subrouter
-      ROUTERS?.[0]?.routes?.find((el) => el.path === props.base).children
+      ROUTERS.instances?.[0]?.routes?.find((el) => el.path === props.base).children
     );
   }, [props.routes, props.base]);
 
   // deduce a router ID
-  const id = ROUTERS?.length > 0 ? ROUTERS.length + 1 : 1;
+  const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
 
   // keep router instance in state
   const [routerState] = useState<RouterInstance>(() => {
@@ -58,24 +57,25 @@ export const Router = memo((props: IProps) => {
       base,
       routes,
       id,
+      noHistory: props.noHistory,
       middlewares: props.middlewares,
     });
     // keep new router in global constant
-    ROUTERS.push(newRouter);
+    ROUTERS.instances.push(newRouter);
     // return it as state
     return newRouter;
   });
 
   useEffect(() => {
-    debug(`${componentName} > routers array`, ROUTERS);
-    // on destroy, we need to remove this current router instance from ROUTERS array
+    debug(`${componentName} > routers array`, ROUTERS.instances);
+    // on destroy, we need to remove this current router instance from ROUTERS.instances array
     return () => {
       // remove 1 element from specific index
-      ROUTERS.splice(
-        ROUTERS.findIndex((el) => el.id === routerState.id),
+      ROUTERS.instances.splice(
+        ROUTERS.instances.findIndex((el) => el.id === routerState.id),
         1
       );
-      debug(`${componentName} > routers array after splice`, ROUTERS);
+      debug(`${componentName} > routers array after splice`, ROUTERS.instances);
       // stop to listen events
       routerState.destroyEvents();
     };

@@ -2,7 +2,8 @@ import { Path } from "path-parser";
 import React from "react";
 import { EventEmitter } from "events";
 import { buildUrl } from "./helpers";
-import { history } from "./history";
+import { ROUTERS } from "./routers";
+
 
 const debug = require("debug")("front:RouterInstance");
 
@@ -24,6 +25,7 @@ export enum ERouterEvent {
   PREVIOUS_ROUTE_CHANGE = "previous-route-change",
   CURRENT_ROUTE_CHANGE = "current-route-change",
   STACK_IS_ANIMATING = "stack-is-animating",
+  PUSH_LOCATION = "PUSH_LOCATION",
 }
 
 /**
@@ -44,6 +46,8 @@ export class RouterInstance {
   public currentRoute: TRoute;
   public previousRoute: TRoute;
 
+  public noHistory: boolean;
+
   // store history listener
   protected unlistenHistory;
 
@@ -53,17 +57,19 @@ export class RouterInstance {
   constructor({
     base = "/",
     routes = null,
+    noHistory = false,
     middlewares,
     id = 1,
   }: {
     base?: string;
     routes?: TRoute[];
     middlewares?: (e: any) => void[];
-    fakeMode?: boolean;
+    noHistory?: boolean;
     id?: number | string;
   }) {
     this.base = base;
     this.id = id;
+    this.noHistory = noHistory;
     this.middlewares = middlewares;
 
     if (!routes) {
@@ -88,10 +94,12 @@ export class RouterInstance {
    * Initialise event
    */
   public initEvents() {
-    this.unlistenHistory = history.listen(({ location, action }) => {
+    this.unlistenHistory = ROUTERS.history.listen(({ location, action }) => {
       debug(this.id, " initEvents > history", { location, action });
       this.handleHistory(location.pathname);
     });
+
+    this.events.on(ERouterEvent.PUSH_LOCATION, this.handleHistory.bind(this));
   }
 
   /**
@@ -100,6 +108,7 @@ export class RouterInstance {
   public destroyEvents(): void {
     // To stop listening, call the function returned from listen().
     this.unlistenHistory();
+    this.events.off(ERouterEvent.PUSH_LOCATION, this.handleHistory);
   }
 
   /**
@@ -107,6 +116,7 @@ export class RouterInstance {
    * Call each time new event is fired by history
    */
   protected handleHistory = (param: string): void => {
+    debug("coucou");
     this.updateRoute(param);
   };
 
@@ -122,7 +132,7 @@ export class RouterInstance {
    * - get route object matching with current URL
    * - emit selected route object on route-change event (listen by Stack)
    */
-  protected updateRoute(url: string = history.location.pathname): void {
+  protected updateRoute(url: string = ROUTERS.history.location.pathname): void {
     // get matching route depending of current URL
     const matchingRoute: TRoute = this.getRouteFromUrl({ pUrl: url });
 

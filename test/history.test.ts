@@ -1,7 +1,7 @@
-import { history } from "../src/api/history";
+import { ROUTERS } from "../src/api/routers";
 
 describe("history", () => {
   it("should be defined", () => {
-    expect(history).toBeDefined();
+    expect(ROUTERS.history).toBeDefined();
   });
 });

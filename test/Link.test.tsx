@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "../src";
-import { history } from "../src/api/history";
 import { render, fireEvent } from "@testing-library/react";
+import { ROUTERS } from "../src/api/routers";
 
 describe("Link", () => {
 
@@ -39,8 +39,8 @@ describe("Link", () => {
   it("should push in history on click", () => {
     const { container } = render(<Link to={"/bar"}>Foo</Link>);
     fireEvent.click(container.firstChild);
-    expect(history.location.pathname).toBe("/bar");
-    expect(history.action).toBe("PUSH");
+    expect(ROUTERS.history.location.pathname).toBe("/bar");
+    expect(ROUTERS.history.action).toBe("PUSH");
   });
 
 });
