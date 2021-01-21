@@ -1,4 +1,12 @@
 .idea
+.cache
+.github
 node_modules
 src
 test
+example
+.babelrc
+.prettierignore
+.prettierc
+jest.config
+tsconfig.json
