@@ -3,8 +3,8 @@
 <p align="center">
 A fresh react router designed for flexible route transitions
 <br>
-<img alt="npm" src="https://img.shields.io/npm/v/@cher-ami/router">
 <img alt="build" src="https://github.com/cher-ami/router/workflows/CI/badge.svg">
+<img alt="npm" src="https://img.shields.io/npm/v/@cher-ami/router">
 </p>
 
 
