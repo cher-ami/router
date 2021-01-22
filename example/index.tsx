@@ -53,7 +53,7 @@ export const routesList: TRoute[] = [
  */
 
 ReactDOM.render(
-  <Router routes={routesList} base={"/"} noHistory={false}>
+  <Router routes={routesList} base={"/"} noHistory={true}>
     <App />
   </Router>,
   document.getElementById("root")

@@ -28,16 +28,23 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
   function setLocation(args: string | TOpenRouteParams): void {
     let urlToPush: string;
 
+    // prepare URL
     if (typeof args === "string") {
       urlToPush = args;
     } else if (typeof args === "object" && args.name) {
       urlToPush = getUrlByRouteName(rootRouter.routes, args);
-    } else return;
+    } else {
+      throw new Error("ERROR: setLocation param isn't valid. return.");
+    }
 
+    // don't push in history, emit a simple event for each instance
     if (ROUTERS.noHistory) {
-      for (let i in ROUTERS) {
+      for (let i in ROUTERS.instances) {
         ROUTERS.instances[i].events.emit(ERouterEvent.PUSH_LOCATION, urlToPush);
+        debug("push with event !");
       }
+
+      // push in history
     } else {
       ROUTERS.history.push(urlToPush);
     }

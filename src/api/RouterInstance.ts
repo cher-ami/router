@@ -4,7 +4,6 @@ import { EventEmitter } from "events";
 import { buildUrl } from "./helpers";
 import { ROUTERS } from "./routers";
 
-
 const debug = require("debug")("front:RouterInstance");
 
 export type TRoute = {
@@ -94,21 +93,27 @@ export class RouterInstance {
    * Initialise event
    */
   public initEvents() {
+    if (this.noHistory) {
+      this.events.on(ERouterEvent.PUSH_LOCATION, this.handleHistory.bind(this));
+      return;
+    }
+
     this.unlistenHistory = ROUTERS.history.listen(({ location, action }) => {
       debug(this.id, " initEvents > history", { location, action });
       this.handleHistory(location.pathname);
     });
-
-    this.events.on(ERouterEvent.PUSH_LOCATION, this.handleHistory.bind(this));
   }
 
   /**
    * Destroy events
    */
   public destroyEvents(): void {
+    if (this.noHistory) {
+      this.events.off(ERouterEvent.PUSH_LOCATION, this.handleHistory);
+      return;
+    }
     // To stop listening, call the function returned from listen().
     this.unlistenHistory();
-    this.events.off(ERouterEvent.PUSH_LOCATION, this.handleHistory);
   }
 
   /**
@@ -116,7 +121,6 @@ export class RouterInstance {
    * Call each time new event is fired by history
    */
   protected handleHistory = (param: string): void => {
-    debug("coucou");
     this.updateRoute(param);
   };
 

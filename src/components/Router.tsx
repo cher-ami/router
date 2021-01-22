@@ -36,8 +36,10 @@ RouterContext.displayName = componentName;
 export const Router = memo((props: IProps) => {
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
+
   // we need to join each parent router base
   const base = useMemo(() => joinPaths([parentRouter?.base, props.base]), [props.base]);
+
   // prepare routes list
   const routes = useMemo(() => {
     return (
@@ -51,15 +53,27 @@ export const Router = memo((props: IProps) => {
   // deduce a router ID
   const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
 
+    // set global noHistory if is not set
+  const noHistory = useMemo(() => {
+    if (ROUTERS.noHistory === undefined) {
+      ROUTERS.noHistory = props.noHistory;
+    }
+    return ROUTERS.noHistory;
+  }, [props.noHistory]);
+
   // keep router instance in state
   const [routerState] = useState<RouterInstance>(() => {
+    debug(`${componentName} > ROUTERS.noHistory`, ROUTERS.noHistory);
+
+    // create instance
     const newRouter = new RouterInstance({
       base,
       routes,
       id,
-      noHistory: props.noHistory,
+      noHistory,
       middlewares: props.middlewares,
     });
+
     // keep new router in global constant
     ROUTERS.instances.push(newRouter);
     // return it as state
