@@ -37,17 +37,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
       throw new Error("ERROR: setLocation param isn't valid. return.");
     }
 
-    // don't push in history, emit a simple event for each instance
-    if (ROUTERS.noHistory) {
-      for (let i in ROUTERS.instances) {
-        ROUTERS.instances[i].events.emit(ERouterEvent.PUSH_LOCATION, urlToPush);
-        debug("push with event !");
-      }
-
-      // push in history
-    } else {
-      ROUTERS.history.push(urlToPush);
-    }
+    ROUTERS.history.push(urlToPush);
   }
 
   return [location, setLocation];

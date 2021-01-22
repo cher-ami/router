@@ -45,8 +45,6 @@ export class RouterInstance {
   public currentRoute: TRoute;
   public previousRoute: TRoute;
 
-  public noHistory: boolean;
-
   // store history listener
   protected unlistenHistory;
 
@@ -56,19 +54,16 @@ export class RouterInstance {
   constructor({
     base = "/",
     routes = null,
-    noHistory = false,
     middlewares,
     id = 1,
   }: {
     base?: string;
     routes?: TRoute[];
     middlewares?: (e: any) => void[];
-    noHistory?: boolean;
     id?: number | string;
   }) {
     this.base = base;
     this.id = id;
-    this.noHistory = noHistory;
     this.middlewares = middlewares;
 
     if (!routes) {
@@ -93,11 +88,6 @@ export class RouterInstance {
    * Initialise event
    */
   public initEvents() {
-    if (this.noHistory) {
-      this.events.on(ERouterEvent.PUSH_LOCATION, this.handleHistory.bind(this));
-      return;
-    }
-
     this.unlistenHistory = ROUTERS.history.listen(({ location, action }) => {
       debug(this.id, " initEvents > history", { location, action });
       this.handleHistory(location.pathname);
@@ -108,10 +98,6 @@ export class RouterInstance {
    * Destroy events
    */
   public destroyEvents(): void {
-    if (this.noHistory) {
-      this.events.off(ERouterEvent.PUSH_LOCATION, this.handleHistory);
-      return;
-    }
     // To stop listening, call the function returned from listen().
     this.unlistenHistory();
   }

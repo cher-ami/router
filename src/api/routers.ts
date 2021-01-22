@@ -11,14 +11,15 @@ export type TRoutersConfig = {
    * doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
    */
   history: BrowserHistory;
+
   /**
-   * No history mode
+   * keep navigation history array
    */
-  noHistory: boolean | undefined;
+  navigationHistory: any[];
 };
 
 export const ROUTERS: TRoutersConfig = {
   instances: [],
   history: createBrowserHistory(),
-  noHistory: undefined,
+  navigationHistory: [],
 };

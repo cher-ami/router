@@ -19,7 +19,6 @@ interface IProps {
   routes?: TRoute[];
   middlewares?: (e: any) => void[];
   children: ReactElement;
-  noHistory?: boolean;
 }
 
 // Router instance will be keep on this context
@@ -40,12 +39,11 @@ export const Router = memo((props: IProps) => {
   // we need to join each parent router base
   const base = useMemo(() => joinPaths([parentRouter?.base, props.base]), [props.base]);
 
-  // prepare routes list
+  // get routes list by props first
+  // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
     return (
-      // get routes list by props first
       props.routes ||
-      // if there is no props.routes, we deduce that we are on a subrouter
       ROUTERS.instances?.[0]?.routes?.find((el) => el.path === props.base).children
     );
   }, [props.routes, props.base]);
@@ -53,24 +51,12 @@ export const Router = memo((props: IProps) => {
   // deduce a router ID
   const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
 
-    // set global noHistory if is not set
-  const noHistory = useMemo(() => {
-    if (ROUTERS.noHistory === undefined) {
-      ROUTERS.noHistory = props.noHistory;
-    }
-    return ROUTERS.noHistory;
-  }, [props.noHistory]);
-
   // keep router instance in state
   const [routerState] = useState<RouterInstance>(() => {
-    debug(`${componentName} > ROUTERS.noHistory`, ROUTERS.noHistory);
-
-    // create instance
     const newRouter = new RouterInstance({
       base,
       routes,
       id,
-      noHistory,
       middlewares: props.middlewares,
     });
 
@@ -90,7 +76,6 @@ export const Router = memo((props: IProps) => {
         1
       );
       debug(`${componentName} > routers array after splice`, ROUTERS.instances);
-      // stop to listen events
       routerState.destroyEvents();
     };
   }, [routerState]);
