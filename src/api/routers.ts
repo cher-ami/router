@@ -1,7 +1,12 @@
-import { RouterInstance } from "./RouterInstance";
+import { RouterInstance, TRoute } from "./RouterInstance";
 import { BrowserHistory, createBrowserHistory } from "history";
 
 export type TRoutersConfig = {
+  /**
+   * Keep global routes array
+   * TODO continue (storer ici la liste au lieu d'aller chercher la liste de la 1ere instance)
+   */
+  routes: TRoute[];
   /**
    * Keep routers instances in array
    */
@@ -31,6 +36,7 @@ export type TRoutersConfig = {
 const browserHistory: BrowserHistory = createBrowserHistory();
 
 export const ROUTERS: TRoutersConfig = {
+  routes: null,
   instances: [],
   history: browserHistory,
   locationsHistory: [browserHistory.location],
