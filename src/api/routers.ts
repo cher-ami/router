@@ -11,15 +11,29 @@ export type TRoutersConfig = {
    * doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
    */
   history: BrowserHistory;
-
   /**
    * keep navigation history array
+   * TODO continue in use history
    */
-  navigationHistory: any[];
+  locationsHistory: any[];
+  /**
+   * Router counter increment in each history push
+   * TODO continue in useRouteCounter
+   */
+  routeCounter: number;
+  /**
+   * Is first route is true if routerCounter === 1
+   * TODO continue in useRouteCounter
+   */
+  isFirstRoute: boolean;
 };
+
+const browserHistory: BrowserHistory = createBrowserHistory();
 
 export const ROUTERS: TRoutersConfig = {
   instances: [],
-  history: createBrowserHistory(),
-  navigationHistory: [],
+  history: browserHistory,
+  locationsHistory: [browserHistory.location],
+  routeCounter: 1,
+  isFirstRoute: true,
 };
