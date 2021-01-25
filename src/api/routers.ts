@@ -17,28 +17,25 @@ export type TRoutersConfig = {
   history: BrowserHistory;
   /**
    * keep navigation history array
-   * TODO continue in use history
    */
   locationsHistory: any[];
   /**
    * Router counter increment in each history push
-   * TODO continue in useRouteCounter
    */
   routeCounter: number;
   /**
    * Is first route is true if routerCounter === 1
-   * TODO continue in useRouteCounter
    */
   isFirstRoute: boolean;
 };
 
-const browserHistory: BrowserHistory = createBrowserHistory();
+const BROWSER_HISTORY: BrowserHistory = createBrowserHistory();
 
 export const ROUTERS: TRoutersConfig = {
   routes: null,
   instances: [],
-  history: browserHistory,
-  locationsHistory: [browserHistory.location],
+  history: BROWSER_HISTORY,
+  locationsHistory: [BROWSER_HISTORY.location],
   routeCounter: 1,
   isFirstRoute: true,
 };
