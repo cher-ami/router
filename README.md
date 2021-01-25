@@ -21,6 +21,14 @@ It provides Stack component who render previous and current page component when 
 
 This router loads [history](https://github.com/ReactTraining/history), [path-parser](https://github.com/troch/path-parser) and [debug](https://github.com/visionmedia/debug) as dependencies.
 
+
+## Summary
+
+- [Installation](#Installation)
+- [Simple usage](#SimpleUsage)
+- [Nested routes](#NestedRoutes)
+- [Dynamic routes](#DynamicRoutes)
+
 ## API
 
 Components:
@@ -38,13 +46,13 @@ Hooks:
 - [`useRouteCounter`](#useRouteCounter) Get route counter + isFirstRoute state
 - [`useHistory`](#useHistory) Handle history changed and get global router history
 
-## Installation
+## <a name="Installation"></a>Installation
 
 ```shell
-npm i @cher-ami/router -s
+$ npm i @cher-ami/router -s
 ```
 
-## Simple usage
+## <a name="SimpleUsage"></a>Simple usage
 
 ```jsx
 import React from "react";
@@ -77,7 +85,7 @@ function App() {
 }
 ```
 
-Page component need to be wrap by `React.forwardRef`. The `handleRef` lets hold transitions, ref, etc. used by `<Stack />` component.
+Page component need to be wrap by `React.forwardRef`. The `handleRef` lets hold transitions, and ref used by `<Stack />` component.
 
 ```jsx
 import React from "react";
@@ -112,11 +120,11 @@ const FooPage = forwardRef((props, handleRef) => {
 
 **[Demo codesandbox: simple usage](https://codesandbox.io/s/simple-usage-cpufs)**
 
-## Nested Router
+## <a name="NestedRoutes"></a>Nested Routes
 
-cher-ami router supports nested routers 🙏🏽
+cher-ami router supports nested routes 🙏🏽  
 
-1. define children routes;
+1. define children routes in initial routes list with `children` key;
 
 ```js
 // create a route object
@@ -144,10 +152,13 @@ const routesList = [
 ];
 ```
 
-2. Create new router instance in `FooPage` component.
+2. Children where defined in route who render `FooPage` component, so you can now create a new router instance in this component.
 
-**Only if it's a nested router**, you did not pass `routes` Router props again.
-The previous routes array, passed to the root component, will be used.
+**Only if it's a nested router, you must not pass `routes` Router props again**.
+The previous routes array, passed to the root component, will be used by `Router`.
+
+`Router` props `base` need to be the same than the path who contains children routes. 
+In this case, `/foo` will be the new nested router base. The stack will then able to render `/foo/people` and `/foo/yolo`. 
 
 ```jsx
 import React from "react";
@@ -155,9 +166,6 @@ import { Router, useStack, Stack } from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
   // ...
-
-  // Nested router must specify a base what depends of it's own instance location
-  // in this new Stack will be render `/foo/people` and `/foo/yolo`
   return (
     <div
       className="FooPage"
@@ -173,7 +181,7 @@ const FooPage = forwardRef((props, handleRef) => {
 
 **[Demo codesandbox: nested router](https://codesandbox.io/s/nested-router-bvspe?file=/src/index.tsx)**
 
-## Dynamic routes
+## <a name="DynamicRoutes"></a>Dynamic routes
 
 [path-parser](https://github.com/troch/path-parser) accept path parameters. (check this [documentation](https://github.com/troch/path-parser#defining-parameters)).
 For example, `/blog/my-article` will matched with this route object:
