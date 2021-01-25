@@ -3,10 +3,10 @@
 <p align="center">
 A fresh react router designed for flexible route transitions
 <br>
+<br>
 <img alt="npm" src="https://img.shields.io/npm/v/@cher-ami/router">
 <img alt="build" src="https://github.com/cher-ami/router/workflows/CI/badge.svg">
 </p>
-
 
 <br>
 
@@ -21,7 +21,17 @@ It provides Stack component who render previous and current page component when 
 
 This router loads [history](https://github.com/ReactTraining/history), [path-parser](https://github.com/troch/path-parser) and [debug](https://github.com/visionmedia/debug) as dependencies.
 
-## API
+## Summary
+
+- [Installation](#Installation)
+- [Simple usage](#SimpleUsage)
+- [Dynamic routes](#DynamicRoutes)
+- [Nested routes](#NestedRoutes)
+- [Manage Transitions](#ManageTransitions)
+  - [Default sequential transition](#DefaultSequentialTransition)
+  - [Custom transition](#CustomTransition)
+
+**API**
 
 Components:
 
@@ -33,24 +43,33 @@ Hooks:
 
 - [`useRouter`](#useRouter) Get router instance from any component
 - [`useLocation`](#useLocation) Get current location and set new location
-- [`useRoute`](#useRoute) Get previous and current route
-- [`useStack`](#useStack) Register page component in stack
-- [`useRouteCounter`](#useRouteCounter) Get route counter + isFirstRoute state
-- [`useHistory`](#useHistory) Handle history changed and get global router history
+- [`useRoute`](#useRoute) Get previous and current route object
+- [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
+- [`useRouteCounter`](#useRouteCounter) Get global history route counter
+- [`useHistory`](#useHistory) Get global router history and handle history changed
 
-## Installation
+## <a name="Installation"></a>Installation
 
-````shell
-npm i @cher-ami/router -s
-````
+```shell
+$ npm i @cher-ami/router -s
+```
 
-## Simple usage
+## <a name="SimpleUsage"></a>Simple usage
 
 ```jsx
+import React from "react";
+import { Router, Link, Stack } from "@cher-ami/router";
+
 // create a route object
 const routesList = [
-  { path: "/", component: HomePage },
-  { path: "/foo", component: FooPage },
+  {
+    path: "/",
+    component: HomePage,
+  },
+  {
+    path: "/foo",
+    component: FooPage,
+  },
 ];
 
 // wrap render with Router component
@@ -68,9 +87,12 @@ function App() {
 }
 ```
 
-Page component need to be wrap by `React.forwardRef`. The `handleRef` lets hold transitions, ref, etc. used by `<Stack />` component.
+Page component need to be wrap by `React.forwardRef`. The `handleRef` lets hold transitions, and ref used by `<Stack />` component.
 
 ```jsx
+import React from "react";
+import { useStack } from "@cher-ami/router";
+
 const FooPage = forwardRef((props, handleRef) => {
   const componentName = "FooPage";
   const rootRef = useRef(null);
@@ -98,11 +120,73 @@ const FooPage = forwardRef((props, handleRef) => {
 });
 ```
 
-## Nested Router
+**[Demo codesandbox: simple usage](https://codesandbox.io/s/simple-usage-cpufs)**
 
-cher-ami router accept nested routers! To create a nested router,
+## <a name="DynamicRoutes"></a>Dynamic routes
 
-1. define children routes.
+cher-ami router used [path-parser](https://github.com/troch/path-parser) who accept path parameters. (check this [documentation](https://github.com/troch/path-parser#defining-parameters)).
+For example, URL `/blog/my-article` will matched with this route object:
+
+```js
+const routesList = [
+  {
+    path: "/blog/:id",
+    component: ArticlePage,
+  },
+];
+```
+
+You can access route parameters by page component props or by `useRoute()` hook.
+
+```jsx
+import React, { useEffect, forwardRef } from "react";
+import { useRoute } from "@cher-ami/router";
+
+const ArticlePage = forwardRef((props, handleRef) => {
+  useEffect(() => {
+    console.log(props.params); // { id: "my-article" }
+  }, [props]);
+
+  // or from any nested components
+  const { currentRoute } = useRoute();
+  useEffect(() => {
+    console.log(currentRoute.props.params); // { id: "my-article" }
+  }, [currentRoute]);
+
+  // ...
+});
+```
+
+**[Demo codesandbox: simple usage](https://codesandbox.io/s/simple-usage-cpufs)**
+
+Also, it is possible to match a specific route by a simple dynamic route parameter for the "not found route" case.
+In this case, the routes object order declaration is important. `/:rest` path route need to be the last of the `routesList` array.
+
+```js
+const routesList = [
+  {
+    path: "/",
+    component: HomePage,
+  },
+  {
+    path: "/foo",
+    component: FooPage,
+  },
+  // if "/" and "/foo" doesn't match with the current URL,  this route will be rendered
+  {
+    path: "/:rest",
+    component: NotFoundPage,
+  },
+];
+```
+
+**[Demo codesandbox: not found route](https://codesandbox.io/s/not-found-route-eu4bi)**
+
+## <a name="NestedRoutes"></a>Nested Routes
+
+cher-ami router supports nested routes 🙏🏽
+
+1. define children routes in initial routes list with `children` key;
 
 ```js
 // create a route object
@@ -130,17 +214,20 @@ const routesList = [
 ];
 ```
 
-2. Create new router instance in `FooPage` component.
+2. Children where defined in route who render `FooPage` component, so you can now create a new router instance in this component.
 
-**Only if it's a nested router**, you did not pass `routes` Router props again.
-The previous routes array, passed to the root component, will be used.
+**Only if it's a nested router, you must not pass `routes` Router props again**.
+The previous routes array, passed to the root component, will be used by `Router`.
+
+`Router` props `base` need to be the same than the path who contains children routes.
+In this case, `/foo` will be the new nested router base. The stack will then able to render `/foo/people` and `/foo/yolo`.
 
 ```jsx
+import React from "react";
+import { Router, useStack, Stack } from "@cher-ami/router";
+
 const FooPage = forwardRef((props, handleRef) => {
   // ...
-
-  // Nested router must specify a base what depends of it's own instance location
-  // in this new Stack will be render `/foo/people` and `/foo/yolo`
   return (
     <div
       className="FooPage"
@@ -154,87 +241,58 @@ const FooPage = forwardRef((props, handleRef) => {
 });
 ```
 
-## Dynamic routes
+**[Demo codesandbox: nested router](https://codesandbox.io/s/nested-router-bvspe?file=/src/index.tsx)**
 
-[path-parser](https://github.com/troch/path-parser) accept path parameters. (check this [documentation](https://github.com/troch/path-parser#defining-parameters))
+## <a name="ManageTransitions"></a>Manage transitions
 
-```js
-const routesList = [{ path: "/blog/:id", component: ArticlePage }];
-```
+`ManageTransitions` function allows to define, "when" and "in what conditions", routes transitions will be exectued.
 
-For example, `/blog/my-article` will matched with this route object.
+### <a name="DefaultSequentialTransition"></a>Default sequential transition
 
-You can access route parameters by page component props or by `useRoute()` hook.
-
-```jsx
-import { useRoute } from "./useRoute";
-import React, { useEffect, forwardRef } from "react";
-
-const ArticlePage = forwardRef((props, handleRef) => {
-  useEffect(() => {
-    console.log(props.params); // { id: "my-article" }
-  }, [props]);
-
-  // or from nested components
-  const { currentRoute } = useRoute();
-  useEffect(() => {
-    console.log(currentRoute.props.params); // { id: "my-article" }
-  }, [props]);
-
-  // ...
-});
-```
-
-## Not Found route
-
-It is possible to match a specific route by a simple dynamic route parameter, if all the others do not match.
-
-```js
-const routesList = [
-  { path: "/", component: HomePage },
-  { path: "/foo", component: FooPage },
-  // this route will be rendered if "/" and "/foo" doesn't match with the current URL
-  { path: "/:rest", component: NotFoundPage },
-];
-```
-
-In this case, the routes object order declaration is important. `/:rest` path route need to be
-the last of the `routesList` array.
-
-## Manage transitions
-
-By default, cher-ami router will executed a "sequential" transitions senario:
+By default, a "sequential" transitions senario is used by Stack component: the previous page play out performs, then the new page play in.
 
 ```js
 const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }) => {
   return new Promise(async (resolve) => {
     const $current = currentPage?.$element;
+
     // hide new page
     if ($current) $current.style.visibility = "hidden";
+
     // play out and unmount previous page
     if (previousPage) {
       await previousPage.playOut();
       unmountPreviousPage();
     }
+
     // wait page isReady promise
     await currentPage?.isReadyPromise?.();
+
     // show and play in new page
     if (currentPage) {
       if ($current) $current.style.visibility = "visible";
       await currentPage?.playIn?.();
     }
+
     resolve();
   });
 };
 ```
 
+### <a name="CustomTransitions"></a>Custom transition
+
 But it's possible to create a custom transitions senario function and pass it to the Stack `manageTransitions` props.
+In this example, we would like to create a "crossed" route senario: the previous page playOut performs in same time than the new page playIn.
 
 ```jsx
 const App = (props, handleRef) => {
   const customSenario = ({ previousPage, currentPage, unmountPreviousPage }) => {
     return new Promise(async (resolve) => {
-      // write a custom senario ...
+      // write a custom "crossed" senario...
+
+      if (previousPage) previousPage?.playOut?.();
+      if (currentPage) await currentPage?.playIn?.();
+
       resolve();
     });
   };
@@ -247,7 +305,13 @@ const App = (props, handleRef) => {
 };
 ```
 
-## <a name="Router"></a>Router
+**[Demo codesandbox: custom manage transitions](https://codesandbox.io/s/inspiring-thompson-tw4qn)**
+
+TODO `isReady`
+
+## <a name="Api"></a>API
+
+### <a name="Router"></a>Router
 
 Router component create a new router instance.
 
@@ -262,7 +326,7 @@ Router component create a new router instance.
 - **routes** `TRoute[]` Routes list
 - **base** `string` Base URL - default: `"/"`
 
-## <a name="Link"></a>Link
+### <a name="Link"></a>Link
 
 Trig new route.
 
@@ -275,7 +339,7 @@ Trig new route.
 - **to** `string` Path ex: "/foo". Can be absolute `/path/foo` or relative `path/foo`
 - **className** `string` _(optional)_ Class name added to component root DOM element
 
-## <a name="Stack"></a>Stack
+### <a name="Stack"></a>Stack
 
 Render previous and current page component.
 
@@ -307,7 +371,7 @@ interface IRouteStack {
 }
 ```
 
-## <a name="useRouter"></a>useRouter
+### <a name="useRouter"></a>useRouter
 
 Get current router instance.
 
@@ -315,7 +379,11 @@ Get current router instance.
 const router = useRouter();
 ```
 
-## <a name="useLocation"></a>useLocation
+**Returns:**
+
+Current router instance.
+
+### <a name="useLocation"></a>useLocation
 
 Allow the router to change location.
 
@@ -324,7 +392,7 @@ const [location, setLocation] = useLocation();
 // give URL
 setLocation("/bar");
 // or an object
-setLocation({ name: "FooPage", param: { id: "2" } });
+setLocation({ name: "FooPage", params: { id: "2" } });
 ```
 
 **Returns:**
@@ -341,7 +409,7 @@ type TOpenRouteParams = {
 };
 ```
 
-## <a name="useRoute"></a>useRoute
+### <a name="useRoute"></a>useRoute
 
 Get previous and current route properties (TRoute)
 
@@ -368,13 +436,87 @@ type TRoute = {
 };
 ```
 
-## <a name="useStack"></a>useStack
+### <a name="useStack"></a>useStack
 
-Prepare page component for Stack.
+useStack allows to the parent Stack to handle page transitions and refs.
 
-```js
-useStack({ componentName, handleRef, rootRef, playIn, playOut, isReady });
+**usage:**
+
+```jsx
+import React from "react";
+import { useStack } from "@cher-ami/router";
+
+const FooPage = forwardRef((props, handleRef) => {
+  const componentName = "FooPage";
+  const rootRef = useRef(null);
+
+  // create custom page transitions (example with GSAP)
+  const playIn = () => new Promise((resolve) => {  ... });
+  const playOut = () => new Promise((resolve) => {  ... });
+
+  // "handleRef" will got properties via useImperativeHandle
+  useStack({
+    componentName,
+    handleRef,
+    rootRef,
+    playIn,
+    playOut
+  });
+
+  return (
+      <div className={componentName} ref={rootRef}>
+        {/* ... */}
+      </div>
+  );
+});
 ```
+
+`useStack` hook can also receive `isReady` state from the page component.
+This state allows for example to waiting for fetching data before page playIn function is executed.
+
+```jsx
+ // ...
+
+  const [pageIsReady, setPageIsReady] = useState(false);
+
+  useEffect(() => {
+    // simulate data fetching or whatever for 2 seconds
+    setTimeout(() => {
+      setPageIsReady(true);
+    }, 2000);
+  }, []);
+  
+  useStack({
+    componentName,
+    handleRef,
+    rootRef,
+    playIn,
+    playOut,
+    // add the state to useStack
+    // playIn function wait for isReady to change to true 
+    isReady: pageIsReady,
+  });
+  
+  // ... 
+  
+```
+
+How it's work? `useStack` hook register `isReady` state and `isReadyPromise` in `handleRef`.
+`manageTransitions` can now used `isReadyPromise` in its own thread senario.
+
+````js
+const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPage }) => {
+  return new Promise(async (resolve) => {
+    // ...
+    // waiting for page "isReady" state change to continue...
+    await currentPage?.isReadyPromise?.();
+    // ...
+    resolve();
+  });
+};
+````
+
+**[Demo codesandbox: wait-is-ready](https://codesandbox.io/s/wait-isready-6irps?file=/src/pages/AboutPage.tsx)**
 
 **Parameters:**
 
@@ -389,7 +531,7 @@ useStack({ componentName, handleRef, rootRef, playIn, playOut, isReady });
 
 nothing
 
-## <a name="useRouteCounter"></a>useRouteCounter
+### <a name="useRouteCounter"></a>useRouteCounter
 
 Returns route counter
 
@@ -409,7 +551,7 @@ An object with these properties:
 - **isFirstRoute** `boolean` Check if is first route - default: `true`
 - **resetCounter** `() => void` Reset routerCounter & isFirstRoute states
 
-## <a name="useHistory"></a>useHistory
+### <a name="useHistory"></a>useHistory
 
 Allow to get the global router history and execute a callback each time history change.
 
