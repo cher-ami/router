@@ -16,7 +16,7 @@ cher-ami router API is inspired by [wouter](https://github.com/molefrog/wouter),
 
 ## Why another react router?
 
-Because manage route transitions with React is always complicated, this router is designed to allow flexible transitions.
+Because managing route transitions with React is always complicated, this router is designed to allow flexible transitions.
 It provides Stack component who render previous and current page component when route change.
 
 This router loads [history](https://github.com/ReactTraining/history), [path-parser](https://github.com/troch/path-parser) and [debug](https://github.com/visionmedia/debug) as dependencies.
@@ -46,7 +46,7 @@ Hooks:
 - [`useRoute`](#useRoute) Get previous and current route object
 - [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
-- [`useHistory`](#useHistory) Get global router history and handle history changed
+- [`useHistory`](#useHistory) Get global router history and handle history changes
 
 ## <a name="Installation"></a>Installation
 
@@ -87,7 +87,7 @@ function App() {
 }
 ```
 
-Page component need to be wrap by `React.forwardRef`. The `handleRef` lets hold transitions, and ref used by `<Stack />` component.
+Page component need to be wrapped by `React.forwardRef`. The `handleRef` lets hold transitions, and ref used by `<Stack />` component.
 
 ```jsx
 import React from "react";
@@ -124,8 +124,8 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## <a name="DynamicRoutes"></a>Dynamic routes
 
-cher-ami router used [path-parser](https://github.com/troch/path-parser) who accept path parameters. (check this [documentation](https://github.com/troch/path-parser#defining-parameters)).
-For example, URL `/blog/my-article` will matched with this route object:
+cher-ami router use [path-parser](https://github.com/troch/path-parser) which accept path parameters. (check this [documentation](https://github.com/troch/path-parser#defining-parameters)).
+For example, URL `/blog/my-article` will match with this route object:
 
 ```js
 const routesList = [
@@ -172,7 +172,7 @@ const routesList = [
     path: "/foo",
     component: FooPage,
   },
-  // if "/" and "/foo" doesn't match with the current URL,  this route will be rendered
+  // if "/" and "/foo" doesn't match with the current URL, this route will be rendered
   {
     path: "/:rest",
     component: NotFoundPage,
@@ -186,7 +186,7 @@ const routesList = [
 
 cher-ami router supports nested routes 🙏🏽
 
-1. define children routes in initial routes list with `children` key;
+1. Define children routes in initial routes list with `children` key;
 
 ```js
 // create a route object
@@ -214,13 +214,13 @@ const routesList = [
 ];
 ```
 
-2. Children where defined in route who render `FooPage` component, so you can now create a new router instance in this component.
+2. Children were defined within the route that render `FooPage` component, so you can then create a new router instance in this component.
 
 **Only if it's a nested router, you must not pass `routes` Router props again**.
 The previous routes array, passed to the root component, will be used by `Router`.
 
 `Router` props `base` need to be the same than the path who contains children routes.
-In this case, `/foo` will be the new nested router base. The stack will then able to render `/foo/people` and `/foo/yolo`.
+In this case, `/foo` will be the new nested router base. The stack will then be able to render `/foo/people` and `/foo/yolo`.
 
 ```jsx
 import React from "react";
@@ -281,8 +281,8 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
 
 ### <a name="CustomTransitions"></a>Custom transition
 
-But it's possible to create a custom transitions senario function and pass it to the Stack `manageTransitions` props.
-In this example, we would like to create a "crossed" route senario: the previous page playOut performs in same time than the new page playIn.
+It's however possible to create a custom transitions senario function and pass it to the Stack `manageTransitions` props.
+In this example, we would like to create a "crossed" route senario: the previous page playOut performs at the same time than the new page playIn.
 
 ```jsx
 const App = (props, handleRef) => {
@@ -313,7 +313,7 @@ TODO `isReady`
 
 ### <a name="Router"></a>Router
 
-Router component create a new router instance.
+Router component creates a new router instance.
 
 ```jsx
 <Router routes={} base={}>
@@ -350,7 +350,7 @@ Render previous and current page component.
 **Props:**
 
 - **manageTransitions** `(T:TManageTransitions) => Promise<void>` _(optional)_
-  This function allow to create the transition scenario. If no props is filled, a sequential
+  This function allows to create the transition scenario. If no props is filled, a sequential
   transition will be executed.
 - **className** `string` _(optional)_ className added to component root DOM element
 
@@ -450,11 +450,10 @@ const FooPage = forwardRef((props, handleRef) => {
   const componentName = "FooPage";
   const rootRef = useRef(null);
 
-  // create custom page transitions (example with GSAP)
   const playIn = () => new Promise((resolve) => {  ... });
   const playOut = () => new Promise((resolve) => {  ... });
 
-  // "handleRef" will got properties via useImperativeHandle
+  // "handleRef" will get properties via useImperativeHandle
   useStack({
     componentName,
     handleRef,
@@ -472,7 +471,7 @@ const FooPage = forwardRef((props, handleRef) => {
 ```
 
 `useStack` hook can also receive `isReady` state from the page component.
-This state allows for example to waiting for fetching data before page playIn function is executed.
+This state allows for example to wait for fetching data before page playIn function is executed.
 
 ```jsx
  // ...
@@ -501,14 +500,14 @@ This state allows for example to waiting for fetching data before page playIn fu
   
 ```
 
-How it's work? `useStack` hook register `isReady` state and `isReadyPromise` in `handleRef`.
-`manageTransitions` can now used `isReadyPromise` in its own thread senario.
+How does it work? `useStack` hook registers `isReady` state and `isReadyPromise` in `handleRef`.
+`manageTransitions` can now use `isReadyPromise` in its own thread senario.
 
 ````js
 const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPage }) => {
   return new Promise(async (resolve) => {
     // ...
-    // waiting for page "isReady" state change to continue...
+    // waiting for page "isReady" state to change to continue...
     await currentPage?.isReadyPromise?.();
     // ...
     resolve();
@@ -548,7 +547,7 @@ nothing
 An object with these properties:
 
 - **routerCounter** `number` Current route number - default: `1`
-- **isFirstRoute** `boolean` Check if is first route - default: `true`
+- **isFirstRoute** `boolean` Check if it's first route - default: `true`
 - **resetCounter** `() => void` Reset routerCounter & isFirstRoute states
 
 ### <a name="useHistory"></a>useHistory
