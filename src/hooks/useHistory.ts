@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { history as HISTORY_LIB } from "../api/history";
+import { ROUTERS } from "../api/routers";
 
 const componentName = "useHistory";
 const debug = require("debug")(`front:${componentName}`);
 
 // keep global location history outside the scope
-let locationsHistory = [HISTORY_LIB.location];
+//let locationsHistory = [ROUTERS.history.location];
 /**
  * Handle router history
  */
@@ -14,17 +14,17 @@ export const useHistory = (
   deps = []
 ) => {
   const UNLISTEN_HISTORY = useRef(null);
-  const [history, setHistory] = useState<any[]>(locationsHistory);
+  const [history, setHistory] = useState<any[]>(ROUTERS.locationsHistory);
 
   useEffect(() => {
     // handle history change and keep reference
-    UNLISTEN_HISTORY.current = HISTORY_LIB.listen(
+    UNLISTEN_HISTORY.current = ROUTERS.history.listen(
       (event: { action: any; location: any }) => {
         // prepare new history
         const newHistory = [...history, event.location];
         // set it in external singleton
         // (because, we need to start history in new useHistory() with the current locationsHistory)
-        locationsHistory = newHistory;
+        ROUTERS.locationsHistory = newHistory;
         // set in local start returned
         setHistory(newHistory);
         // execute callback if exist

@@ -1,6 +1,7 @@
+import { BrowserHistory, createBrowserHistory } from "history";
+
 /**
- * Create history
+ * Browser history
  * doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
  */
-import { createBrowserHistory } from "history";
-export const history = createBrowserHistory();
+export const HISTORY: BrowserHistory = createBrowserHistory();

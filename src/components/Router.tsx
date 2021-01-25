@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { joinPaths } from "../api/helpers";
+import { ROUTERS } from "../api/routers";
 
 const componentName = "Router";
 const debug = require("debug")(`front:${componentName}`);
@@ -20,9 +21,6 @@ interface IProps {
   children: ReactElement;
 }
 
-// keep router instances as global
-export const ROUTERS: RouterInstance[] = [];
-
 // Router instance will be keep on this context
 // Big thing is you can access this context from the closest provider in the tree.
 // This allow to manage easily nested stack instances.
@@ -32,25 +30,32 @@ RouterContext.displayName = componentName;
 /**
  * Router
  * This component returns children wrapped by provider who contains router instance
- * (will wrap Link and Stack components)
  */
 export const Router = memo((props: IProps) => {
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
+
   // we need to join each parent router base
   const base = useMemo(() => joinPaths([parentRouter?.base, props.base]), [props.base]);
-  // prepare routes list
+
+  // get routes list by props first
+  // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
-    return (
-      // get routes list by props first
-      props.routes ||
-      // if there is no props.routes, we deduce that we are on a subrouter
-      ROUTERS?.[0]?.routes?.find((el) => el.path === props.base).children
-    );
+    let currentRoutesList: TRoute[];
+    if (props.routes) {
+      ROUTERS.routes = props.routes;
+      currentRoutesList = props.routes;
+    } else {
+      currentRoutesList = ROUTERS?.routes?.find((el) => el.path === props.base).children;
+    }
+    return currentRoutesList;
   }, [props.routes, props.base]);
 
   // deduce a router ID
-  const id = ROUTERS?.length > 0 ? ROUTERS.length + 1 : 1;
+  const id = useMemo(
+    () => (ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1),
+    []
+  );
 
   // keep router instance in state
   const [routerState] = useState<RouterInstance>(() => {
@@ -60,23 +65,26 @@ export const Router = memo((props: IProps) => {
       id,
       middlewares: props.middlewares,
     });
+
     // keep new router in global constant
-    ROUTERS.push(newRouter);
+    ROUTERS.instances.push(newRouter);
+
     // return it as state
+    debug("ROUTERS", ROUTERS);
+
     return newRouter;
   });
 
   useEffect(() => {
-    debug(`${componentName} > routers array`, ROUTERS);
-    // on destroy, we need to remove this current router instance from ROUTERS array
+    debug(`${componentName} > routers array`, ROUTERS.instances);
     return () => {
+      // on destroy, we need to remove this current router instance from ROUTERS.instances array
       // remove 1 element from specific index
-      ROUTERS.splice(
-        ROUTERS.findIndex((el) => el.id === routerState.id),
+      ROUTERS.instances.splice(
+        ROUTERS.instances.findIndex((el) => el.id === routerState.id),
         1
       );
-      debug(`${componentName} > routers array after splice`, ROUTERS);
-      // stop to listen events
+      debug(`${componentName} > routers array after splice`, ROUTERS.instances);
       routerState.destroyEvents();
     };
   }, [routerState]);

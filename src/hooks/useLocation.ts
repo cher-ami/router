@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useHistory, useRootRouter } from "..";
-import { history } from "../api/history";
+import { ERouterEvent, useHistory, useRootRouter } from "..";
 import { getUrlByRouteName, TOpenRouteParams } from "../api/helpers";
+import { ROUTERS } from "../api/routers";
 
 const componentName = "useLocation";
 const debug = require("debug")(`front:${componentName}`);
@@ -26,13 +26,18 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
    * @param args
    */
   function setLocation(args: string | TOpenRouteParams): void {
+    let urlToPush: string;
+
+    // prepare URL
     if (typeof args === "string") {
-      history.push(args);
+      urlToPush = args;
+    } else if (typeof args === "object" && args.name) {
+      urlToPush = getUrlByRouteName(rootRouter.routes, args);
+    } else {
+      throw new Error("ERROR: setLocation param isn't valid. return.");
     }
-    // case this is TOpenRouteParams
-    if (typeof args === "object" && args.name) {
-      history.push(getUrlByRouteName(rootRouter.routes, args));
-    }
+
+    ROUTERS.history.push(urlToPush);
   }
 
   return [location, setLocation];

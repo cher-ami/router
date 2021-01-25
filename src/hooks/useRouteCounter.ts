@@ -1,14 +1,9 @@
 import { useHistory } from "..";
 import { useState } from "react";
+import { ROUTERS } from "../api/routers";
 
 const componentName = "useLocation";
 const debug = require("debug")(`front:${componentName}`);
-
-// constants
-const initialCount = 1;
-const initialIsFirstRoute = true;
-let GLOBAL_ROUTE_COUNTER = initialCount;
-let GLOBAL_IS_FIRST_ROUTE = initialIsFirstRoute;
 
 /**
  * use Route Counter
@@ -19,23 +14,22 @@ export const useRouteCounter = (): {
   resetCounter: () => void;
 } => {
   // get current route count
-  const [routeCounter, setRouteCounter] = useState<number>(GLOBAL_ROUTE_COUNTER);
+  const [routeCounter, setRouteCounter] = useState<number>(ROUTERS.routeCounter);
   // check if is first route
-  const [isFirstRoute, setIsFirstRoute] = useState<boolean>(GLOBAL_IS_FIRST_ROUTE);
-
+  const [isFirstRoute, setIsFirstRoute] = useState<boolean>(ROUTERS.isFirstRoute);
   // handle history
   useHistory(() => {
-    GLOBAL_ROUTE_COUNTER = routeCounter + 1;
+    ROUTERS.routeCounter = routeCounter + 1;
     setRouteCounter(routeCounter + 1);
 
-    GLOBAL_IS_FIRST_ROUTE = false;
+    ROUTERS.isFirstRoute = false;
     setIsFirstRoute(false);
   }, [routeCounter, isFirstRoute]);
 
   // allow to reset counter if needed (after first redirection for example)
   const resetCounter = () => {
-    setRouteCounter(initialCount);
-    setIsFirstRoute(initialIsFirstRoute);
+    setRouteCounter(1);
+    setIsFirstRoute(true);
   };
 
   return { routeCounter, isFirstRoute, resetCounter };
