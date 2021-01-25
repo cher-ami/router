@@ -30,7 +30,6 @@ RouterContext.displayName = componentName;
 /**
  * Router
  * This component returns children wrapped by provider who contains router instance
- * (will wrap Link and Stack components)
  */
 export const Router = memo((props: IProps) => {
   // get parent router instance if exist, in case we are one sub router
