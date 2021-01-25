@@ -1,4 +1,8 @@
-import React, { forwardRef, MutableRefObject, useRef } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  useRef
+} from "react";
 import { useLocation } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
@@ -8,7 +12,7 @@ const debug = require("debug")(`front:${componentName}`);
 
 interface IProps {}
 
-export const BarPage = forwardRef((props: IProps, handleRef: MutableRefObject<any>) => {
+export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
   useStack({

@@ -1,4 +1,4 @@
-import React, { forwardRef, MutableRefObject, useRef } from "react";
+import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "YoloPage";
@@ -6,7 +6,7 @@ const debug = require("debug")(`front:${componentName}`);
 
 interface IProps {}
 
-const YoloPage = forwardRef((props: IProps, handleRef: MutableRefObject<any>) => {
+const YoloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
   useStack({

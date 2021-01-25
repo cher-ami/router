@@ -1,4 +1,8 @@
-import React, { forwardRef, MutableRefObject, useRef } from "react";
+import React, {
+  ForwardedRef,
+  forwardRef,
+  useRef
+} from "react";
 import { useLocation } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
@@ -16,7 +20,7 @@ const debug = require("debug")(`front:${componentName}`);
  * @name ArticlePage
  */
 export const ArticlePage = forwardRef(
-  (props: IProps, handleRef: MutableRefObject<any>) => {
+  (props: IProps, handleRef: ForwardedRef<any>) => {
     debug("params", props);
     const rootRef = useRef(null);
     const [location, setLocation] = useLocation();

@@ -1,4 +1,4 @@
-import React, { forwardRef, MutableRefObject, useEffect, useRef } from "react";
+import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react";
 import { useHistory, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "HomePage";
@@ -6,7 +6,7 @@ const debug = require("debug")(`front:${componentName}`);
 
 interface IProps {}
 
-const HomePage = forwardRef((props: IProps, handleRef: MutableRefObject<any>) => {
+const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
   const history = useHistory();
