@@ -28,8 +28,8 @@ This router loads [history](https://github.com/ReactTraining/history), [path-par
 - [Dynamic routes](#DynamicRoutes)
 - [Nested routes](#NestedRoutes)
 - [Manage Transitions](#ManageTransitions)
-  - [Default sequential transition](#DefaultSequentialTransition)
-  - [Custom transition](#CustomTransition)
+  - [Default sequential transitions](#DefaultSequentialTransitions)
+  - [Custom transitions](#CustomTransitions)
 
 **API**
 
@@ -247,7 +247,7 @@ const FooPage = forwardRef((props, handleRef) => {
 
 `ManageTransitions` function allows to define, "when" and "in what conditions", routes transitions will be exectued.
 
-### <a name="DefaultSequentialTransition"></a>Default sequential transition
+### <a name="DefaultSequentialTransitions"></a>Default sequential transitions
 
 By default, a "sequential" transitions senario is used by Stack component: the previous page play out performs, then the new page play in.
 
@@ -279,7 +279,7 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
 };
 ```
 
-### <a name="CustomTransitions"></a>Custom transition
+### <a name="CustomTransitions"></a>Custom transitions
 
 It's however possible to create a custom transitions senario function and pass it to the Stack `manageTransitions` props.
 In this example, we would like to create a "crossed" route senario: the previous page playOut performs at the same time than the new page playIn.
@@ -289,7 +289,6 @@ const App = (props, handleRef) => {
   const customSenario = ({ previousPage, currentPage, unmountPreviousPage }) => {
     return new Promise(async (resolve) => {
       // write a custom "crossed" senario...
-
       if (previousPage) previousPage?.playOut?.();
       if (currentPage) await currentPage?.playIn?.();
 
@@ -306,8 +305,6 @@ const App = (props, handleRef) => {
 ```
 
 **[Demo codesandbox: custom manage transitions](https://codesandbox.io/s/inspiring-thompson-tw4qn)**
-
-TODO `isReady`
 
 ## <a name="Api"></a>API
 
@@ -474,36 +471,35 @@ const FooPage = forwardRef((props, handleRef) => {
 This state allows for example to wait for fetching data before page playIn function is executed.
 
 ```jsx
- // ...
+// ...
 
-  const [pageIsReady, setPageIsReady] = useState(false);
+const [pageIsReady, setPageIsReady] = useState(false);
 
-  useEffect(() => {
-    // simulate data fetching or whatever for 2 seconds
-    setTimeout(() => {
-      setPageIsReady(true);
-    }, 2000);
-  }, []);
-  
-  useStack({
-    componentName,
-    handleRef,
-    rootRef,
-    playIn,
-    playOut,
-    // add the state to useStack
-    // playIn function wait for isReady to change to true 
-    isReady: pageIsReady,
-  });
-  
-  // ... 
-  
+useEffect(() => {
+  // simulate data fetching or whatever for 2 seconds
+  setTimeout(() => {
+    setPageIsReady(true);
+  }, 2000);
+}, []);
+
+useStack({
+  componentName,
+  handleRef,
+  rootRef,
+  playIn,
+  playOut,
+  // add the state to useStack
+  // playIn function wait for isReady to change to true
+  isReady: pageIsReady,
+});
+
+// ...
 ```
 
 How does it work? `useStack` hook registers `isReady` state and `isReadyPromise` in `handleRef`.
 `manageTransitions` can now use `isReadyPromise` in its own thread senario.
 
-````js
+```js
 const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPage }) => {
   return new Promise(async (resolve) => {
     // ...
@@ -513,7 +509,7 @@ const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPag
     resolve();
   });
 };
-````
+```
 
 **[Demo codesandbox: wait-is-ready](https://codesandbox.io/s/wait-isready-6irps?file=/src/pages/AboutPage.tsx)**
 
