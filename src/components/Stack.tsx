@@ -99,7 +99,7 @@ function Stack(props: IProps) {
   }, [currentRoute]);
 
   return (
-    <div className={componentName}>
+    <div className={[componentName, props.className].filter((e) => e).join(" ")}>
       {previousRoute?.component && (
         <previousRoute.component
           ref={prevRef}

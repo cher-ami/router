@@ -33,7 +33,7 @@ export default function App() {
           </li>
         </ul>
       </nav>
-      <Stack />
+      <Stack className={"App_stack"} />
     </div>
   );
 }
