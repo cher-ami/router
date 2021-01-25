@@ -1,4 +1,4 @@
-<h1 align="center" style="text-align: center">🚃<br>cher-ami router</h1>
+<h1 align="center" style="text-align:center">🚃<br>cher-ami router</h1>
 
 <p align="center">
 A fresh react router designed for flexible route transitions
