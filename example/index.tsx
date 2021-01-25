@@ -52,9 +52,7 @@ export const routesList: TRoute[] = [
 // Language
 // Language.service() -> singleton / store
 // Language.middleware() -> fonction static qui permet de patcher les routes et faire du traitement
-
 // const monMiddleware = Langage.getMiddleware("FR")
-
 // getMiddleware(options) {
 //   return (routes, currentoute) => {
 //     options
