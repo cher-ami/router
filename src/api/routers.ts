@@ -4,7 +4,6 @@ import { BrowserHistory, createBrowserHistory } from "history";
 export type TRoutersConfig = {
   /**
    * Keep global routes array
-   * TODO continue (storer ici la liste au lieu d'aller chercher la liste de la 1ere instance)
    */
   routes: TRoute[];
   /**

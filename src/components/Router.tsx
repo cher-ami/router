@@ -42,14 +42,21 @@ export const Router = memo((props: IProps) => {
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
-    return (
-      props.routes ||
-      ROUTERS.instances?.[0]?.routes?.find((el) => el.path === props.base).children
-    );
+    let currentRoutesList: TRoute[];
+    if (props.routes) {
+      ROUTERS.routes = props.routes;
+      currentRoutesList = props.routes;
+    } else {
+      currentRoutesList = ROUTERS?.routes?.find((el) => el.path === props.base).children;
+    }
+    return currentRoutesList;
   }, [props.routes, props.base]);
 
   // deduce a router ID
-  const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
+  const id = useMemo(
+    () => (ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1),
+    []
+  );
 
   // keep router instance in state
   const [routerState] = useState<RouterInstance>(() => {
@@ -62,14 +69,17 @@ export const Router = memo((props: IProps) => {
 
     // keep new router in global constant
     ROUTERS.instances.push(newRouter);
+
     // return it as state
+    debug("ROUTERS", ROUTERS);
+
     return newRouter;
   });
 
   useEffect(() => {
     debug(`${componentName} > routers array`, ROUTERS.instances);
-    // on destroy, we need to remove this current router instance from ROUTERS.instances array
     return () => {
+      // on destroy, we need to remove this current router instance from ROUTERS.instances array
       // remove 1 element from specific index
       ROUTERS.instances.splice(
         ROUTERS.instances.findIndex((el) => el.id === routerState.id),
