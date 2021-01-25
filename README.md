@@ -28,6 +28,10 @@ This router loads [history](https://github.com/ReactTraining/history), [path-par
 - [Dynamic routes](#DynamicRoutes)
 - [Nested routes](#NestedRoutes)
 - [Manage Transitions](#ManageTransitions)
+  - [Default sequential transition](#DefaultSequentialTransition)
+  - [Custom transition](#CustomTransition)
+
+**API**
 
 Components:
 
@@ -241,8 +245,11 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## <a name="ManageTransitions"></a>Manage transitions
 
-`ManageTransitions` function allows to define, "when" and "in what conditions", routes transitions will be exectued. 
-By default, cher-ami router will executed a "sequential" transitions senario: the previous page play out performs, then the new page play in.
+`ManageTransitions` function allows to define, "when" and "in what conditions", routes transitions will be exectued.
+
+### <a name="DefaultSequentialTransition"></a>Default sequential transition
+
+By default, a "sequential" transitions senario is used by Stack component: the previous page play out performs, then the new page play in.
 
 ```js
 const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }) => {
@@ -272,6 +279,8 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
 };
 ```
 
+### <a name="CustomTransitions"></a>Custom transition
+
 But it's possible to create a custom transitions senario function and pass it to the Stack `manageTransitions` props.
 In this example, we would like to create a "crossed" route senario: the previous page playOut performs in same time than the new page playIn.
 
@@ -298,8 +307,9 @@ const App = (props, handleRef) => {
 
 **[Demo codesandbox: custom manage transitions](https://codesandbox.io/s/inspiring-thompson-tw4qn)**
 
+TODO `isReady`
 
-## API
+## <a name="Api"></a>API
 
 ### <a name="Router"></a>Router
 
@@ -369,6 +379,10 @@ Get current router instance.
 const router = useRouter();
 ```
 
+**Returns:**
+
+Current router instance.
+
 ### <a name="useLocation"></a>useLocation
 
 Allow the router to change location.
@@ -424,11 +438,85 @@ type TRoute = {
 
 ### <a name="useStack"></a>useStack
 
-Prepare page component for Stack.
+useStack allows to the parent Stack to handle page transitions and refs.
 
-```js
-useStack({ componentName, handleRef, rootRef, playIn, playOut, isReady });
+**usage:**
+
+```jsx
+import React from "react";
+import { useStack } from "@cher-ami/router";
+
+const FooPage = forwardRef((props, handleRef) => {
+  const componentName = "FooPage";
+  const rootRef = useRef(null);
+
+  // create custom page transitions (example with GSAP)
+  const playIn = () => new Promise((resolve) => {  ... });
+  const playOut = () => new Promise((resolve) => {  ... });
+
+  // "handleRef" will got properties via useImperativeHandle
+  useStack({
+    componentName,
+    handleRef,
+    rootRef,
+    playIn,
+    playOut
+  });
+
+  return (
+      <div className={componentName} ref={rootRef}>
+        {/* ... */}
+      </div>
+  );
+});
 ```
+
+`useStack` hook can also receive `isReady` state from the page component.
+This state allows for example to waiting for fetching data before page playIn function is executed.
+
+```jsx
+ // ...
+
+  const [pageIsReady, setPageIsReady] = useState(false);
+
+  useEffect(() => {
+    // simulate data fetching or whatever for 2 seconds
+    setTimeout(() => {
+      setPageIsReady(true);
+    }, 2000);
+  }, []);
+  
+  useStack({
+    componentName,
+    handleRef,
+    rootRef,
+    playIn,
+    playOut,
+    // add the state to useStack
+    // playIn function wait for isReady to change to true 
+    isReady: pageIsReady,
+  });
+  
+  // ... 
+  
+```
+
+How it's work? `useStack` hook register `isReady` state and `isReadyPromise` in `handleRef`.
+`manageTransitions` can now used `isReadyPromise` in its own thread senario.
+
+````js
+const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPage }) => {
+  return new Promise(async (resolve) => {
+    // ...
+    // waiting for page "isReady" state change to continue...
+    await currentPage?.isReadyPromise?.();
+    // ...
+    resolve();
+  });
+};
+````
+
+**[Demo codesandbox: wait-is-ready](https://codesandbox.io/s/wait-isready-6irps?file=/src/pages/AboutPage.tsx)**
 
 **Parameters:**
 
