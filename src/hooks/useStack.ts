@@ -1,10 +1,16 @@
-import { MutableRefObject, useEffect, useImperativeHandle, useMemo } from "react";
+import {
+  ForwardedRef,
+  MutableRefObject,
+  useEffect,
+  useImperativeHandle,
+  useMemo
+} from "react";
 
 const componentName = "useStack";
 const debug = require("debug")(`front:${componentName}`);
 
 export interface IUseStack extends Omit<IRouteStack, "$element" | "isReadyPromise"> {
-  handleRef: MutableRefObject<any>;
+  handleRef: ForwardedRef<any>;
   rootRef: MutableRefObject<any>;
 }
 
