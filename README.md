@@ -60,7 +60,6 @@ $ npm i @cher-ami/router -s
 import React from "react";
 import { Router, Link, Stack } from "@cher-ami/router";
 
-// create a route object
 const routesList = [
   {
     path: "/",
@@ -72,8 +71,6 @@ const routesList = [
   },
 ];
 
-// wrap render with Router component
-// Link and Stack components are available inside a Router
 function App() {
   return (
     <Router routes={routesList} base={"/"}>
@@ -189,7 +186,6 @@ cher-ami router supports nested routes 🙏🏽
 1. Define children routes in initial routes list with `children` key;
 
 ```js
-// create a route object
 const routesList = [
   {
     path: "/",
@@ -297,9 +293,8 @@ const App = (props, handleRef) => {
   };
 
   return (
-    <Router base={"/foo"}>
+      // ...
       <Stack manageTransitions={customSenario} />
-    </Router>
   );
 };
 ```
