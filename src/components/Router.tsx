@@ -17,7 +17,7 @@ interface IProps {
   base: string;
   // routes array is required for 1st instance only
   routes?: TRoute[];
-  middlewares?: (e: any) => void[];
+  middlewares?: any[];
   children: ReactElement;
   historyMode?: EHistoryMode;
 }

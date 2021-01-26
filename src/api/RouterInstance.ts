@@ -46,9 +46,11 @@ export class RouterInstance {
   // base URL
   public base: string;
   // routes list
+  public preMiddlewareRoutes: TRoute[] = [];
   public routes: TRoute[] = [];
 
-  public middlewares: (e: any) => void[];
+  // middlewares list to exectute in specific order
+  public middlewares: any[];
 
   // create event emitter
   public events: EventEmitter = new EventEmitter();
@@ -75,7 +77,7 @@ export class RouterInstance {
   }: {
     base?: string;
     routes?: TRoute[];
-    middlewares?: (e: any) => void[];
+    middlewares?: any[];
     id?: number | string;
     historyMode: EHistoryMode;
   }) {
@@ -108,6 +110,12 @@ export class RouterInstance {
     // start
     this.updateRoute();
     this.initEvents();
+
+    // ex: language service devrait pouvoir patcher les routes une a une
+    this.routes = this.middlewares.reduce(
+      (routes, middleware) => middleware(routes),
+      this.preMiddlewareRoutes
+    );
   }
 
   /**
@@ -162,7 +170,7 @@ export class RouterInstance {
    * Add new route object to routes array
    */
   protected addRoute(route: TRoute): void {
-    this.routes.push({ ...route, parser: new Path(route.path) });
+    this.preMiddlewareRoutes.push({ ...route, parser: new Path(route.path) });
   }
 
   /**
@@ -217,11 +225,6 @@ export class RouterInstance {
     // test each routes
     for (let i in pRoutes) {
       let currentRoute = pRoutes[i];
-
-      // TODO appeler tous les middlewares ici pour patcher les routes
-      // ex: language service devrait pouvoir patcher les routes une a une
-      // this.middlewares.foreach(middleware =>  middleware(currentRoute) ) ...
-
       // create parser & matcher
       const currentRoutePath = `${pBase}${currentRoute.path}`.replace("//", "/");
       // prepare parser
