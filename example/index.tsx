@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
-import { Router, TRoute } from "../src";
+import { EHistoryMode, Router, TRoute } from "../src";
 
 import App from "./App";
 import HomePage from "./pages/HomePage";
@@ -10,7 +10,7 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
-import { EHistoryMode } from "../src";
+import Languages from "../src/middleware/Languages";
 
 const debug = require("debug")(`router:index`);
 
@@ -48,6 +48,16 @@ export const routesList: TRoute[] = [
     component: forwardRef((props, r) => <div className="NotFoundPage">Not Found</div>),
   },
 ];
+
+Languages.service([
+  {
+    key: "fr",
+  },
+  {
+    key: "en",
+    default: true,
+  },
+]);
 
 // Language
 // Language.service() -> singleton / store
