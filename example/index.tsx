@@ -51,25 +51,14 @@ export const routesList: TRoute[] = [
   },
 ];
 
-LanguagesService.init([
-  {
-    key: "fr",
-  },
-  {
-    key: "en",
-    default: true,
-  },
-]);
+// prettier-ignore
+const locales = [
+  { key: "fr" },
+  { key: "en", default: true },
+  { key: "de" }
+];
 
-// Language
-// Language.service() -> singleton / store
-// Language.middleware() -> fonction static qui permet de patcher les routes et faire du traitement
-// const monMiddleware = Langage.getMiddleware("FR")
-// getMiddleware(options) {
-//   return (routes, currentoute) => {
-//     options
-//   }
-// }
+LanguagesService.init(locales, true);
 
 /**
  * Init Application

@@ -1,8 +1,13 @@
-import { TRoute } from "../api/RouterInstance";
+import { ROUTERS } from "../api/routers";
+import { buildUrl } from "../api/helpers";
 
 const debug = require("debug")(`front:Languages`);
 
-export type TLanguage = { key: string; default?: boolean };
+export type TLanguage = {
+  key: string;
+  name?: string;
+  default?: boolean;
+};
 
 class LanguagesService {
   /**
@@ -19,7 +24,7 @@ class LanguagesService {
    * Show default language in URL
    * ex: if default language is "en"
    * if true, URL with language is "my-url.com/en/rest"
-   * if false,default language isn't shown in URL "my-url.com/rest"
+   * if false, default language isn't shown in URL "my-url.com/rest" but remains "en"
    */
   public showDefaultLanguageInUrl: boolean;
 
@@ -29,15 +34,33 @@ class LanguagesService {
   public defaultLanguage: TLanguage;
 
   /**
-   * Set / Get current language object
+   * Get current language object
    */
   protected _currentLanguage: TLanguage;
   public get currentLanguage(): TLanguage {
     return this._currentLanguage;
   }
+
+  /**
+   * Set current language object
+   * Push new URL in history
+   * @param pCurrentLanguage
+   */
   public set currenLanguage(pCurrentLanguage: TLanguage) {
     if (this.currentLanguage === pCurrentLanguage) return;
     this._currentLanguage = pCurrentLanguage;
+
+    // get current route of first instance (language service performs only for root instance)
+    const currentRoute = ROUTERS.instances?.[0].currentRoute;
+
+    // prepare new URL with new lang param
+    const newUrl = buildUrl(currentRoute.path, {
+      ...currentRoute.props?.params,
+      lang: pCurrentLanguage.key,
+    });
+
+    // push new URL result in history
+    ROUTERS.history.push(newUrl);
   }
 
   /**
@@ -74,6 +97,7 @@ class LanguagesService {
    */
   protected getLanguageFromUrl(pathname = window.location.pathname): TLanguage {
     const currentLanguageObj = this.languages.find((language) =>
+      // TODO match pas assez précis
       pathname.startsWith(`/${language.key}`)
     );
     debug("getLanguageFromUrl > currentLanguageObj", currentLanguageObj);

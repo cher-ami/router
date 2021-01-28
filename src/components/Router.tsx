@@ -53,10 +53,10 @@ export const Router = memo((props: IProps) => {
   }, [props.routes, props.base]);
 
   // deduce a router ID
-  const id = useMemo(
-    () => (ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1),
-    []
-  );
+  const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
+
+  // middlewares are properties of root instance only ?
+  const middlewares = props.middlewares;
 
   // keep router instance in state
   const [routerState] = useState<RouterInstance>(() => {
@@ -64,28 +64,24 @@ export const Router = memo((props: IProps) => {
       base,
       routes,
       id,
+      middlewares,
       historyMode: props.historyMode,
-      middlewares: props.middlewares,
     });
 
     // keep new router in global constant
     ROUTERS.instances.push(newRouter);
     // return it as state
-    debug("ROUTERS", ROUTERS);
-
     return newRouter;
   });
 
+  // on destroy, we need to remove this current router instance from ROUTERS.instances array
+  // remove 1 element from specific index
   useEffect(() => {
-    debug(`${componentName} > routers array`, ROUTERS.instances);
     return () => {
-      // on destroy, we need to remove this current router instance from ROUTERS.instances array
-      // remove 1 element from specific index
       ROUTERS.instances.splice(
         ROUTERS.instances.findIndex((el) => el.id === routerState.id),
         1
       );
-      debug(`${componentName} > routers array after splice`, ROUTERS.instances);
       routerState.destroyEvents();
     };
   }, [routerState]);

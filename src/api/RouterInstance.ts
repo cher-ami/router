@@ -19,7 +19,10 @@ export type TRoute = {
   component: React.ComponentType<any>;
   name?: string;
   parser?: Path;
-  props?: { [x: string]: any };
+  props?: {
+    params?: { [x: string]: any };
+    [x: string]: any;
+  };
   children?: TRoute[];
   // local match URL with params (needed by nested router)
   matchUrl?: string;
@@ -107,15 +110,15 @@ export class RouterInstance {
     // format routes
     routes.forEach((el: TRoute) => this.addRoute(el));
 
-    // start
-    this.updateRoute();
-    this.initEvents();
-
     // ex: language service devrait pouvoir patcher les routes une a une
-    this.routes = this.middlewares.reduce(
+    this.routes = this.middlewares?.reduce(
       (routes, middleware) => middleware(routes),
       this.preMiddlewareRoutes
     );
+
+    // start
+    this.updateRoute();
+    this.initEvents();
   }
 
   /**

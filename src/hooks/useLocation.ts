@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ERouterEvent, useHistory, useRootRouter } from "..";
+import { useHistory, useRootRouter } from "..";
 import { getUrlByRouteName, TOpenRouteParams } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 
@@ -32,7 +32,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
     if (typeof args === "string") {
       urlToPush = args;
     } else if (typeof args === "object" && args.name) {
-      urlToPush = getUrlByRouteName(rootRouter.preMiddlewareRoutes, args);
+      urlToPush = getUrlByRouteName(rootRouter.routes, args);
     } else {
       throw new Error("ERROR: setLocation param isn't valid. return.");
     }

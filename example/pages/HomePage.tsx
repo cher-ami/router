@@ -4,7 +4,11 @@ import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "HomePage";
 const debug = require("debug")(`router:${componentName}`);
 
-interface IProps {}
+interface IProps {
+  params: {
+    lang: string;
+  };
+}
 
 const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
@@ -13,6 +17,10 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   useEffect(() => {
     debug("history form home", history);
   }, [history]);
+
+  useEffect(() => {
+    debug("props.params.lang", props.params.lang);
+  }, [props.params.lang]);
 
   useStack({
     componentName,

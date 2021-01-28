@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useRouteCounter, Stack, useHistory } from "../src";
+import LanguagesService from "../src/languages/LanguagesService";
 
 const componentName = "App";
 const debug = require("debug")(`router:${componentName}`);
@@ -20,16 +21,30 @@ export default function App() {
 
   return (
     <div className={componentName}>
+      <button
+        onClick={() => {
+          LanguagesService.currenLanguage = { key: "en" };
+        }}
+      >
+        CHANGE LANGUAGE TO EN
+      </button>
+      <button
+        onClick={() => {
+          LanguagesService.currenLanguage = { key: "fr" };
+        }}
+      >
+        CHANGE LANGUAGE TO FR
+      </button>
       <nav>
         <ul>
           <li>
-            <Link to={"/"}>Home</Link>{" "}
+            <Link to={"/fr"}>Home</Link>{" "}
           </li>
           <li>
-            <Link to={"/about"}>About</Link>{" "}
+            <Link to={"/fr/about"}>About</Link>{" "}
           </li>
           <li>
-            <Link to={"/blog/article-1"}>Blog id:article-1</Link>
+            <Link to={"/fr/blog/article-1"}>Blog id:article-1</Link>
           </li>
         </ul>
       </nav>
