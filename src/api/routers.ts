@@ -1,6 +1,5 @@
 import { RouterInstance, TRoute } from "./RouterInstance";
 import { History } from "history";
-import { HISTORY } from "./history";
 
 export type TRoutersConfig = {
   /**
