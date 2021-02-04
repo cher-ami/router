@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
+import { History, createBrowserHistory, createHashHistory, createMemoryHistory } from "history";
 
 const componentName = "Router";
 const debug = require("debug")(`front:${componentName}`);
@@ -19,6 +20,13 @@ interface IProps {
   routes?: TRoute[];
   middlewares?: (e: any) => void[];
   children: ReactElement;
+  environment?: ERouterEnvironment;
+}
+
+export enum ERouterEnvironment {
+  BROWSER = "browser",
+  HASH = "hash",
+  MEMORY = "memory",
 }
 
 // Router instance will be keep on this context
@@ -37,6 +45,23 @@ export const Router = memo((props: IProps) => {
 
   // we need to join each parent router base
   const base = useMemo(() => joinPaths([parentRouter?.base, props.base]), [props.base]);
+
+  // Select router environment once
+  // doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
+  if (!ROUTERS.history) {
+    switch (props.environment) {
+      case ERouterEnvironment.HASH:
+        ROUTERS.history = createHashHistory();
+        break;
+      case ERouterEnvironment.MEMORY:
+        ROUTERS.history = createMemoryHistory();
+        break;
+      default:
+        ROUTERS.history = createBrowserHistory();
+        break;
+    }
+    ROUTERS.locationsHistory.push(ROUTERS.history);
+  }
 
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter

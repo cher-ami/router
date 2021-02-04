@@ -1,5 +1,5 @@
 import { RouterInstance, TRoute } from "./RouterInstance";
-import { BrowserHistory } from "history";
+import { History } from "history";
 import { HISTORY } from "./history";
 
 export type TRoutersConfig = {
@@ -14,7 +14,7 @@ export type TRoutersConfig = {
   /**
    * Global browser history
    */
-  history: BrowserHistory;
+  history: History;
   /**
    * GLobal navigation history list
    */
@@ -37,8 +37,8 @@ export type TRoutersConfig = {
 export const ROUTERS: TRoutersConfig = {
   routes: null,
   instances: [],
-  history: HISTORY,
-  locationsHistory: [HISTORY.location],
+  history: null,
+  locationsHistory: [],
   routeCounter: 1,
   isFirstRoute: true,
 };

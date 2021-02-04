@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
-import { Router, TRoute } from "../src";
+import { Router, TRoute, ERouterEnvironment } from "../src";
 
 import App from "./App";
 import HomePage from "./pages/HomePage";
@@ -53,7 +53,7 @@ export const routesList: TRoute[] = [
  */
 
 ReactDOM.render(
-  <Router routes={routesList} base={"/"}>
+  <Router routes={routesList} base={"/"} environment={ERouterEnvironment.BROWSER}>
     <App />
   </Router>,
   document.getElementById("root")
