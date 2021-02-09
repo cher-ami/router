@@ -7,7 +7,7 @@ import {
 } from "react";
 
 const componentName = "useStack";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 export interface IUseStack extends Omit<IRouteStack, "$element" | "isReadyPromise"> {
   handleRef: ForwardedRef<any>;

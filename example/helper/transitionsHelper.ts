@@ -1,5 +1,5 @@
 import { gsap } from "gsap";
-const debug = require("debug")(`front:transitionsHelper`);
+const debug = require("debug")(`router:transitionsHelper`);
 
 export const transitionsHelper = (el, show: boolean): Promise<any> => {
   return new Promise((resolve) => {

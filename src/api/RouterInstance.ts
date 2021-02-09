@@ -12,7 +12,7 @@ import {
   MemoryHistory,
 } from "history";
 
-const debug = require("debug")("front:RouterInstance");
+const debug = require("debug")("router:RouterInstance");
 
 export type TRoute = {
   path: string;

@@ -4,7 +4,7 @@ import { getUrlByRouteName, TOpenRouteParams } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 
 const componentName = "useLocation";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 /**
  * useLocation

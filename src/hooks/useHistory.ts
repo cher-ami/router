@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ROUTERS } from "../api/routers";
 
 const componentName = "useHistory";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 /**
  * Handle router history

@@ -12,7 +12,7 @@ import BarPage from "./pages/BarPage";
 import "./index.css";
 import { EHistoryMode } from "../src";
 
-const debug = require("debug")(`front:index`);
+const debug = require("debug")(`router:index`);
 
 /**
  * Define routes list

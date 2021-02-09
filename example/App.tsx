@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Link, useRouteCounter, Stack, useHistory } from "../src";
 
 const componentName = "App";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 /**
  * @name App
