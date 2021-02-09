@@ -3,6 +3,14 @@ import React from "react";
 import { EventEmitter } from "events";
 import { buildUrl } from "./helpers";
 import { ROUTERS } from "./routers";
+import {
+  createBrowserHistory,
+  createHashHistory,
+  createMemoryHistory,
+  BrowserHistory,
+  HashHistory,
+  MemoryHistory,
+} from "history";
 
 const debug = require("debug")("front:RouterInstance");
 
@@ -10,7 +18,6 @@ export type TRoute = {
   path: string;
   component: React.ComponentType<any>;
   name?: string;
-
   parser?: Path;
   props?: { [x: string]: any };
   children?: TRoute[];
@@ -20,11 +27,16 @@ export type TRoute = {
   fullUrl?: string;
 };
 
+export enum EHistoryMode {
+  BROWSER = "browser",
+  HASH = "hash",
+  MEMORY = "memory",
+}
+
 export enum ERouterEvent {
   PREVIOUS_ROUTE_CHANGE = "previous-route-change",
   CURRENT_ROUTE_CHANGE = "current-route-change",
   STACK_IS_ANIMATING = "stack-is-animating",
-  PUSH_LOCATION = "PUSH_LOCATION",
 }
 
 /**
@@ -45,6 +57,9 @@ export class RouterInstance {
   public currentRoute: TRoute;
   public previousRoute: TRoute;
 
+  // history mode choice used by history library›
+  public historyMode: EHistoryMode;
+
   // store history listener
   protected unlistenHistory;
 
@@ -56,18 +71,29 @@ export class RouterInstance {
     routes = null,
     middlewares,
     id = 1,
+    historyMode,
   }: {
     base?: string;
     routes?: TRoute[];
     middlewares?: (e: any) => void[];
     id?: number | string;
+    historyMode: EHistoryMode;
   }) {
     this.base = base;
     this.id = id;
     this.middlewares = middlewares;
+    this.historyMode = historyMode;
 
     if (!routes) {
       throw new Error(`Router id ${id} > no routes array is set.`);
+    }
+
+    if (!ROUTERS.history) {
+      debug("No ROUTERS.history exist, create a new one", this.historyMode);
+      ROUTERS.history = this.getHistory(this.historyMode);
+
+      // push first location history object in global locationsHistory
+      ROUTERS.locationsHistory.push(ROUTERS.history.location);
     }
 
     // patch: create root path '/' if doesn't exist
@@ -100,6 +126,28 @@ export class RouterInstance {
   public destroyEvents(): void {
     // To stop listening, call the function returned from listen().
     this.unlistenHistory();
+  }
+
+  /**
+   * Select History mode
+   * doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
+   * @param historyMode
+   */
+  protected getHistory(
+    historyMode: EHistoryMode
+  ): HashHistory | MemoryHistory | BrowserHistory {
+    if (historyMode === EHistoryMode.HASH) {
+      return createHashHistory();
+    }
+    if (historyMode === EHistoryMode.MEMORY) {
+      return createMemoryHistory();
+    }
+    if (historyMode === EHistoryMode.BROWSER) {
+      return createBrowserHistory();
+    }
+
+    // in other case, return a browser history
+    return createBrowserHistory();
   }
 
   /**

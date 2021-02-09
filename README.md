@@ -293,8 +293,8 @@ const App = (props, handleRef) => {
   };
 
   return (
-      // ...
-      <Stack manageTransitions={customSenario} />
+    // ...
+    <Stack manageTransitions={customSenario} />
   );
 };
 ```
@@ -308,7 +308,7 @@ const App = (props, handleRef) => {
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={}>
+<Router routes={} base={} historyMode={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -316,7 +316,11 @@ Router component creates a new router instance.
 **Props:**
 
 - **routes** `TRoute[]` Routes list
-- **base** `string` Base URL - default: `"/"`
+- **base** `string` Base URL - default: `"/"``
+- **historyMode** `EHistoryMode` _(optional)_ choose history mode. - default : `EHistoryMode.BROWSER`
+  History mode can be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory),
+  [HASH](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createhashhistory),
+  [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory). For more information, check the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
 
 ### <a name="Link"></a>Link
 

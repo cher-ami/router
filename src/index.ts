@@ -1,6 +1,6 @@
-export { RouterInstance, TRoute, ERouterEvent } from "./api/RouterInstance";
+export { RouterInstance, TRoute, ERouterEvent, EHistoryMode } from "./api/RouterInstance";
 
-export { Router, ERouterEnvironment } from "./components/Router";
+export { Router } from "./components/Router";
 export { Link } from "./components/Link";
 export { Stack, TManageTransitions } from "./components/Stack";
 

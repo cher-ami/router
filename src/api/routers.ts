@@ -1,5 +1,5 @@
 import { RouterInstance, TRoute } from "./RouterInstance";
-import { History } from "history";
+import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 export type TRoutersConfig = {
   /**
@@ -13,7 +13,7 @@ export type TRoutersConfig = {
   /**
    * Global browser history
    */
-  history: History;
+  history: HashHistory | MemoryHistory | BrowserHistory;
   /**
    * GLobal navigation history list
    */
