@@ -14,7 +14,7 @@ interface IProps {
 }
 
 const componentName = "ArticlePage";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 /**
  * @name ArticlePage

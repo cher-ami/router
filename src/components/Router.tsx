@@ -11,7 +11,7 @@ import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 
 const componentName = "Router";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;

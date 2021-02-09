@@ -2,7 +2,7 @@ import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "FooPage";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {}
 

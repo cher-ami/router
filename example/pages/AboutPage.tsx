@@ -9,7 +9,7 @@ import { transitionsHelper } from "../helper/transitionsHelper";
 import { Link } from "../../src";
 import { Stack } from "../../src";
 const componentName: string = "AboutPage";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {}
 

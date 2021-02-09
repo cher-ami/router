@@ -9,7 +9,7 @@ interface IProps {
 }
 
 const componentName = "Link";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 /**
  * @name Link

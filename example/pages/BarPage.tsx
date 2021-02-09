@@ -8,7 +8,7 @@ import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 
 const componentName: string = "BarPage";
-const debug = require("debug")(`front:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {}
 
