@@ -1,4 +1,4 @@
-import { RouterInstance, TRoute, useRouter } from "..";
+import { EHistoryMode, RouterInstance, TRoute, useRouter } from "..";
 import React, {
   createContext,
   memo,
@@ -9,7 +9,6 @@ import React, {
 } from "react";
 import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
-import { EHistoryMode } from "../api/RouterInstance";
 
 const componentName = "Router";
 const debug = require("debug")(`front:${componentName}`);
@@ -65,8 +64,8 @@ export const Router = memo((props: IProps) => {
       base,
       routes,
       id,
-      middlewares: props.middlewares,
       historyMode: props.historyMode,
+      middlewares: props.middlewares,
     });
 
     // keep new router in global constant
