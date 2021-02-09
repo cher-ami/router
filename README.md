@@ -30,6 +30,8 @@ This router loads [history](https://github.com/ReactTraining/history), [path-par
 - [Manage Transitions](#ManageTransitions)
   - [Default sequential transitions](#DefaultSequentialTransitions)
   - [Custom transitions](#CustomTransitions)
+- [Debug](#Debug)
+- [Example](#Example)
 
 **API**
 
@@ -301,6 +303,33 @@ const App = (props, handleRef) => {
 
 **[Demo codesandbox: custom manage transitions](https://codesandbox.io/s/inspiring-thompson-tw4qn)**
 
+## <a name="Debug"></a>Debug
+
+[debug](https://github.com/visionmedia/debug) is used on this project.
+It allows to easily get logs informations on development and production modes.
+
+To use it, add this line in your browser console:
+
+```shell
+localStorage.debug = "router:*"
+```
+
+## <a name="Example"></a>Example
+
+A use case example is available on this repos.
+
+Install dependencies
+
+```shell
+$ npm i
+```
+
+Start dev server
+
+```shell
+$ npm run dev
+```
+
 ## <a name="Api"></a>API
 
 ### <a name="Router"></a>Router
@@ -562,22 +591,6 @@ const history = useHistory((e) => {
 **Returns:**
 
 - **history** `location[]` : Location array of history API
-
----
-
-## Example
-
-Install dependencies
-
-```shell
-$ npm i
-```
-
-Start dev server
-
-```shell
-$ npm run dev
-```
 
 ## Credits
 
