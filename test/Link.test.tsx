@@ -1,19 +1,27 @@
 import React from "react";
-import { Link } from "../src";
+import { Link, Router, TRoute } from "../src";
 import { render, fireEvent } from "@testing-library/react";
 import { ROUTERS } from "../src/api/routers";
 
 describe("Link", () => {
-
   it("should be defined", () => {
     expect(Link).toBeDefined();
   });
 
   it("should renders proper attributes", () => {
+    const routesList: TRoute[] = [
+      {
+        path: "/",
+        component: null,
+      },
+    ];
+
     const { container } = render(
-      <Link to={"/foo"} className={"containerLink"}>
-        Foo
-      </Link>
+      <Router base={"/"} routes={routesList}>
+        <Link to={"/foo"} className={"containerLink"}>
+          Foo
+        </Link>
+      </Router>
     );
     const link: any = container.firstChild;
     expect(link.tagName).toBe("A");
@@ -42,5 +50,4 @@ describe("Link", () => {
     expect(ROUTERS.history.location.pathname).toBe("/bar");
     expect(ROUTERS.history.action).toBe("PUSH");
   });
-
 });

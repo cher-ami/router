@@ -1,4 +1,4 @@
-import { RouterInstance, TRoute, useRouter } from "..";
+import { EHistoryMode, RouterInstance, TRoute, useRouter } from "..";
 import React, {
   createContext,
   memo,
@@ -19,6 +19,7 @@ interface IProps {
   routes?: TRoute[];
   middlewares?: (e: any) => void[];
   children: ReactElement;
+  historyMode?: EHistoryMode;
 }
 
 // Router instance will be keep on this context
@@ -63,12 +64,12 @@ export const Router = memo((props: IProps) => {
       base,
       routes,
       id,
+      historyMode: props.historyMode,
       middlewares: props.middlewares,
     });
 
     // keep new router in global constant
     ROUTERS.instances.push(newRouter);
-
     // return it as state
     debug("ROUTERS", ROUTERS);
 

@@ -4,8 +4,6 @@ import { ROUTERS } from "../api/routers";
 const componentName = "useHistory";
 const debug = require("debug")(`front:${componentName}`);
 
-// keep global location history outside the scope
-//let locationsHistory = [ROUTERS.history.location];
 /**
  * Handle router history
  */

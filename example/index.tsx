@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
+import { forwardRef } from "react";
 import { Router, TRoute } from "../src";
 
 import App from "./App";
@@ -9,7 +10,7 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
-import { forwardRef } from "react";
+import { EHistoryMode } from "../src";
 
 const debug = require("debug")(`front:index`);
 
@@ -53,7 +54,7 @@ export const routesList: TRoute[] = [
  */
 
 ReactDOM.render(
-  <Router routes={routesList} base={"/"}>
+  <Router routes={routesList} base={"/"} historyMode={EHistoryMode.BROWSER}>
     <App />
   </Router>,
   document.getElementById("root")
