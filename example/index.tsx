@@ -13,7 +13,6 @@ import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
 
-
 const debug = require("debug")(`router:index`);
 
 /**
@@ -53,12 +52,12 @@ export const routesList: TRoute[] = [
 
 // prettier-ignore
 const locales = [
+  { key: "en" },
   { key: "fr" },
-  { key: "en", default: true },
   { key: "de" }
 ];
 
-LanguagesService.init(locales, true);
+LanguagesService.init(locales);
 
 /**
  * Init Application

@@ -1,7 +1,7 @@
 import { ROUTERS } from "../api/routers";
 import { buildUrl } from "../api/helpers";
 
-const debug = require("debug")(`front:Languages`);
+const debug = require("debug")(`router:LanguagesServices`);
 
 export type TLanguage = {
   key: string;
@@ -19,14 +19,6 @@ class LanguagesService {
    * Get previous language object
    */
   public previousLanguage: TLanguage;
-
-  /**
-   * Show default language in URL
-   * ex: if default language is "en"
-   * if true, URL with language is "my-url.com/en/rest"
-   * if false, default language isn't shown in URL "my-url.com/rest" but remains "en"
-   */
-  public showDefaultLanguageInUrl: boolean;
 
   /**
    * Default language object
@@ -64,17 +56,14 @@ class LanguagesService {
   }
 
   /**
-   * TODO
-   * singleton / store
+   * Init languages service
    * @param languages
-   * @param showDefaultLanguageInUrl
    */
-  public init(languages: TLanguage[], showDefaultLanguageInUrl: boolean = false) {
+  public init(languages: TLanguage[]): void {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
     }
     this.languages = languages;
-    this.showDefaultLanguageInUrl = showDefaultLanguageInUrl;
     this.defaultLanguage = this.selectDefaultLanguage(languages);
     this.previousLanguage = this.currentLanguage;
     this._currentLanguage = this.getLanguageFromUrl();
@@ -102,16 +91,6 @@ class LanguagesService {
     );
     debug("getLanguageFromUrl > currentLanguageObj", currentLanguageObj);
     return currentLanguageObj || this.defaultLanguage;
-  }
-
-  /**
-   * Check if current language is the default one
-   */
-  protected currentLangageIsDefaultLanguage(
-    currentLanguage = this.currentLanguage,
-    defaultLanguage = this.defaultLanguage
-  ): boolean {
-    return currentLanguage.key === defaultLanguage.key;
   }
 }
 
