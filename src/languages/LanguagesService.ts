@@ -1,6 +1,5 @@
 import { ROUTERS } from "../api/routers";
 import { buildUrl } from "../api/helpers";
-
 const debug = require("debug")(`router:LanguagesServices`);
 
 export type TLanguage = {
@@ -91,6 +90,10 @@ class LanguagesService {
     );
     debug("getLanguageFromUrl > currentLanguageObj", currentLanguageObj);
     return currentLanguageObj || this.defaultLanguage;
+  }
+
+  public redirectToDefaultLanguageIfNoLanguageIsSet() {
+
   }
 }
 
