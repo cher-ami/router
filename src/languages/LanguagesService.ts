@@ -1,5 +1,6 @@
 import { ROUTERS } from "../api/routers";
-import { buildUrl } from "../api/helpers";
+import { buildUrl, joinPaths } from "../api/helpers";
+import { useRootRouter } from "../hooks/useRouter";
 const debug = require("debug")(`router:LanguagesServices`);
 
 export type TLanguage = {
@@ -37,15 +38,20 @@ class LanguagesService {
    * Push new URL in history
    * @param pCurrentLanguage
    */
-  public setLanguage(pCurrentLanguage: TLanguage) :void {
+  public setLanguage(pCurrentLanguage: TLanguage): void {
     if (this.currentLanguage === pCurrentLanguage) return;
     this._currentLanguage = pCurrentLanguage;
 
     // get current route of first instance (language service performs only for root instance)
-    const currentRoute = ROUTERS.instances?.[0].currentRoute;
+    const rootRouter = useRootRouter();
+    const currentBase = rootRouter.base;
+    const currentRoute = rootRouter.currentRoute;
+    const path = joinPaths([currentBase, currentRoute.path]);
+
+
 
     // prepare new URL with new lang param
-    const newUrl = buildUrl(currentRoute.path, {
+    const newUrl = buildUrl(path, {
       ...currentRoute.props?.params,
       lang: pCurrentLanguage.key,
     });
@@ -92,9 +98,7 @@ class LanguagesService {
     return currentLanguageObj || this.defaultLanguage;
   }
 
-  public redirectToDefaultLanguageIfNoLanguageIsSet() {
-
-  }
+  public redirectToDefaultLanguageIfNoLanguageIsSet() {}
 }
 
 export default new LanguagesService();

@@ -65,7 +65,7 @@ LanguagesService.init(locales);
 ReactDOM.render(
   <Router
     routes={routesList}
-    base={"/"}
+    base={"/coucou"}
     middlewares={[languagesMiddleware]}
     historyMode={EHistoryMode.BROWSER}
   >

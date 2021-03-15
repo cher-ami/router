@@ -38,6 +38,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
 
     // add base and lang to string URL like "/{base}/{lang}/foo"
     urlToPush = formatUrl(urlToPush);
+
     // finally, push in history
     ROUTERS.history.push(urlToPush);
   }

@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { formatUrl, joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
+import LanguagesService from "../languages/LanguagesService";
 
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);
@@ -39,8 +40,15 @@ export const Router = memo((props: IProps) => {
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
 
-  // we need to join each parent router base
-  const base = joinPaths([parentRouter?.base, props.base]);
+  const useLanguageService = LanguagesService.currentLanguage?.key != null;
+
+  // join each parent router base
+  const base = joinPaths([
+    parentRouter?.base,
+    // because language middleware nedd to patch only first level routes
+    id !== 1 && useLanguageService && "/:lang",
+    props.base,
+  ]);
 
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter

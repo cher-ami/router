@@ -1,7 +1,7 @@
 import { Path } from "path-parser";
 import React from "react";
 import { EventEmitter } from "events";
-import { buildUrl } from "./helpers";
+import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
 import {
   createBrowserHistory,
@@ -226,11 +226,17 @@ export class RouterInstance {
     for (let i in pRoutes) {
       let currentRoute = pRoutes[i];
       // create parser & matcher
-      const currentRoutePath = `${pBase}${currentRoute.path}`.replace("//", "/");
+      const currentRoutePath = joinPaths([pBase, currentRoute.path]);
       // prepare parser
       const pathParser: Path = new Path(currentRoutePath);
       // prettier-ignore
       debug(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!pathParser.test(pUrl));
+
+      debug(this.id, ">> INFO", {
+        pBase,
+        currentRouteDotPath: currentRoute.path,
+        currentRoutePath,
+      });
       // set new matcher
       match = pathParser.test(pUrl);
       // if current route path match with the param url
