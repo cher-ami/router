@@ -1,5 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { useLocation } from "..";
+import { formatUrl } from "../api/helpers";
 
 interface IProps {
   to: string;
@@ -24,8 +25,8 @@ function Link(props: IProps) {
   };
 
   const isActive = useMemo(() => {
-    return location === props.to;
-  }, [props.to]);
+    return location === formatUrl(props.to);
+  }, [location, props.to]);
 
   return (
     <a

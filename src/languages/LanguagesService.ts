@@ -44,18 +44,15 @@ class LanguagesService {
 
     // get current route of first instance (language service performs only for root instance)
     const rootRouter = useRootRouter();
-    const currentBase = rootRouter.base;
     const currentRoute = rootRouter.currentRoute;
-    const path = joinPaths([currentBase, currentRoute.path]);
-
-
+    const fullPath = rootRouter.currentRoute.fullPath;
 
     // prepare new URL with new lang param
-    const newUrl = buildUrl(path, {
+    const newUrl = buildUrl(fullPath, {
       ...currentRoute.props?.params,
       lang: pCurrentLanguage.key,
     });
-
+    
     // push new URL result in history
     ROUTERS.history.push(newUrl);
   }

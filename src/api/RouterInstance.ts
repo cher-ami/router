@@ -28,6 +28,8 @@ export type TRoute = {
   matchUrl?: string;
   // full URL who not depend of current instance
   fullUrl?: string;
+  // full Path /base/:lang/foo/second-foo
+  fullPath?: string;
 };
 
 export enum EHistoryMode {
@@ -232,11 +234,12 @@ export class RouterInstance {
       // prettier-ignore
       debug(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!pathParser.test(pUrl));
 
-      debug(this.id, ">> INFO", {
-        pBase,
-        currentRouteDotPath: currentRoute.path,
-        currentRoutePath,
-      });
+      // debug(this.id, ">> INFO", {
+      //   pBase,
+      //   currentRouteDotPath: currentRoute.path,
+      //   currentRoutePath,
+      // });
+
       // set new matcher
       match = pathParser.test(pUrl);
       // if current route path match with the param url
@@ -246,6 +249,7 @@ export class RouterInstance {
         const params = pMatch || match;
         const routeObj = {
           fullUrl: pUrl,
+          fullPath: currentRoutePath,
           matchUrl: buildUrl(route.path, params),
           path: route?.path,
           component: route?.component,
