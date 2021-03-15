@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useMemo } from "react";
 import { useLocation } from "..";
 
 interface IProps {
@@ -23,9 +23,13 @@ function Link(props: IProps) {
     setLocation(props.to);
   };
 
+  const isActive = useMemo(() => {
+    return location === props.to;
+  }, [props.to]);
+
   return (
     <a
-      className={[componentName, props.className, location === props.to && "active"]
+      className={[componentName, props.className, isActive && "active"]
         .filter((e: string) => e)
         .join(" ")}
       onClick={handleClick}

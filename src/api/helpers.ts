@@ -1,5 +1,7 @@
 import { Path } from "path-parser";
 import { TRoute } from "./RouterInstance";
+import LanguagesService from "../languages/LanguagesService";
+import { ROUTERS } from "./routers";
 const debug = require("debug")("router:helpers");
 
 export type TParams = { [x: string]: any };
@@ -9,6 +11,10 @@ export type TOpenRouteParams = {
   params?: TParams;
 };
 
+/**
+ * Join string paths array
+ * @param paths
+ */
 export function joinPaths(paths: string[]): string {
   return paths
     ?.filter((e) => e)
@@ -17,7 +23,7 @@ export function joinPaths(paths: string[]): string {
 }
 
 /**
- * Build an URL with path and params
+ * Build an URL with path and params via PathParser
  */
 export function buildUrl(path: string, params?: TParams): string {
   const newPath = new Path(path);
@@ -111,3 +117,66 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
 
   return recursiveFn(pRoutes, pParams);
 }
+
+/**
+ * if language service exist we set automatically lang key to URL
+ * and current language in URL
+ *
+ * ex
+ * before: "/foo"
+ * after:  "/en/foo"
+ *
+ * ex2
+ * before: "/"
+ * after:  "/en"
+ *
+ * @param url
+ * @param lang
+ */
+export const addLangToUrl = (
+  url: string,
+  lang: string = LanguagesService.currentLanguage?.key
+): string => {
+  if (!lang) return url;
+  url = `/${lang}${url === "/" ? "" : url}`;
+  debug("url w/ lang", url);
+  return url;
+};
+
+/**
+ * add base to URL
+ *
+ * ex
+ * before: "/foo"
+ * after:  "/custom-base/foo"
+ *
+ * ex with lang "en"
+ * before: "/en/foo"
+ * after:  "/custom-base/en/foo"
+ *
+ * @param url
+ * @param base
+ */
+export const addBaseToUrl = (url: string, base = ROUTERS.instances?.[0].base): string => {
+  url = `${base === "/" ? "" : base}${url}`.replace("//", "/");
+  debug("url w/ base", url);
+  return url;
+};
+
+/**
+ * Format URL allow to prepare URL string before history push
+ * add base and lang to string URL
+ *
+ * ex
+ * before: "/foo"
+ * after:  "/{base}/{lang}/foo"
+ *
+ * @param url
+ */
+export const formatUrl = (url: string): string => {
+  // add language to URL (if language service is set)
+  url = addLangToUrl(url);
+  // add base to URL
+ // url = addBaseToUrl(url);
+  return url;
+};

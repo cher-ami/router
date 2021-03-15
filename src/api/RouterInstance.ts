@@ -108,15 +108,19 @@ export class RouterInstance {
     }
 
     // format routes
-    routes.forEach((el: TRoute) => this.addRoute(el));
+    this.preMiddlewareRoutes = routes.map((route: TRoute) => ({
+      ...route,
+      parser: new Path(route.path),
+    }));
+    debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
 
     // ex: language service devrait pouvoir patcher les routes une a une
-    this.routes = this.middlewares?.reduce(
-      (routes, middleware) => middleware(routes),
-      this.preMiddlewareRoutes
-    );
+    // prettier-ignore
+    this.routes =
+      this.middlewares?.reduce((routes, middleware) => middleware(routes), this.preMiddlewareRoutes)
+      || this.preMiddlewareRoutes;
+    debug(this.id, "this.routes", this.routes);
 
-    // start
     this.updateRoute();
     this.initEvents();
   }
@@ -168,13 +172,6 @@ export class RouterInstance {
   protected handleHistory = (param: string): void => {
     this.updateRoute(param);
   };
-
-  /**
-   * Add new route object to routes array
-   */
-  protected addRoute(route: TRoute): void {
-    this.preMiddlewareRoutes.push({ ...route, parser: new Path(route.path) });
-  }
 
   /**
    * Update route

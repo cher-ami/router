@@ -15,14 +15,9 @@ class LanguagesService {
   public languages: TLanguage[];
 
   /**
-   * Get previous language object
+   * Previous language object
    */
   public previousLanguage: TLanguage;
-
-  /**
-   * Default language object
-   */
-  public defaultLanguage: TLanguage;
 
   /**
    * Get current language object
@@ -33,11 +28,16 @@ class LanguagesService {
   }
 
   /**
-   * Set current language object
+   * Default language object
+   */
+  public defaultLanguage: TLanguage;
+
+  /**
+   * set current language object
    * Push new URL in history
    * @param pCurrentLanguage
    */
-  public set currenLanguage(pCurrentLanguage: TLanguage) {
+  public setLanguage(pCurrentLanguage: TLanguage) :void {
     if (this.currentLanguage === pCurrentLanguage) return;
     this._currentLanguage = pCurrentLanguage;
 

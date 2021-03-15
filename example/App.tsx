@@ -23,29 +23,23 @@ export default function App() {
     <div className={componentName}>
       <button
         onClick={() => {
-          LanguagesService.currenLanguage = { key: "en" };
+          LanguagesService.setLanguage({ key: "en" });
         }}
       >
         CHANGE LANGUAGE TO EN
       </button>
       <button
         onClick={() => {
-          LanguagesService.currenLanguage = { key: "fr" };
+          LanguagesService.setLanguage({ key: "fr" });
         }}
       >
         CHANGE LANGUAGE TO FR
       </button>
       <nav>
         <ul>
-          <li>
-            <Link to={"/fr"}>Home</Link>{" "}
-          </li>
-          <li>
-            <Link to={"/fr/about"}>About</Link>{" "}
-          </li>
-          <li>
-            <Link to={"/fr/blog/article-1"}>Blog id:article-1</Link>
-          </li>
+          <li><Link to={"/"}>Home</Link></li>
+          <li><Link to={"/about"}>About</Link></li>
+          <li><Link to={"/blog/article-1"}>Blog id:article-1</Link></li>
         </ul>
       </nav>
       <Stack className={"App_stack"} />

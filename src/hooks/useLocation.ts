@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useHistory, useRootRouter } from "..";
-import { getUrlByRouteName, TOpenRouteParams } from "../api/helpers";
+import { formatUrl, getUrlByRouteName, TOpenRouteParams } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 
 const componentName = "useLocation";
@@ -28,7 +28,6 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
   function setLocation(args: string | TOpenRouteParams): void {
     let urlToPush: string;
 
-    // prepare URL
     if (typeof args === "string") {
       urlToPush = args;
     } else if (typeof args === "object" && args.name) {
@@ -37,6 +36,9 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
       throw new Error("ERROR: setLocation param isn't valid. return.");
     }
 
+    // add base and lang to string URL like "/{base}/{lang}/foo"
+    urlToPush = formatUrl(urlToPush);
+    // finally, push in history
     ROUTERS.history.push(urlToPush);
   }
 
