@@ -34,42 +34,84 @@ class LanguagesService {
   public defaultLanguage: TLanguage;
 
   /**
-   * set current language object
-   * Push new URL in history
-   * @param pCurrentLanguage
+   * Show default language in URL
    */
-  public setLanguage(pCurrentLanguage: TLanguage): void {
-    if (this.currentLanguage === pCurrentLanguage) return;
-    this._currentLanguage = pCurrentLanguage;
-
-    // get current route of first instance (language service performs only for root instance)
-    const rootRouter = useRootRouter();
-    const currentRoute = rootRouter.currentRoute;
-    const fullPath = rootRouter.currentRoute.fullPath;
-
-    // prepare new URL with new lang param
-    const newUrl = buildUrl(fullPath, {
-      ...currentRoute.props?.params,
-      lang: pCurrentLanguage.key,
-    });
-    
-    // push new URL result in history
-    ROUTERS.history.push(newUrl);
-  }
+  public showDefaultLanguageInUrl: boolean;
 
   /**
    * Init languages service
    * @param languages
+   * @param showDefaultLanguageIsUrl
    */
-  public init(languages: TLanguage[]): void {
+  public init(languages: TLanguage[], showDefaultLanguageIsUrl: boolean = true): void {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
     }
     this.languages = languages;
     this.defaultLanguage = this.selectDefaultLanguage(languages);
     this.previousLanguage = this.currentLanguage;
-    this._currentLanguage = this.getLanguageFromUrl();
+
+    this._currentLanguage = this.showDefaultLanguageInUrl
+      ? this.getLanguageFromUrl()
+      : this.defaultLanguage;
+
+    debug("this._currentLanguage", this._currentLanguage);
+
+    this.showDefaultLanguageInUrl = showDefaultLanguageIsUrl;
   }
+
+  /**
+   * set current language object
+   * Push new URL in history
+   * @param pCurrentLanguage
+   */
+  public setLanguage(pCurrentLanguage: TLanguage): void {
+    if (this.currentLanguage.key === pCurrentLanguage.key) return;
+    this._currentLanguage = pCurrentLanguage;
+
+    // get current route of first instance (language service performs only for root instance)
+    const rootRouter = useRootRouter();
+    const base = rootRouter.base;
+    const currentRoute = rootRouter.currentRoute;
+    const fullPath = rootRouter.currentRoute.fullPath;
+
+    debug("fullPath", fullPath);
+
+    // if  default language is visible in URL
+    if (this.showDefaultLanguageInUrl) {
+      // build new URL with param
+      const newUrl = buildUrl(fullPath, {
+        ...currentRoute.props?.params,
+        lang: pCurrentLanguage.key,
+      });
+
+      // push in history
+      ROUTERS.history.push(newUrl);
+
+      // if default language need to be hidden from URL
+      // process window open on the current URL without language
+    } else {
+      //
+      let pathWithoutLangParam;
+
+      pathWithoutLangParam = fullPath.split("/:lang").join("");
+      const splitArray = fullPath.split(base);
+      splitArray[0] = `/${pCurrentLanguage.key}`;
+      splitArray.unshift(base);
+      pathWithoutLangParam = splitArray.join("");
+
+      window.open(pathWithoutLangParam, "_self");
+    }
+  }
+
+  /**
+   * Current lang is default lang
+   */
+  public currentLangageIsDefaultLanguage(): boolean {
+    return this.currentLanguage.key === this.defaultLanguage.key;
+  }
+
+  public redirectToDefaultLanguageIfNoLanguageIsSet() {}
 
   // --------------------------------------------------------------------------- LOCAL
 
@@ -89,13 +131,11 @@ class LanguagesService {
   protected getLanguageFromUrl(pathname = window.location.pathname): TLanguage {
     const currentLanguageObj = this.languages.find((language) =>
       // TODO match pas assez précis
-      pathname.startsWith(`/${language.key}`)
+      pathname.startsWith(joinPaths([`${useRootRouter().base}/${language.key}`]))
     );
     debug("getLanguageFromUrl > currentLanguageObj", currentLanguageObj);
     return currentLanguageObj || this.defaultLanguage;
   }
-
-  public redirectToDefaultLanguageIfNoLanguageIsSet() {}
 }
 
 export default new LanguagesService();

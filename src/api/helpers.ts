@@ -137,8 +137,8 @@ export const addLangToUrl = (
   url: string,
   lang: string = LanguagesService.currentLanguage?.key
 ): string => {
-  if (!lang) return url;
-  url = `/${lang}${url === "/" ? "" : url}`;
+  if (!lang || !LanguagesService.showDefaultLanguageInUrl) return url;
+  url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
   debug("url w/ lang", url);
   return url;
 };

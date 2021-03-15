@@ -57,7 +57,7 @@ const locales = [
   { key: "de" }
 ];
 
-LanguagesService.init(locales);
+LanguagesService.init(locales, false);
 
 /**
  * Init Application

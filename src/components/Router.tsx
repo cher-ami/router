@@ -39,7 +39,9 @@ export const Router = memo((props: IProps) => {
 
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
-  const useLanguageService = LanguagesService.currentLanguage?.key != null;
+  const useLanguageService =
+    LanguagesService.currentLanguage?.key != null &&
+    LanguagesService.showDefaultLanguageInUrl;
 
   // join each parent router base
   const base = joinPaths([

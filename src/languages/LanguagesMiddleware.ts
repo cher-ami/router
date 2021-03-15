@@ -1,4 +1,6 @@
 import { TRoute } from "../api/RouterInstance";
+import { joinPaths } from "../api/helpers";
+import LanguagesService from "./LanguagesService";
 const debug = require("debug")(`router:languagesMiddleware`);
 
 /**
@@ -7,8 +9,15 @@ const debug = require("debug")(`router:languagesMiddleware`);
  * @param pRoutes
  */
 export const languagesMiddleware = (pRoutes: TRoute[]): TRoute[] => {
+  if (
+    !LanguagesService.showDefaultLanguageInUrl &&
+    LanguagesService.currentLangageIsDefaultLanguage()
+  ) {
+    return pRoutes;
+  }
+
   return pRoutes.map((route: TRoute) => ({
     ...route,
-    path: `/:lang${route.path !== "/" ? route.path : ""}`,
+    path: joinPaths(["/:lang", route.path !== "/" ? route.path : ""]),
   }));
 };
