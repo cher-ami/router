@@ -1,6 +1,6 @@
 import { TRoute } from "../api/RouterInstance";
 import { joinPaths } from "../api/helpers";
-import LanguagesService from "./LanguagesService";
+import LanguagesService from "./LangService";
 const debug = require("debug")(`router:languagesMiddleware`);
 
 /**
@@ -9,7 +9,7 @@ const debug = require("debug")(`router:languagesMiddleware`);
  * @param pRoutes
  * @param enable
  */
-export const languagesMiddleware = (
+export const langMiddleware = (
   pRoutes: TRoute[],
   enable = LanguagesService.showLangInUrl()
 ): TRoute[] => {

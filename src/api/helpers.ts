@@ -1,6 +1,6 @@
 import { Path } from "path-parser";
 import { TRoute } from "./RouterInstance";
-import LanguagesService from "../languages/LanguagesService";
+import LanguagesService from "../languages/LangService";
 import { useRootRouter } from "../hooks/useRouter";
 const debug = require("debug")("router:helpers");
 
@@ -19,7 +19,7 @@ export function joinPaths(paths: string[]): string {
   return paths
     ?.filter((e) => e)
     .join("")
-    .replace("//", "/");
+    .replace(/(https?:\/\/)|(\/)+/g, "$1$2");
 }
 
 /**
@@ -28,9 +28,7 @@ export function joinPaths(paths: string[]): string {
  * @param lastCaracter
  */
 export function removeLastCaracterFromString(str: string, lastCaracter = "/") {
-  if (str.charAt(str.length - 1) == lastCaracter) {
-    return str.substr(0, str.length - 1);
-  }
+  if (str.endsWith(lastCaracter)) return str.slice(0, -1);
 }
 
 /**
@@ -188,4 +186,14 @@ export const formatUrl = (url: string): string => {
   url = addLangToUrl(url);
   url = addBaseToUrl(url);
   return url;
+};
+
+/**
+ * Return path without his base
+ * @param path
+ * @param base
+ */
+export const extractPathFromBase = (path: string, base: string): string => {
+  let baseStartIndex = path.indexOf(base);
+  return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
 };

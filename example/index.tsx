@@ -2,8 +2,8 @@ import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
 import { EHistoryMode, Router, TRoute } from "../src";
-import LanguagesService from "../src/languages/LanguagesService";
-import { languagesMiddleware } from "../src/languages/LanguagesMiddleware";
+import LangService from "../src/languages/LangService";
+import { langMiddleware } from "../src/languages/LangMiddleware";
 
 import App from "./App";
 import HomePage from "./pages/HomePage";
@@ -50,10 +50,10 @@ export const routesList: TRoute[] = [
   },
 ];
 
-const baseUrl = "/coucou-base";
-const locales = [{ key: "fr" }, { key: "en" }, { key: "de" }];
+const baseUrl = "/";
+const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 
-LanguagesService.init(locales, false, baseUrl);
+LangService.init(locales, true, baseUrl);
 
 /**
  * Init Application
@@ -62,7 +62,7 @@ ReactDOM.render(
   <Router
     routes={routesList}
     base={baseUrl}
-    middlewares={[languagesMiddleware]}
+    middlewares={[langMiddleware]}
     historyMode={EHistoryMode.BROWSER}
   >
     <App />
