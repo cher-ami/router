@@ -59,7 +59,7 @@ class LanguagesService {
     this.base = base;
     this.defaultLanguage = this.selectDefaultLanguage(languages);
     this.previousLanguage = this.currentLanguage;
-    this.currentLanguage = this.getLanguageFromUrl();
+    this.currentLanguage = this.getLanguageFromUrl() || this.defaultLanguage;
     this.showDefaultLanguageInUrl = showDefaultLanguageIsUrl;
     this.isInit = true;
 
@@ -164,7 +164,52 @@ class LanguagesService {
     }
   }
 
-  public redirectToDefaultLanguageIfNoLanguageIsSet() {}
+  /**
+   * On first load
+   * redirect to default language if no language is set
+   */
+  public redirect() {
+    const isValideLanguage = this.langIsAvailable(this.getLanguageFromUrl());
+    const currentRoute = ROUTERS.instances?.[ROUTERS.instances?.length - 1].currentRoute;
+    let newUrl: string;
+
+    // si toute les URL possèdent une langue
+    if (this.showDefaultLanguageInUrl) {
+      // if lang key is not in URL, redirect to default language
+      if (!isValideLanguage) {
+        newUrl = buildUrl(currentRoute.fullPath, {
+          ...currentRoute.props?.params,
+          lang: this.defaultLanguage.key,
+        });
+      }
+
+      window.open(newUrl, "_self");
+      // TODO continue
+
+      // si toute les URL NE possèdent PAS une langue (pas de langue pour la default lang)
+    } else {
+      const langFromUrl = this.getLanguageFromUrl();
+
+      // si il y a un langue dans l'url, ça ne doit pas etre la default
+      // si la langue de l'url n'est pas la langue par defaut
+      if (this.isDefaultLanguageKey(langFromUrl?.key)) {
+        debug("lang from URL is not default language, return");
+      }
+
+      // si la lang dans l'URL n'est pas une langue valide
+      if (!isValideLanguage) {
+        debug("isValideLanguage", isValideLanguage);
+        // la langue de l'URL n'est pas valide, reconstruire l'URL
+        newUrl = buildUrl(currentRoute.fullPath, {
+          ...currentRoute.props?.params,
+          lang: this.defaultLanguage.key,
+        });
+      //window.open(newUrl, "_self");
+      } else {
+      }
+
+    }
+  }
 
   // --------------------------------------------------------------------------- LOCAL
 
@@ -187,7 +232,7 @@ class LanguagesService {
       return pathname.startsWith(joinPaths([`${this.base}/${language.key}`]));
     });
     debug("getLanguageFromUrl > currentLanguageObj", currentLanguageObj);
-    return currentLanguageObj || this.defaultLanguage;
+    return currentLanguageObj;
   }
 
   /**
@@ -195,7 +240,7 @@ class LanguagesService {
    * @protected
    */
   protected langIsAvailable(langObject: TLanguage, languesList = this.languages) {
-    return languesList.some((lang) => lang.key === langObject.key);
+    return languesList.some((lang) => lang.key === langObject?.key);
   }
 }
 

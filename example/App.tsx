@@ -19,6 +19,10 @@ export default function App() {
     debug("count", count);
   }, [count]);
 
+  useEffect(() => {
+    LanguagesService.redirect();
+  }, []);
+
   return (
     <div className={componentName}>
       <button
