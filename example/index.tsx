@@ -50,14 +50,10 @@ export const routesList: TRoute[] = [
   },
 ];
 
-// prettier-ignore
-const locales = [
-  { key: "en" },
-  { key: "fr" },
-  { key: "de" }
-];
+const baseUrl = "/coucou-base";
+const locales = [{ key: "fr" }, { key: "en" }, { key: "de" }];
 
-LanguagesService.init(locales, false);
+LanguagesService.init(locales, false, baseUrl);
 
 /**
  * Init Application
@@ -65,7 +61,7 @@ LanguagesService.init(locales, false);
 ReactDOM.render(
   <Router
     routes={routesList}
-    base={"/coucou"}
+    base={baseUrl}
     middlewares={[languagesMiddleware]}
     historyMode={EHistoryMode.BROWSER}
   >

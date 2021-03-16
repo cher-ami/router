@@ -233,13 +233,6 @@ export class RouterInstance {
       const pathParser: Path = new Path(currentRoutePath);
       // prettier-ignore
       debug(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!pathParser.test(pUrl));
-
-      // debug(this.id, ">> INFO", {
-      //   pBase,
-      //   currentRouteDotPath: currentRoute.path,
-      //   currentRoutePath,
-      // });
-
       // set new matcher
       match = pathParser.test(pUrl);
       // if current route path match with the param url
@@ -261,7 +254,7 @@ export class RouterInstance {
           },
         };
 
-        debug(this.id, "getRouteFromUrl: > MATCH routeObj", routeObj);
+        debug(this.id, "getRouteFromUrl: MATCH routeObj", routeObj);
         return routeObj;
       }
 

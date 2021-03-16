@@ -7,15 +7,13 @@ const debug = require("debug")(`router:languagesMiddleware`);
  * LanguagesMiddleware
  * Patch all routes with ":lang" param
  * @param pRoutes
+ * @param enable
  */
-export const languagesMiddleware = (pRoutes: TRoute[]): TRoute[] => {
-  if (
-    !LanguagesService.showDefaultLanguageInUrl &&
-    LanguagesService.currentLangageIsDefaultLanguage()
-  ) {
-    return pRoutes;
-  }
-
+export const languagesMiddleware = (
+  pRoutes: TRoute[],
+  enable = LanguagesService.showLangInUrl()
+): TRoute[] => {
+  if (!enable) return pRoutes;
   return pRoutes.map((route: TRoute) => ({
     ...route,
     path: joinPaths(["/:lang", route.path !== "/" ? route.path : ""]),

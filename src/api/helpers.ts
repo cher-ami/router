@@ -23,6 +23,17 @@ export function joinPaths(paths: string[]): string {
 }
 
 /**
+ * Remove last caracter from string
+ * @param str
+ * @param lastCaracter
+ */
+export function removeLastCaracterFromString(str: string, lastCaracter = "/") {
+  if (str.charAt(str.length - 1) == lastCaracter) {
+    return str.substr(0, str.length - 1);
+  }
+}
+
+/**
  * Build an URL with path and params via PathParser
  */
 export function buildUrl(path: string, params?: TParams): string {
@@ -132,14 +143,15 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  *
  * @param url
  * @param lang
+ * @param enable
  */
 export const addLangToUrl = (
   url: string,
-  lang: string = LanguagesService.currentLanguage?.key
+  lang: string = LanguagesService.currentLanguage?.key,
+  enable = LanguagesService.showLangInUrl()
 ): string => {
-  if (!lang || !LanguagesService.showDefaultLanguageInUrl) return url;
+  if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
-  debug("url w/ lang", url);
   return url;
 };
 
@@ -159,7 +171,6 @@ export const addLangToUrl = (
  */
 export const addBaseToUrl = (url: string, base = useRootRouter().base): string => {
   url = joinPaths([base === "/" ? "" : base, url]);
-  debug("url w/ base", url);
   return url;
 };
 
@@ -174,9 +185,7 @@ export const addBaseToUrl = (url: string, base = useRootRouter().base): string =
  * @param url
  */
 export const formatUrl = (url: string): string => {
-  // add language to URL (if language service is set)
   url = addLangToUrl(url);
-  // add base to URL
   url = addBaseToUrl(url);
   return url;
 };

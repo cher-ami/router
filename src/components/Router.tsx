@@ -39,15 +39,14 @@ export const Router = memo((props: IProps) => {
 
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
-  const useLanguageService =
-    LanguagesService.currentLanguage?.key != null &&
-    LanguagesService.showDefaultLanguageInUrl;
+
+  const showLang = LanguagesService.showLangInUrl();
 
   // join each parent router base
   const base = joinPaths([
     parentRouter?.base,
     // because language middleware nedd to patch only first level routes
-    id !== 1 && useLanguageService && "/:lang",
+    id !== 1 && showLang && "/:lang",
     props.base,
   ]);
 
@@ -63,7 +62,6 @@ export const Router = memo((props: IProps) => {
         return `${el.path}` === props.base;
       })?.children;
     }
-    debug(id, `currentRoutesList`, currentRoutesList);
 
     return currentRoutesList;
   }, [props.routes, props.base]);
@@ -90,9 +88,6 @@ export const Router = memo((props: IProps) => {
   // on destroy, we need to remove this current router instance from ROUTERS.instances array
   // remove 1 element from specific index
   useEffect(() => {
-    debug(id, "parentRouter", parentRouter);
-    debug(id, "ROUTERS.instances", ROUTERS.instances);
-
     return () => {
       ROUTERS.instances.splice(
         ROUTERS.instances.findIndex((el) => el.id === routerState.id),
