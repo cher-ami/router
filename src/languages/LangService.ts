@@ -1,7 +1,12 @@
 import { ROUTERS } from "../api/routers";
-import { buildUrl, extractPathFromBase, joinPaths } from "../api/helpers";
+import {
+  buildUrl,
+  extractPathFromBase,
+  joinPaths,
+  removeLastCaracterFromString,
+} from "../api/helpers";
 import { useRootRouter } from "../hooks/useRouter";
-const debug = require("debug")(`router:LanguagesService`);
+const debug = require("debug")(`router:LangService`);
 
 export type TLanguage = {
   key: string;
@@ -76,7 +81,7 @@ class LangService {
     }
 
     if (toLang.key === this.currentLanguage.key) {
-      debug("setLanguage > This is the same language, exit.");
+      debug("setLang > This is the same language, exit.");
       return;
     }
     if (!this.langIsAvailable(toLang)) {
@@ -85,61 +90,66 @@ class LangService {
     }
     // prettier-ignore
     if (!useRootRouter()) {
-      debug("setLanguage > useRootRouter() is not available before his initialisation, exit.");
+      debug("setLang > useRootRouter() is not available before his initialisation, exit.");
       return;
     }
 
     const rootRouter = useRootRouter();
-    const base = rootRouter.base;
     const currentRoute = rootRouter.currentRoute;
     // need the last instance fullPath in case of sub router
-    const fullPath =
-      ROUTERS.instances?.[ROUTERS.instances?.length - 1].currentRoute.fullPath;
+    const instances = ROUTERS.instances;
+    const fullPath = instances?.[instances?.length - 1].currentRoute.fullPath;
 
-    // if default language should be visible in URL
-    // use history push
+    // if default language should be visible in URL, use history push
     if (this.showDefaultLanguageInUrl) {
-      debug(
-        "setLanguage > default language should be always visible in URL, show /:lang"
-      );
+      debug("setLang > default language should be always visible in URL, show /:lang");
       const newUrl = buildUrl(fullPath, {
         ...currentRoute.props?.params,
         lang: toLang.key,
       });
 
-      window.open(newUrl, "_self");
-
-      // if other, case default language need to be hidden from URL
-      // process window open on the current URL without language
-    } else {
-      let newPath: string;
-      debug("show default lang in URL is FALSE", { fullPath });
-
-      if (this.isDefaultLangKey(toLang.key)) {
-        debug("setLanguage > go to default lang, HIDDEN :lang from URL");
-        newPath = fullPath.split("/:lang").join("");
-      } else if (this.isDefaultLangKey(this.currentLanguage.key)) {
-        debug("setLanguage > we are on default lang, add /:lang param after base");
-        if (base === "/") {
-          newPath = joinPaths(["/:lang", fullPath]);
-        } else {
-          const pathWithoutBase = fullPath.split(base).join("");
-          newPath = joinPaths([base, "/:lang", pathWithoutBase]);
-        }
-      } else {
-        debug("setLanguage > switch to another lang, keep /:lang param");
-        newPath = fullPath;
-      }
-
-      const newUrl = buildUrl(newPath, {
-        ...currentRoute.props?.params,
-        lang: toLang.key,
-      });
-
-      debug("setLanguage > infos", { newPath, newUrl });
       // reload application
       window.open(newUrl, "_self");
+      return;
     }
+
+    // if other, case default language need to be hidden from URL
+    // process window open on the current URL without language
+    let newPath: string;
+    debug("show default lang in URL is FALSE", { fullPath });
+
+    // if toLang is default lang
+    if (this.isDefaultLangKey(toLang.key)) {
+      debug("setLang > go to default lang, need to hidden lang from URL");
+      newPath = fullPath.split("/:lang").join("");
+      newPath = newPath === "" ? "/" : newPath;
+
+      // if curent lang is default lang
+    } else if (this.isDefaultLangKey(this.currentLanguage.key)) {
+      debug("setLang > we are on default lang, add /:lang param after base");
+      const path = extractPathFromBase(fullPath, this.base);
+      newPath = joinPaths([this.base, "/:lang/", path]);
+
+      // if we are on url with lang and switch to another lang visible in URL
+    } else {
+      debug("setLang > switch to another lang, keep /:lang param");
+      newPath = fullPath;
+    }
+
+    // remove last "/" if exist
+    if (newPath !== "/") newPath = removeLastCaracterFromString(newPath, "/");
+    debug("setLang > newPath", { newPath });
+
+    // build new URL
+    const newUrl = buildUrl(newPath, {
+      ...currentRoute.props?.params,
+      lang: toLang.key,
+    });
+
+    debug("setLang > newUrl", { newUrl });
+
+    // reload application
+    window.open(newUrl, "_self");
 
     // register currentLangage
     this.currentLanguage = toLang;
@@ -150,7 +160,7 @@ class LangService {
    * redirect to default language if no language is set
    *
    * FIXME si l'URL possède la base mais n'a pas de local, on redirige vers /base/local par default
-   * FIXME par contre, si on a /base/{bad-lang}/path -> 404
+   * FIXME par contre, si on a /base/{bad-lang}/path on ne redirige pas -> 404
    *
    */
   public redirect(forcePageReload: boolean = true) {

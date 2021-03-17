@@ -24,6 +24,18 @@ export function joinPaths(paths: string[], join: string = ""): string {
 }
 
 /**
+ * Remove last caracter from string
+ * @param str
+ * @param lastCaracter
+ */
+export function removeLastCaracterFromString(str: string, lastCaracter = "/"): string {
+  if (str.endsWith(lastCaracter)) {
+    str = str.slice(0, -1);
+  }
+  return str;
+}
+
+/**
  * Build an URL with path and params via PathParser
  */
 export function buildUrl(path: string, params?: TParams): string {
