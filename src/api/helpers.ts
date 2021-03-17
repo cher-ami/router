@@ -18,7 +18,7 @@ export type TOpenRouteParams = {
  */
 export function joinPaths(paths: string[], join: string = ""): string {
   return paths
-    ?.filter((e) => e)
+    ?.filter((str) => str)
     .join(join)
     .replace(/(https?:\/\/)|(\/)+/g, "$1$2");
 }

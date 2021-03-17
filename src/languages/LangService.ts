@@ -73,72 +73,76 @@ class LangService {
    * set current language object
    * Push new URL in history
    * @param toLang
+   * @param forcePageReload
    */
-  public setLang(toLang: TLanguage): void {
+  public setLang(toLang: TLanguage, forcePageReload = true): void {
     if (!this.isInit) {
-      console.warn("LangService is not init, exit.");
+      console.warn("setLang: LangService is not init, exit.");
       return;
     }
-
     if (toLang.key === this.currentLanguage.key) {
-      debug("setLang > This is the same language, exit.");
+      debug("setLang: This is the same language, exit.");
       return;
     }
     if (!this.langIsAvailable(toLang)) {
-      debug(`lang ${toLang.key} is not available in languages list, exit.`);
+      debug(`setLang: lang ${toLang.key} is not available in languages list, exit.`);
       return;
     }
     // prettier-ignore
     if (!useRootRouter()) {
-      debug("setLang > useRootRouter() is not available before his initialisation, exit.");
+      debug("setLang: useRootRouter() is not available before his initialisation, exit.");
       return;
     }
 
     const rootRouter = useRootRouter();
     const currentRoute = rootRouter.currentRoute;
-    // need the last instance fullPath in case of sub router
     const instances = ROUTERS.instances;
     const fullPath = instances?.[instances?.length - 1].currentRoute.fullPath;
 
     // if default language should be visible in URL, use history push
     if (this.showDefaultLanguageInUrl) {
-      debug("setLang > default language should be always visible in URL, show /:lang");
+      debug("setLang: default language should be always visible in URL, show /:lang");
       const newUrl = buildUrl(fullPath, {
         ...currentRoute.props?.params,
         lang: toLang.key,
       });
 
+      // register current langage (not usefull if we reload the app...)
+      this.currentLanguage = toLang;
+
       // reload application
-      window.open(newUrl, "_self");
+      this.reloadOrRefresh(newUrl, forcePageReload);
+
+      // stop process here
       return;
     }
 
     // if other, case default language need to be hidden from URL
     // process window open on the current URL without language
     let newPath: string;
-    debug("show default lang in URL is FALSE", { fullPath });
+    debug("setLang: show default lang in URL is false...");
 
     // if toLang is default lang
     if (this.isDefaultLangKey(toLang.key)) {
-      debug("setLang > go to default lang, need to hidden lang from URL");
+      debug("setLang: go to default lang, need to hidden lang from URL");
       newPath = fullPath.split("/:lang").join("");
       newPath = newPath === "" ? "/" : newPath;
 
       // if curent lang is default lang
     } else if (this.isDefaultLangKey(this.currentLanguage.key)) {
-      debug("setLang > we are on default lang, add /:lang param after base");
+      debug("setLang: we are on default lang, add /:lang param after base");
       const path = extractPathFromBase(fullPath, this.base);
       newPath = joinPaths([this.base, "/:lang/", path]);
 
       // if we are on url with lang and switch to another lang visible in URL
     } else {
-      debug("setLang > switch to another lang, keep /:lang param");
+      debug("setLang: switch to another lang, keep /:lang param");
       newPath = fullPath;
     }
 
     // remove last "/" if exist
     if (newPath !== "/") newPath = removeLastCaracterFromString(newPath, "/");
-    debug("setLang > newPath", { newPath });
+    debug("setLang: newPath", { newPath });
 
     // build new URL
     const newUrl = buildUrl(newPath, {
@@ -146,47 +150,53 @@ class LangService {
       lang: toLang.key,
     });
 
-    debug("setLang > newUrl", { newUrl });
+    debug("setLang: newUrl", { newUrl });
 
-    // reload application
-    window.open(newUrl, "_self");
-
-    // register currentLangage
+    // register current langage (not usefull if we reload the app...)
     this.currentLanguage = toLang;
+
+    // reload application for regenerate route path with LangMiddleware
+    this.reloadOrRefresh(newUrl, true);
   }
 
   /**
    * On first load
    * redirect to default language if no language is set
-   *
    * FIXME si l'URL possède la base mais n'a pas de local, on redirige vers /base/local par default
    * FIXME par contre, si on a /base/{bad-lang}/path on ne redirige pas -> 404
    *
    */
   public redirect(forcePageReload: boolean = true) {
     if (!this.isInit) {
-      console.warn("LangService is not init, exit.");
+      console.warn("redirect: LangService is not init, exit.");
+      return;
+    }
+    if (!this.showDefaultLanguageInUrl) {
+      debug("redirect: URLs have a lang param or language is valid, don't redirect.");
+      return;
+    }
+    if (this.langIsAvailable(this.getLangFromUrl())) {
+      debug("redirect: lang from URL is valid, don't redirect");
       return;
     }
 
-    const langFromUrl = this.getLangFromUrl();
-    const langIsValid = this.langIsAvailable(langFromUrl);
-    const currentRoute = ROUTERS.instances?.[ROUTERS.instances?.length - 1].currentRoute;
-    debug("redirect vars", { langFromUrl, langIsValid, currentRoute });
-
-    // If all URLs have a lang param or language is valid, do not redirect
-    if (!this.showDefaultLanguageInUrl || langIsValid) return;
-
-    // prepare path if currentRoute doesn't exist
+    // prepare path for case who currentRoute doesn't exist
     const path = joinPaths([this.base, "/:lang"]);
 
-    // build new URL
-    let newUrl = buildUrl(currentRoute?.fullPath || path, {
-      ...(currentRoute?.props?.params || {}),
-      lang: this.defaultLanguage.key,
-    });
+    if (
+      // FIXME peut rediriger  vers /base/ ou /base
+      location.pathname === this.base
+    ) {
+      debug("redirect: currentRoute.path === this base");
 
-    forcePageReload ? window.open(newUrl, "_self") : ROUTERS.history.push(newUrl);
+      // build new URL
+      let newUrl = buildUrl(path, { lang: this.defaultLanguage.key });
+
+      debug("redirect: ", { newUrl });
+
+      // reload or refresh all application
+      this.reloadOrRefresh(newUrl, forcePageReload);
+    }
   }
 
   /**
@@ -246,6 +256,16 @@ class LangService {
     languesList = this.languages
   ): boolean {
     return languesList.some((lang) => lang.key === langObject?.key);
+  }
+
+  /**
+   * Reload full page or refresh with router push
+   * @param newUrl
+   * @param forcePageReload
+   * @protected
+   */
+  protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
+    forcePageReload ? window.open(newUrl, "_self") : ROUTERS.history.push(newUrl);
   }
 }
 
