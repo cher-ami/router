@@ -14,21 +14,13 @@ export type TOpenRouteParams = {
 /**
  * Join string paths array
  * @param paths
+ * @param join
  */
-export function joinPaths(paths: string[]): string {
+export function joinPaths(paths: string[], join: string = ""): string {
   return paths
     ?.filter((e) => e)
-    .join("")
+    .join(join)
     .replace(/(https?:\/\/)|(\/)+/g, "$1$2");
-}
-
-/**
- * Remove last caracter from string
- * @param str
- * @param lastCaracter
- */
-export function removeLastCaracterFromString(str: string, lastCaracter = "/") {
-  if (str.endsWith(lastCaracter)) return str.slice(0, -1);
 }
 
 /**

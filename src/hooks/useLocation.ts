@@ -37,12 +37,13 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
     if (typeof args === "string") {
       urlToPush = args;
     } else if (typeof args === "object" && args.name) {
-
-      // add lang param if
-      args.params = {
-        ...args.params,
-        ...(LangService.isInit ? { lang: LangService.currentLanguage.key } : {}),
-      };
+      // add lang param if not set
+      if (LangService.isInit && !args.params?.lang) {
+        args.params = {
+          ...args.params,
+          ...{ lang: LangService.currentLanguage.key },
+        };
+      }
       urlToPush = getUrlByRouteName(rootRouter.routes, args);
     } else {
       throw new Error("ERROR: setLocation param isn't valid. return.");

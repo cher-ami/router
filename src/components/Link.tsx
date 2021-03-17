@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { useLocation } from "..";
-import { formatUrl } from "../api/helpers";
+import { formatUrl, joinPaths } from "../api/helpers";
 
 interface IProps {
   to: string;
@@ -30,10 +30,9 @@ function Link(props: IProps) {
 
   return (
     <a
-      className={[componentName, props.className, isActive && "active"]
-        .filter((e: string) => e)
-        .join(" ")}
+      className={joinPaths([componentName, props.className, isActive && "active"], " ")}
       onClick={handleClick}
+      // FIXME il faut que l'URL contienne la lang ici
       href={props.to}
       children={props.children}
     />

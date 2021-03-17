@@ -48,10 +48,10 @@ class LangService {
   /**
    * Init languages service
    * @param languages
-   * @param showDefaultLanguageIsUrl
+   * @param showDefaultLanguageInUrl
    * @param base
    */
-  public init(languages: TLanguage[], showDefaultLanguageIsUrl = true, base = "/"): void {
+  public init(languages: TLanguage[], showDefaultLanguageInUrl = true, base = "/"): void {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
     }
@@ -60,7 +60,7 @@ class LangService {
     this.defaultLanguage = this.getDefaultLang(languages);
     this.previousLanguage = this.currentLanguage;
     this.currentLanguage = this.getLangFromUrl() || this.defaultLanguage;
-    this.showDefaultLanguageInUrl = showDefaultLanguageIsUrl;
+    this.showDefaultLanguageInUrl = showDefaultLanguageInUrl;
     this.isInit = true;
   }
 
@@ -106,7 +106,8 @@ class LangService {
         ...currentRoute.props?.params,
         lang: toLang.key,
       });
-      ROUTERS.history.push(newUrl);
+
+      window.open(newUrl, "_self");
 
       // if other, case default language need to be hidden from URL
       // process window open on the current URL without language
@@ -145,13 +146,14 @@ class LangService {
   }
 
   /**
-   * On first load,
+   * On first load
    * redirect to default language if no language is set
    *
-   * case 1: language param is always visible in URL
-   * case 2: language param is not visible in URL for default language
+   * FIXME si l'URL possède la base mais n'a pas de local, on redirige vers /base/local par default
+   * FIXME par contre, si on a /base/{bad-lang}/path -> 404
+   *
    */
-  public redirect() {
+  public redirect(forcePageReload: boolean = true) {
     if (!this.isInit) {
       console.warn("LangService is not init, exit.");
       return;
@@ -162,50 +164,19 @@ class LangService {
     const currentRoute = ROUTERS.instances?.[ROUTERS.instances?.length - 1].currentRoute;
     debug("redirect vars", { langFromUrl, langIsValid, currentRoute });
 
-    let newUrl: string;
+    // If all URLs have a lang param or language is valid, do not redirect
+    if (!this.showDefaultLanguageInUrl || langIsValid) return;
 
-    // If all URLs have a lang param
-    if (this.showDefaultLanguageInUrl) {
-      if (langIsValid) return;
+    // prepare path if currentRoute doesn't exist
+    const path = joinPaths([this.base, "/:lang"]);
 
-      // prepare path if currentRoute doesn't exist
-      const path = joinPaths([this.base, "/:lang"]);
+    // build new URL
+    let newUrl = buildUrl(currentRoute?.fullPath || path, {
+      ...(currentRoute?.props?.params || {}),
+      lang: this.defaultLanguage.key,
+    });
 
-      newUrl = buildUrl(currentRoute?.fullPath || path, {
-        ...(currentRoute?.props?.params || {}),
-        lang: this.defaultLanguage.key,
-      });
-
-      //ROUTERS.history.push(newUrl);
-      window.open(newUrl, "_self");
-
-      // FIXME donesn't work for now
-      // If all URLs do not have a lang param (pas de langue pour la default lang)
-    } else {
-      // 1 la langue n'existe pas, et la route match on est sur la default lang, return
-      // TODO pour savoir si c'est vraiment une langue après la base, ou le debut du path,
-      // TODO on a besoin de transformer l'URL en path
-
-      if (!langFromUrl) {
-        debug("Lang doesnt exist, we are on default lang, return");
-        return;
-      }
-
-      // 2 la langue existe mais n'est pas bonne -> go to default sans lang dans l'URL
-      if (!langIsValid) {
-        // debug("isValideLanguage", langIsValid);
-        //
-        // // la langue de l'URL n'est pas valide, reconstruire l'URL
-        // if (!currentRoute?.fullPath) return;
-        //
-        // newUrl = buildUrl(currentRoute?.fullPath, {
-        //   ...currentRoute.props?.params,
-        //   lang: this.defaultLanguage.key,
-        // });
-        // debug("new", newUrl);
-        // window.open(newUrl, "_self");
-      }
-    }
+    forcePageReload ? window.open(newUrl, "_self") : ROUTERS.history.push(newUrl);
   }
 
   /**
