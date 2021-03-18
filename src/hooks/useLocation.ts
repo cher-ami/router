@@ -41,7 +41,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
       if (LangService.isInit && !args.params?.lang) {
         args.params = {
           ...args.params,
-          ...{ lang: LangService.currentLanguage.key },
+          ...{ lang: LangService.currentLang.key },
         };
       }
       urlToPush = getUrlByRouteName(rootRouter.routes, args);

@@ -26,12 +26,16 @@ export function joinPaths(paths: string[], join: string = ""): string {
 /**
  * Remove last caracter from string
  * @param str
- * @param lastCaracter
+ * @param lastChar
+ * @param exeptIfStringIsLastChar if str is "/" and lastChar to remove is "/" do nothing
  */
-export function removeLastCaracterFromString(str: string, lastCaracter = "/"): string {
-  if (str.endsWith(lastCaracter)) {
-    str = str.slice(0, -1);
-  }
+export function removeLastCharFromString(
+  str: string,
+  lastChar: string,
+  exeptIfStringIsLastChar = true
+): string {
+  if (exeptIfStringIsLastChar && str === lastChar) return str;
+  if (str.endsWith(lastChar)) str = str.slice(0, -1);
   return str;
 }
 
@@ -149,7 +153,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  */
 export const addLangToUrl = (
   url: string,
-  lang: string = LanguagesService.currentLanguage?.key,
+  lang: string = LanguagesService.currentLang?.key,
   enable = LanguagesService.showLangInUrl()
 ): string => {
   if (!enable) return url;

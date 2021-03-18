@@ -3,7 +3,7 @@ import {
   buildUrl,
   extractPathFromBase,
   joinPaths,
-  removeLastCaracterFromString,
+  removeLastCharFromString,
 } from "../api/helpers";
 import { useRootRouter } from "../hooks/useRouter";
 const debug = require("debug")(`router:LangService`);
@@ -26,24 +26,19 @@ class LangService {
   public languages: TLanguage[];
 
   /**
-   * Previous language object
-   */
-  public previousLanguage: TLanguage;
-
-  /**
    * Current language object
    */
-  public currentLanguage: TLanguage;
+  public currentLang: TLanguage;
 
   /**
    * Default language object
    */
-  public defaultLanguage: TLanguage;
+  public defaultLang: TLanguage;
 
   /**
    * Show default language in URL
    */
-  public showDefaultLanguageInUrl: boolean;
+  public showDefaultLangInUrl: boolean;
 
   /**
    * Base URL of the app
@@ -53,19 +48,19 @@ class LangService {
   /**
    * Init languages service
    * @param languages
-   * @param showDefaultLanguageInUrl
+   * @param showDefaultLangInUrl
    * @param base
    */
-  public init(languages: TLanguage[], showDefaultLanguageInUrl = true, base = "/"): void {
+  public init(languages: TLanguage[], showDefaultLangInUrl = true, base = "/"): void {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
     }
     this.languages = languages;
-    this.base = base;
-    this.defaultLanguage = this.getDefaultLang(languages);
-    this.previousLanguage = this.currentLanguage;
-    this.currentLanguage = this.getLangFromUrl() || this.defaultLanguage;
-    this.showDefaultLanguageInUrl = showDefaultLanguageInUrl;
+    // remove extract / at the end, if exist
+    this.base = removeLastCharFromString(base, "/", true);
+    this.defaultLang = this.getDefaultLang(languages);
+    this.currentLang = this.getLangFromUrl() || this.defaultLang;
+    this.showDefaultLangInUrl = showDefaultLangInUrl;
     this.isInit = true;
   }
 
@@ -80,7 +75,7 @@ class LangService {
       console.warn("setLang: LangService is not init, exit.");
       return;
     }
-    if (toLang.key === this.currentLanguage.key) {
+    if (toLang.key === this.currentLang.key) {
       debug("setLang: This is the same language, exit.");
       return;
     }
@@ -88,32 +83,30 @@ class LangService {
       debug(`setLang: lang ${toLang.key} is not available in languages list, exit.`);
       return;
     }
-    // prettier-ignore
     if (!useRootRouter()) {
-      debug("setLang: useRootRouter() is not available before his initialisation, exit.");
+      debug("setLang: useRootRouter is not available before his initialisation, exit.");
       return;
     }
 
     const rootRouter = useRootRouter();
     const currentRoute = rootRouter.currentRoute;
     const instances = ROUTERS.instances;
-    const fullPath = instances?.[instances?.length - 1].currentRoute.fullPath;
+    let fullPath = instances?.[instances?.length - 1].currentRoute.fullPath;
 
     // if default language should be visible in URL, use history push
-    if (this.showDefaultLanguageInUrl) {
-      debug("setLang: default language should be always visible in URL, show /:lang");
+    if (this.showDefaultLangInUrl) {
+      debug("setLang: default language should be always visible in URL, set new /:lang");
+      fullPath = removeLastCharFromString(fullPath, "/", true);
       const newUrl = buildUrl(fullPath, {
         ...currentRoute.props?.params,
         lang: toLang.key,
       });
 
-      // register current langage (not usefull if we reload the app...)
-      this.currentLanguage = toLang;
+      // register current langage (usefull only if we don't reload the app.)
+      this.currentLang = toLang;
 
       // reload application
       this.reloadOrRefresh(newUrl, forcePageReload);
-
-      // stop process here
       return;
     }
 
@@ -129,7 +122,7 @@ class LangService {
       newPath = newPath === "" ? "/" : newPath;
 
       // if curent lang is default lang
-    } else if (this.isDefaultLangKey(this.currentLanguage.key)) {
+    } else if (this.isDefaultLangKey(this.currentLang.key)) {
       debug("setLang: we are on default lang, add /:lang param after base");
       const path = extractPathFromBase(fullPath, this.base);
       newPath = joinPaths([this.base, "/:lang/", path]);
@@ -141,7 +134,7 @@ class LangService {
     }
 
     // remove last "/" if exist
-    if (newPath !== "/") newPath = removeLastCaracterFromString(newPath, "/");
+    newPath = removeLastCharFromString(newPath, "/", true);
     debug("setLang: newPath", { newPath });
 
     // build new URL
@@ -150,10 +143,8 @@ class LangService {
       lang: toLang.key,
     });
 
-    debug("setLang: newUrl", { newUrl });
-
     // register current langage (not usefull if we reload the app...)
-    this.currentLanguage = toLang;
+    this.currentLang = toLang;
 
     // reload application for regenerate route path with LangMiddleware
     this.reloadOrRefresh(newUrl, true);
@@ -171,7 +162,7 @@ class LangService {
       console.warn("redirect: LangService is not init, exit.");
       return;
     }
-    if (!this.showDefaultLanguageInUrl) {
+    if (!this.showDefaultLangInUrl) {
       debug("redirect: URLs have a lang param or language is valid, don't redirect.");
       return;
     }
@@ -180,20 +171,21 @@ class LangService {
       return;
     }
 
-    // prepare path for case who currentRoute doesn't exist
-    const path = joinPaths([this.base, "/:lang"]);
+    debug("redirect: infos", {
+      "location.pathname": location.pathname,
+      "this.base": this.base,
+    });
 
     if (
-      // FIXME peut rediriger  vers /base/ ou /base
-      location.pathname === this.base
+      location.pathname === this.base ||
+      removeLastCharFromString(location.pathname, "/", true) === this.base
     ) {
-      debug("redirect: currentRoute.path === this base");
-
+      // prepare path
+      const path = joinPaths([this.base, "/:lang"]);
       // build new URL
-      let newUrl = buildUrl(path, { lang: this.defaultLanguage.key });
+      let newUrl = buildUrl(path, { lang: this.defaultLang.key });
 
-      debug("redirect: ", { newUrl });
-
+      debug("redirect: to >", { newUrl });
       // reload or refresh all application
       this.reloadOrRefresh(newUrl, forcePageReload);
     }
@@ -202,15 +194,15 @@ class LangService {
   /**
    * Current lang is default lang
    */
-  public isDefaultLangKey(langKey = this.currentLanguage.key): boolean {
-    return langKey === this.defaultLanguage.key;
+  public isDefaultLangKey(langKey = this.currentLang.key): boolean {
+    return langKey === this.defaultLang.key;
   }
 
   /**
    * Determine when we need to show current lang in URL
    */
   public showLangInUrl(): boolean {
-    if (this.showDefaultLanguageInUrl) {
+    if (this.showDefaultLangInUrl) {
       return this.isInit;
     } else {
       return this.isInit && !this.isDefaultLangKey();
@@ -234,7 +226,6 @@ class LangService {
    */
   protected getLangFromUrl(pathname = window.location.pathname): TLanguage {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
-    debug("this.base", this.base);
 
     // format and get only second part (lang)
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
