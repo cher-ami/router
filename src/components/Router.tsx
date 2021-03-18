@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
+import LanguagesService from "..";
 
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);
@@ -17,7 +18,7 @@ interface IProps {
   base: string;
   // routes array is required for 1st instance only
   routes?: TRoute[];
-  middlewares?: (e: any) => void[];
+  middlewares?: any[];
   children: ReactElement;
   historyMode?: EHistoryMode;
 }
@@ -33,11 +34,21 @@ RouterContext.displayName = componentName;
  * This component returns children wrapped by provider who contains router instance
  */
 export const Router = memo((props: IProps) => {
+  // deduce a router ID
+  const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
+
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
 
-  // we need to join each parent router base
-  const base = useMemo(() => joinPaths([parentRouter?.base, props.base]), [props.base]);
+  const showLang = LanguagesService.showLangInUrl();
+
+  // join each parent router base
+  const base = joinPaths([
+    parentRouter?.base,
+    // because language middleware nedd to patch only first level routes
+    id !== 1 && showLang && "/:lang",
+    props.base,
+  ]);
 
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter
@@ -47,16 +58,16 @@ export const Router = memo((props: IProps) => {
       ROUTERS.routes = props.routes;
       currentRoutesList = props.routes;
     } else {
-      currentRoutesList = ROUTERS?.routes?.find((el) => el.path === props.base).children;
+      currentRoutesList = ROUTERS.routes?.find((el) => {
+        return `${el.path}` === props.base;
+      })?.children;
     }
+
     return currentRoutesList;
   }, [props.routes, props.base]);
 
-  // deduce a router ID
-  const id = useMemo(
-    () => (ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1),
-    []
-  );
+  // middlewares are properties of root instance only?
+  const middlewares = props.middlewares;
 
   // keep router instance in state
   const [routerState] = useState<RouterInstance>(() => {
@@ -64,28 +75,24 @@ export const Router = memo((props: IProps) => {
       base,
       routes,
       id,
+      middlewares,
       historyMode: props.historyMode,
-      middlewares: props.middlewares,
     });
 
     // keep new router in global constant
     ROUTERS.instances.push(newRouter);
     // return it as state
-    debug("ROUTERS", ROUTERS);
-
     return newRouter;
   });
 
+  // on destroy, we need to remove this current router instance from ROUTERS.instances array
+  // remove 1 element from specific index
   useEffect(() => {
-    debug(`${componentName} > routers array`, ROUTERS.instances);
     return () => {
-      // on destroy, we need to remove this current router instance from ROUTERS.instances array
-      // remove 1 element from specific index
       ROUTERS.instances.splice(
         ROUTERS.instances.findIndex((el) => el.id === routerState.id),
         1
       );
-      debug(`${componentName} > routers array after splice`, ROUTERS.instances);
       routerState.destroyEvents();
     };
   }, [routerState]);

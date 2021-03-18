@@ -1,5 +1,7 @@
 import { Path } from "path-parser";
 import { TRoute } from "./RouterInstance";
+import LanguagesService from "..";
+import { useRootRouter } from "../hooks/useRouter";
 const debug = require("debug")("router:helpers");
 
 export type TParams = { [x: string]: any };
@@ -9,15 +11,36 @@ export type TOpenRouteParams = {
   params?: TParams;
 };
 
-export function joinPaths(paths: string[]): string {
+/**
+ * Join string paths array
+ * @param paths
+ * @param join
+ */
+export function joinPaths(paths: string[], join: string = ""): string {
   return paths
-    ?.filter((e) => e)
-    .join("")
-    .replace("//", "/");
+    ?.filter((str) => str)
+    .join(join)
+    .replace(/(https?:\/\/)|(\/)+/g, "$1$2");
 }
 
 /**
- * Build an URL with path and params
+ * Remove last caracter from string
+ * @param str
+ * @param lastChar
+ * @param exeptIfStringIsLastChar if str is "/" and lastChar to remove is "/" do nothing
+ */
+export function removeLastCharFromString(
+  str: string,
+  lastChar: string,
+  exeptIfStringIsLastChar = true
+): string {
+  if (exeptIfStringIsLastChar && str === lastChar) return str;
+  if (str.endsWith(lastChar)) str = str.slice(0, -1);
+  return str;
+}
+
+/**
+ * Build an URL with path and params via PathParser
  */
 export function buildUrl(path: string, params?: TParams): string {
   const newPath = new Path(path);
@@ -111,3 +134,58 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
 
   return recursiveFn(pRoutes, pParams);
 }
+
+/**
+ * if language service exist, set lang key to URL
+ * and current language in URL
+ *
+ * ex
+ * before: "/foo"
+ * after:  "/en/foo"
+ *
+ * ex2
+ * before: "/"
+ * after:  "/en"
+ *
+ * @param url
+ * @param lang
+ * @param enable
+ */
+export const addLangToUrl = (
+  url: string,
+  lang: string = LanguagesService.currentLang?.key,
+  enable = LanguagesService.showLangInUrl()
+): string => {
+  if (!enable) return url;
+  url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
+  return url;
+};
+
+/**
+ * add base to URL
+ *
+ * ex
+ * before: "/foo"
+ * after:  "/custom-base/foo"
+ *
+ * ex with lang "en"
+ * before: "/en/foo"
+ * after:  "/custom-base/en/foo"
+ *
+ * @param url
+ * @param base
+ */
+export const addBaseToUrl = (url: string, base = useRootRouter()?.base): string => {
+  url = joinPaths([base === "/" ? "" : base, url]);
+  return url;
+};
+
+/**
+ * Return path without his base
+ * @param path
+ * @param base
+ */
+export const extractPathFromBase = (path: string, base: string): string => {
+  let baseStartIndex = path.indexOf(base);
+  return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
+};

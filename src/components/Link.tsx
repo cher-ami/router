@@ -1,5 +1,6 @@
-import React, { ReactNode } from "react";
-import { useLocation } from "..";
+import React, { ReactNode, useMemo } from "react";
+import { prepareSetLocationUrl, useLocation } from "..";
+import { joinPaths } from "../api/helpers";
 
 interface IProps {
   to: string;
@@ -17,6 +18,10 @@ const debug = require("debug")(`router:${componentName}`);
 function Link(props: IProps) {
   const [location, setLocation] = useLocation();
 
+  const url = useMemo(() => prepareSetLocationUrl(props.to), [props.to]);
+
+  const isActive = useMemo(() => location === url, [location, url]);
+
   const handleClick = (e) => {
     e.preventDefault();
     props.onClick?.();
@@ -25,12 +30,10 @@ function Link(props: IProps) {
 
   return (
     <a
-      className={[componentName, props.className, location === props.to && "active"]
-        .filter((e: string) => e)
-        .join(" ")}
+      className={joinPaths([componentName, props.className, isActive && "active"], " ")}
       onClick={handleClick}
-      href={props.to}
       children={props.children}
+      href={url}
     />
   );
 }

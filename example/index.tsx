@@ -1,7 +1,9 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
-import { Router, TRoute } from "../src";
+import { EHistoryMode, Router, TRoute } from "../src";
+import LangService from "../src";
+import { langMiddleware } from "../src";
 
 import App from "./App";
 import HomePage from "./pages/HomePage";
@@ -10,7 +12,6 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
-import { EHistoryMode } from "../src";
 
 const debug = require("debug")(`router:index`);
 
@@ -49,12 +50,20 @@ export const routesList: TRoute[] = [
   },
 ];
 
+const baseUrl = "/master";
+const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+LangService.init(locales, true, baseUrl);
+
 /**
  * Init Application
  */
-
 ReactDOM.render(
-  <Router routes={routesList} base={"/"} historyMode={EHistoryMode.BROWSER}>
+  <Router
+    routes={routesList}
+    base={baseUrl}
+    middlewares={[langMiddleware]}
+    historyMode={EHistoryMode.BROWSER}
+  >
     <App />
   </Router>,
   document.getElementById("root")

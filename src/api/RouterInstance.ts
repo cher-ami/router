@@ -1,7 +1,7 @@
 import { Path } from "path-parser";
 import React from "react";
 import { EventEmitter } from "events";
-import { buildUrl } from "./helpers";
+import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
 import {
   createBrowserHistory,
@@ -19,12 +19,17 @@ export type TRoute = {
   component: React.ComponentType<any>;
   name?: string;
   parser?: Path;
-  props?: { [x: string]: any };
+  props?: {
+    params?: { [x: string]: any };
+    [x: string]: any;
+  };
   children?: TRoute[];
   // local match URL with params (needed by nested router)
   matchUrl?: string;
   // full URL who not depend of current instance
   fullUrl?: string;
+  // full Path /base/:lang/foo/second-foo
+  fullPath?: string;
 };
 
 export enum EHistoryMode {
@@ -46,9 +51,11 @@ export class RouterInstance {
   // base URL
   public base: string;
   // routes list
+  public preMiddlewareRoutes: TRoute[] = [];
   public routes: TRoute[] = [];
 
-  public middlewares: (e: any) => void[];
+  // middlewares list to exectute in specific order
+  public middlewares: any[];
 
   // create event emitter
   public events: EventEmitter = new EventEmitter();
@@ -75,7 +82,7 @@ export class RouterInstance {
   }: {
     base?: string;
     routes?: TRoute[];
-    middlewares?: (e: any) => void[];
+    middlewares?: any[];
     id?: number | string;
     historyMode: EHistoryMode;
   }) {
@@ -103,9 +110,19 @@ export class RouterInstance {
     }
 
     // format routes
-    routes.forEach((el: TRoute) => this.addRoute(el));
+    this.preMiddlewareRoutes = routes.map((route: TRoute) => ({
+      ...route,
+      parser: new Path(route.path),
+    }));
+    debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
 
-    // start
+    // ex: language service devrait pouvoir patcher les routes une a une
+    // prettier-ignore
+    this.routes =
+      this.middlewares?.reduce((routes, middleware) => middleware(routes), this.preMiddlewareRoutes)
+      || this.preMiddlewareRoutes;
+    debug(this.id, "this.routes", this.routes);
+
     this.updateRoute();
     this.initEvents();
   }
@@ -159,13 +176,6 @@ export class RouterInstance {
   };
 
   /**
-   * Add new route object to routes array
-   */
-  protected addRoute(route: TRoute): void {
-    this.routes.push({ ...route, parser: new Path(route.path) });
-  }
-
-  /**
    * Update route
    * - get route object matching with current URL
    * - emit selected route object on route-change event (listen by Stack)
@@ -217,13 +227,8 @@ export class RouterInstance {
     // test each routes
     for (let i in pRoutes) {
       let currentRoute = pRoutes[i];
-
-      // TODO appeler tous les middlewares ici pour patcher les routes
-      // ex: language service devrait pouvoir patcher les routes une a une
-      // this.middlewares.foreach(middleware =>  middleware(currentRoute) ) ...
-
       // create parser & matcher
-      const currentRoutePath = `${pBase}${currentRoute.path}`.replace("//", "/");
+      const currentRoutePath = joinPaths([pBase, currentRoute.path]);
       // prepare parser
       const pathParser: Path = new Path(currentRoutePath);
       // prettier-ignore
@@ -237,6 +242,7 @@ export class RouterInstance {
         const params = pMatch || match;
         const routeObj = {
           fullUrl: pUrl,
+          fullPath: currentRoutePath,
           matchUrl: buildUrl(route.path, params),
           path: route?.path,
           component: route?.component,
@@ -248,7 +254,7 @@ export class RouterInstance {
           },
         };
 
-        debug(this.id, "getRouteFromUrl: > MATCH routeObj", routeObj);
+        debug(this.id, "getRouteFromUrl: MATCH routeObj", routeObj);
         return routeObj;
       }
 

@@ -11,15 +11,20 @@ A fresh react router designed for flexible route transitions
 <br>
 
 cher-ami router API is inspired by [wouter](https://github.com/molefrog/wouter),
-[solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts) and
-[vue router](https://router.vuejs.org/) API. This repository started from a copy of [willybrauner/react-router](https://github.com/willybrauner/react-router/).
+[solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts)
+and
+[vue router](https://router.vuejs.org/) API. This repository started from a copy
+of [willybrauner/react-router](https://github.com/willybrauner/react-router/).
 
 ## Why another react router?
 
-Because managing route transitions with React is always complicated, this router is designed to allow flexible transitions.
-It provides Stack component who render previous and current page component when route change.
+Because managing route transitions with React is always complicated, this router
+is designed to allow flexible transitions. It provides Stack component who
+render previous and current page component when route change.
 
-This router loads [history](https://github.com/ReactTraining/history), [path-parser](https://github.com/troch/path-parser) and [debug](https://github.com/visionmedia/debug) as dependencies.
+This router loads [history](https://github.com/ReactTraining/history)
+, [path-parser](https://github.com/troch/path-parser)
+and [debug](https://github.com/visionmedia/debug) as dependencies.
 
 ## Summary
 
@@ -46,9 +51,19 @@ Hooks:
 - [`useRouter`](#useRouter) Get router instance from any component
 - [`useLocation`](#useLocation) Get current location and set new location
 - [`useRoute`](#useRoute) Get previous and current route object
-- [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
+- [`useStack`](#useStack) Allow to the parent Stack to handle page transitions
+  and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
-- [`useHistory`](#useHistory) Get global router history and handle history changes
+- [`useHistory`](#useHistory) Get global router history and handle history
+  changes
+
+Middlewares:
+
+- [`langMiddleware`](#langMiddleware) Patch all routes with `:lang` params
+
+Services:
+
+- [`LangService`](#LangService) Manage `:lang` params
 
 ## <a name="Installation"></a>Installation
 
@@ -77,8 +92,8 @@ function App() {
   return (
     <Router routes={routesList} base={"/"}>
       <nav>
-        <Link href={"/"} />
-        <Link href={"/foo"} />
+        <Link to={"/"} />
+        <Link to={"/foo"} />
       </nav>
       <Stack />
     </Router>
@@ -86,7 +101,8 @@ function App() {
 }
 ```
 
-Page component need to be wrapped by `React.forwardRef`. The `handleRef` lets hold transitions, and ref used by `<Stack />` component.
+Page component need to be wrapped by `React.forwardRef`. The `handleRef` lets
+hold transitions, and ref used by `<Stack />` component.
 
 ```jsx
 import React from "react";
@@ -123,7 +139,9 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## <a name="DynamicRoutes"></a>Dynamic routes
 
-cher-ami router use [path-parser](https://github.com/troch/path-parser) which accept path parameters. (check this [documentation](https://github.com/troch/path-parser#defining-parameters)).
+cher-ami router use [path-parser](https://github.com/troch/path-parser) which
+accept path parameters. (check
+this [documentation](https://github.com/troch/path-parser#defining-parameters)).
 For example, URL `/blog/my-article` will match with this route object:
 
 ```js
@@ -158,8 +176,10 @@ const ArticlePage = forwardRef((props, handleRef) => {
 
 **[Demo codesandbox: simple usage](https://codesandbox.io/s/simple-usage-cpufs)**
 
-Also, it is possible to match a specific route by a simple dynamic route parameter for the "not found route" case.
-In this case, the routes object order declaration is important. `/:rest` path route need to be the last of the `routesList` array.
+Also, it is possible to match a specific route by a simple dynamic route
+parameter for the "not found route" case. In this case, the routes object order
+declaration is important. `/:rest` path route need to be the last of
+the `routesList` array.
 
 ```js
 const routesList = [
@@ -212,13 +232,16 @@ const routesList = [
 ];
 ```
 
-2. Children were defined within the route that render `FooPage` component, so you can then create a new router instance in this component.
+2. Children were defined within the route that render `FooPage` component, so
+   you can then create a new router instance in this component.
 
 **Only if it's a nested router, you must not pass `routes` Router props again**.
-The previous routes array, passed to the root component, will be used by `Router`.
+The previous routes array, passed to the root component, will be used
+by `Router`.
 
-`Router` props `base` need to be the same than the path who contains children routes.
-In this case, `/foo` will be the new nested router base. The stack will then be able to render `/foo/people` and `/foo/yolo`.
+`Router` props `base` need to be the same than the path who contains children
+routes. In this case, `/foo` will be the new nested router base. The stack will
+then be able to render `/foo/people` and `/foo/yolo`.
 
 ```jsx
 import React from "react";
@@ -243,11 +266,13 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## <a name="ManageTransitions"></a>Manage transitions
 
-`ManageTransitions` function allows to define, "when" and "in what conditions", routes transitions will be exectued.
+`ManageTransitions` function allows to define, "when" and "in what conditions",
+routes transitions will be exectued.
 
 ### <a name="DefaultSequentialTransitions"></a>Default sequential transitions
 
-By default, a "sequential" transitions senario is used by Stack component: the previous page play out performs, then the new page play in.
+By default, a "sequential" transitions senario is used by Stack component: the
+previous page play out performs, then the new page play in.
 
 ```js
 const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }) => {
@@ -279,8 +304,10 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
 
 ### <a name="CustomTransitions"></a>Custom transitions
 
-It's however possible to create a custom transitions senario function and pass it to the Stack `manageTransitions` props.
-In this example, we would like to create a "crossed" route senario: the previous page playOut performs at the same time than the new page playIn.
+It's however possible to create a custom transitions senario function and pass
+it to the Stack `manageTransitions` props. In this example, we would like to
+create a "crossed" route senario: the previous page playOut performs at the same
+time than the new page playIn.
 
 ```jsx
 const App = (props, handleRef) => {
@@ -305,8 +332,8 @@ const App = (props, handleRef) => {
 
 ## <a name="Debug"></a>Debug
 
-[debug](https://github.com/visionmedia/debug) is used on this project.
-It allows to easily get logs informations on development and production modes.
+[debug](https://github.com/visionmedia/debug) is used on this project. It allows
+to easily get logs informations on development and production modes.
 
 To use it, add this line in your browser console:
 
@@ -337,7 +364,7 @@ $ npm run dev
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={} historyMode={}>
+<Router routes={} base={} historyMode={} middlewares={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -346,10 +373,17 @@ Router component creates a new router instance.
 
 - **routes** `TRoute[]` Routes list
 - **base** `string` Base URL - default: `"/"``
-- **historyMode** `EHistoryMode` _(optional)_ choose history mode. - default : `EHistoryMode.BROWSER`
-  History mode can be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory),
-  [HASH](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createhashhistory),
-  [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory). For more information, check the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
+- **historyMode** `EHistoryMode` _(optional)_ choose history mode. -
+  default : `EHistoryMode.BROWSER`
+  History mode can
+  be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory)
+  ,
+  [HASH](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createhashhistory)
+  ,
+  [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
+  . For more information, check
+  the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
+- **middlewares** `[]` add routes middleware function to patch each routes (check [langMiddleware](src/lang/LangMiddleware.ts) example)
 
 ### <a name="Link"></a>Link
 
@@ -361,8 +395,10 @@ Trig new route.
 
 **Props:**
 
-- **to** `string` Path ex: "/foo". Can be absolute `/path/foo` or relative `path/foo`
-- **className** `string` _(optional)_ Class name added to component root DOM element
+- **to** `string` Path ex: "/foo". Can be absolute `/path/foo` or
+  relative `path/foo`
+- **className** `string` _(optional)_ Class name added to component root DOM
+  element
 
 ### <a name="Stack"></a>Stack
 
@@ -375,9 +411,10 @@ Render previous and current page component.
 **Props:**
 
 - **manageTransitions** `(T:TManageTransitions) => Promise<void>` _(optional)_
-  This function allows to create the transition scenario. If no props is filled, a sequential
-  transition will be executed.
-- **className** `string` _(optional)_ className added to component root DOM element
+  This function allows to create the transition scenario. If no props is filled,
+  a sequential transition will be executed.
+- **className** `string` _(optional)_ className added to component root DOM
+  element
 
 ```ts
 type TManageTransitions = {
@@ -488,15 +525,16 @@ const FooPage = forwardRef((props, handleRef) => {
   });
 
   return (
-      <div className={componentName} ref={rootRef}>
-        {/* ... */}
-      </div>
+    <div className={componentName} ref={rootRef}>
+      {/* ... */}
+    </div>
   );
 });
 ```
 
-`useStack` hook can also receive `isReady` state from the page component.
-This state allows for example to wait for fetching data before page playIn function is executed.
+`useStack` hook can also receive `isReady` state from the page component. This
+state allows for example to wait for fetching data before page playIn function
+is executed.
 
 ```jsx
 // ...
@@ -524,7 +562,8 @@ useStack({
 // ...
 ```
 
-How does it work? `useStack` hook registers `isReady` state and `isReadyPromise` in `handleRef`.
+How does it work? `useStack` hook registers `isReady` state and `isReadyPromise`
+in `handleRef`.
 `manageTransitions` can now use `isReadyPromise` in its own thread senario.
 
 ```js
@@ -546,8 +585,10 @@ const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPag
 - **componentName** `string` Name of current component
 - **handleRef** `MutableRefObject<any>` Ref handled by parent component
 - **rootRef** `MutableRefObject<any>` Ref on root component element
-- **playIn** `() => Promise<any>` _(optional)_ Play in transition - default: `new Promise.resolve()`
-- **playOut** `() => Promise<any>` _(optional)_ Play out transition - default: `new Promise.resolve()`
+- **playIn** `() => Promise<any>` _(optional)_ Play in transition -
+  default: `new Promise.resolve()`
+- **playOut** `() => Promise<any>` _(optional)_ Play out transition -
+  default: `new Promise.resolve()`
 - **isReady** `boolean` _(optional)_ Is ready state - default: `true`
 
 **Returns:**
@@ -576,7 +617,8 @@ An object with these properties:
 
 ### <a name="useHistory"></a>useHistory
 
-Allow to get the global router history and execute a callback each time history change.
+Allow to get the global router history and execute a callback each time history
+change.
 
 ```js
 const history = useHistory((e) => {
@@ -586,12 +628,144 @@ const history = useHistory((e) => {
 
 **Parameters:**
 
-- **callback** `(event) => void` Callback function to execute each time the history change
+- **callback** `(event) => void` Callback function to execute each time the
+  history change
 
 **Returns:**
 
 - **history** `location[]` : Location array of history API
 
+### <a name="langMiddleware"></a>langMiddleware
+
+Patch all first level routes with `:lang` params. For it to work, we need to
+initialize `LangService` first.
+
+```jsx
+import { langMiddleware } from "@cher-ami/router";
+
+<Router routes={routesList} base={"/"} middlewares={[langMiddleware]}>
+  // ...
+</Router>;
+```
+
+### <a name="LangService"></a>LangService
+
+Manage `:lang` params from anywhere inside Router scope.
+
+```jsx
+import { LangService, langMiddleware } from "@cher-ami/router";
+import { Stack } from "./Stack";
+
+const baseUrl = "/";
+// first lang object is default lang
+const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+// optionally, default lang can be defined explicitly
+// const locales = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
+
+// initialize LangService
+LangService.init(locales, true, baseUrl);
+
+<Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
+  <App />
+</Router>;
+```
+
+Inside the App
+
+```jsx
+function App() {
+  return (
+    <div>
+      <button onClick={() => LangService.setLang({ key: "de" })}>
+        switch to "de" lang
+      </button>
+      <nav>
+        {/* will return /de */}
+        <Link to={"/"} />
+        {/* will return /de/foo */}
+        <Link to={"/foo"} />
+      </nav>
+      <Stack />
+    </div>
+  );
+}
+```
+
+**Methods:**
+
+#### init(languages: TLanguage[], showDefaultLangInUrl = true, base = "/") `void`
+
+Initialize LangService. Need to be call before first router instance
+
+- `languages`: list on language objects
+- `showDefaultLangInUrl`: choose if default language is visible in URL or not
+- `base`: set the same than router base
+
+```jsx
+LangService.init([{ key: "en" }, { key: "fr" }], true, "/base");
+```
+
+#### languages `Tlanguage[]`
+
+Return languages list
+
+```jsx
+const langages = LangService.languages;
+```
+
+
+#### currentLang `TLanguage`
+
+Return current Language object.
+
+```jsx
+const lang = LangService.currentLang;
+// { key: "..." }
+```
+
+#### defaultLang `TLanguage`
+
+Return default language object
+
+```jsx
+const defaultLang = LangService.defaultLang;
+// { key: "..." }
+```
+
+#### isInit `boolean`
+
+Return LangService init state
+
+```jsx
+const isInit = LangService.isInit;
+```
+
+#### setLang(toLang: TLanguage, forcePageReload = true) `void`
+
+Switch to another available language. This method can be called in nested router
+component only.
+
+- `forcePageReload`: choose if we reload the full application or using the
+  internal router stack to change the language
+
+```jsx
+LangService.setLang({ key: "de" });
+```
+
+#### redirect(forcePageReload = true) `void`
+
+If URL is `/`, `showDefaultLangInUrl` is set to `true` and default lang is 'en',
+it will redirect to `/en`. This method can be called in nested router component
+only.
+
+- `forcePageReload`: choose if we reload the full application or using the
+  internal router stack to change the language
+
+```jsx
+LangService.redirect();
+```
+
 ## Credits
 
-[Willy Brauner](https://github.com/willybrauner) & [cher-ami](https://cher-ami.tv)
+[Willy Brauner](https://github.com/willybrauner)
+& [cher-ami](https://cher-ami.tv)
