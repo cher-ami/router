@@ -91,14 +91,14 @@ class LangService {
     const rootRouter = useRootRouter();
     const currentRoute = rootRouter.currentRoute;
     const instances = ROUTERS.instances;
-    let fullPath = instances?.[instances?.length - 1].currentRoute.fullPath;
+    let fullPath = instances?.[instances?.length - 1]?.currentRoute?.fullPath || "/:lang";
 
     // if default language should be visible in URL, use history push
     if (this.showDefaultLangInUrl) {
       debug("setLang: default language should be always visible in URL, set new /:lang");
       fullPath = removeLastCharFromString(fullPath, "/", true);
       const newUrl = buildUrl(fullPath, {
-        ...currentRoute.props?.params,
+        ...currentRoute?.props?.params,
         lang: toLang.key,
       });
 
@@ -153,7 +153,7 @@ class LangService {
   /**
    * Redirect to default language if no language is set
    */
-  public redirect(forcePageReload: boolean = true) {
+  public redirect(forcePageReload: boolean = true): void {
     if (!this.isInit) {
       console.warn("redirect: LangService is not init, exit.");
       return;
