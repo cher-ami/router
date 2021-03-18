@@ -2,8 +2,8 @@ import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
 import { EHistoryMode, Router, TRoute } from "../src";
-import LangService from "../src/lang/LangService";
-import { langMiddleware } from "../src/lang/LangMiddleware";
+import LangService from "../src";
+import { langMiddleware } from "../src";
 
 import App from "./App";
 import HomePage from "./pages/HomePage";

@@ -7,7 +7,7 @@ import {
   TOpenRouteParams,
 } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
-import LangService from "../lang/LangService";
+import LangService from "..";
 
 const componentName = "useLocation";
 const debug = require("debug")(`router:${componentName}`);

@@ -1,6 +1,6 @@
 import { Path } from "path-parser";
 import { TRoute } from "./RouterInstance";
-import LanguagesService from "../lang/LangService";
+import LanguagesService from "..";
 import { useRootRouter } from "../hooks/useRouter";
 const debug = require("debug")("router:helpers");
 

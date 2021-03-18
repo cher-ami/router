@@ -252,4 +252,4 @@ class LangService {
   }
 }
 
-export default new LangService();
+export {LangService};

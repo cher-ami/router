@@ -7,9 +7,9 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { formatUrl, joinPaths } from "../api/helpers";
+import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
-import LanguagesService from "../lang/LangService";
+import LanguagesService from "..";
 
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);

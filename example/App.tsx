@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Link, useRouteCounter, Stack, useHistory } from "../src";
-import LangService from "../src/lang/LangService";
+import LangService from "../src";
+import { useLang } from "../src";
 
 const componentName = "App";
 const debug = require("debug")(`router:${componentName}`);
@@ -23,18 +24,20 @@ export default function App() {
     LangService.redirect();
   }, []);
 
+  const [lang, setLang] = useLang();
+
   return (
     <div className={componentName}>
       <button
         onClick={() => {
-          LangService.setLang({ key: "en" });
+          setLang("en");
         }}
       >
         CHANGE LANGUAGE TO EN
       </button>
       <button
         onClick={() => {
-          LangService.setLang({ key: "fr" });
+          setLang("fr");
         }}
       >
         CHANGE LANGUAGE TO FR
