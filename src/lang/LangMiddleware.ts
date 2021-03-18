@@ -1,4 +1,4 @@
-import { TRoute } from "../api/RouterInstance";
+import { TRoute } from "..";
 import { joinPaths } from "../api/helpers";
 import LanguagesService from "..";
 const debug = require("debug")(`router:languagesMiddleware`);

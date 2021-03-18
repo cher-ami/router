@@ -20,15 +20,13 @@ function Link(props: IProps) {
 
   const url = useMemo(() => prepareSetLocationUrl(props.to), [props.to]);
 
+  const isActive = useMemo(() => location === url, [location, url]);
+
   const handleClick = (e) => {
     e.preventDefault();
     props.onClick?.();
     setLocation(props.to);
   };
-
-  const isActive = useMemo(() => {
-    return location === url;
-  }, [location, url]);
 
   return (
     <a
