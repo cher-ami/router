@@ -69,7 +69,7 @@ describe("getUrlByPath", () => {
 });
 
 describe("getUrlByRouteName", () => {
-  it("should be defined", () => {
+  it("should return full URL with only page name and params", () => {
     const routesList = [
       { path: "/", component: null, name: "foo" },
       {
