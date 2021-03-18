@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
-import { useLocation } from "..";
-import { formatUrl, joinPaths } from "../api/helpers";
+import { prepareSetLocationUrl, useLocation } from "..";
+import { joinPaths } from "../api/helpers";
 
 interface IProps {
   to: string;
@@ -18,6 +18,8 @@ const debug = require("debug")(`router:${componentName}`);
 function Link(props: IProps) {
   const [location, setLocation] = useLocation();
 
+  const url = useMemo(() => prepareSetLocationUrl(props.to), [props.to]);
+
   const handleClick = (e) => {
     e.preventDefault();
     props.onClick?.();
@@ -25,16 +27,15 @@ function Link(props: IProps) {
   };
 
   const isActive = useMemo(() => {
-    return location === formatUrl(props.to);
-  }, [location, props.to]);
+    return location === url;
+  }, [location, url]);
 
   return (
     <a
       className={joinPaths([componentName, props.className, isActive && "active"], " ")}
       onClick={handleClick}
-      // FIXME il faut que l'URL contienne la lang ici
-      href={props.to}
       children={props.children}
+      href={url}
     />
   );
 }

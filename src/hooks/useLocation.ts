@@ -13,16 +13,50 @@ const componentName = "useLocation";
 const debug = require("debug")(`router:${componentName}`);
 
 /**
+ * Prepare setLocation URL
+ * @param args can be string or TOpenRouteParams object
+ */
+export const prepareSetLocationUrl = (args: string | TOpenRouteParams): string => {
+  const rootRouter = useRootRouter();
+  let urlToPush: string;
+
+  // in case we recieve a string
+  if (typeof args === "string") {
+    urlToPush = args;
+    urlToPush = addLangToUrl(urlToPush);
+
+    // in case we recieve an object
+  } else if (typeof args === "object" && args?.name) {
+    if (LangService.isInit && !args.params?.lang) {
+      args.params = {
+        ...args.params,
+        ...{ lang: LangService.currentLang.key },
+      };
+    }
+
+    // Get URL by the route name
+    urlToPush = getUrlByRouteName(rootRouter.routes, args);
+
+    // in other case return.
+  } else {
+    console.warn("setLocation param isn't valid. return.");
+    return;
+  }
+
+  // in each case, add base URL
+  urlToPush = addBaseToUrl(urlToPush);
+  return urlToPush;
+};
+
+/**
  * useLocation
+ * @dec Allow to
  */
 export const useLocation = (): [string, (param: string | TOpenRouteParams) => void] => {
-  const rootRouter = useRootRouter();
-
   /**
    * Get dynamic current location
    */
   const [location, setLoc] = useState(ROUTERS.history.location.pathname);
-
   useHistory((event) => {
     setLoc(event.location.pathname);
   }, []);
@@ -32,31 +66,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
    * @param args
    */
   function setLocation(args: string & TOpenRouteParams): void {
-    let urlToPush: string;
-
-    if (typeof args === "string") {
-      urlToPush = args;
-    } else if (typeof args === "object" && args.name) {
-      // add lang param if not set
-      if (LangService.isInit && !args.params?.lang) {
-        args.params = {
-          ...args.params,
-          ...{ lang: LangService.currentLang.key },
-        };
-      }
-      urlToPush = getUrlByRouteName(rootRouter.routes, args);
-    } else {
-      throw new Error("ERROR: setLocation param isn't valid. return.");
-    }
-
-    // add base and lang to string URL like "/{base}/{lang}/foo"
-    debug("args.params?.lang", args.params?.lang);
-
-    if (!args.params?.lang) {
-      urlToPush = addLangToUrl(urlToPush);
-    }
-    urlToPush = addBaseToUrl(urlToPush);
-    // finally, push in history
+    const urlToPush = prepareSetLocationUrl(args);
     ROUTERS.history.push(urlToPush);
   }
 

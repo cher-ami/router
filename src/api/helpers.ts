@@ -181,22 +181,6 @@ export const addBaseToUrl = (url: string, base = useRootRouter().base): string =
 };
 
 /**
- * Format URL allow to prepare URL string before history push
- * add base and lang to string URL
- *
- * ex
- * before: "/foo"
- * after:  "/{base}/{lang}/foo"
- *
- * @param url
- */
-export const formatUrl = (url: string): string => {
-  url = addLangToUrl(url);
-  url = addBaseToUrl(url);
-  return url;
-};
-
-/**
  * Return path without his base
  * @param path
  * @param base
