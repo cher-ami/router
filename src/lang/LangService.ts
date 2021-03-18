@@ -151,11 +151,7 @@ class LangService {
   }
 
   /**
-   * On first load
-   * redirect to default language if no language is set
-   * FIXME si l'URL possède la base mais n'a pas de local, on redirige vers /base/local par default
-   * FIXME par contre, si on a /base/{bad-lang}/path on ne redirige pas -> 404
-   *
+   * Redirect to default language if no language is set
    */
   public redirect(forcePageReload: boolean = true) {
     if (!this.isInit) {
@@ -171,17 +167,13 @@ class LangService {
       return;
     }
 
-    debug("redirect: infos", {
-      "location.pathname": location.pathname,
-      "this.base": this.base,
-    });
-
     if (
       location.pathname === this.base ||
       removeLastCharFromString(location.pathname, "/", true) === this.base
     ) {
       // prepare path
       const path = joinPaths([this.base, "/:lang"]);
+
       // build new URL
       let newUrl = buildUrl(path, { lang: this.defaultLang.key });
 

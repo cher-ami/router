@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useRouteCounter, Stack, useHistory } from "../src";
-import LangService from "../src/languages/LangService";
+import LangService from "../src/lang/LangService";
 
 const componentName = "App";
 const debug = require("debug")(`router:${componentName}`);

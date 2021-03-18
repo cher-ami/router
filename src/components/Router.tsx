@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { formatUrl, joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
-import LanguagesService from "../languages/LangService";
+import LanguagesService from "../lang/LangService";
 
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);

@@ -10,3 +10,7 @@ export { useRoute } from "./hooks/useRoute";
 export { useHistory } from "./hooks/useHistory";
 export { useRouteCounter } from "./hooks/useRouteCounter";
 export { useStack, IRouteStack } from "./hooks/useStack";
+
+export { langMiddleware } from "./lang/LangMiddleware";
+export * as LangService from "./lang/LangService";
+export { TLanguage } from "./lang/LangService";
