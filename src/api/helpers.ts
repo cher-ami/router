@@ -175,7 +175,7 @@ export const addLangToUrl = (
  * @param url
  * @param base
  */
-export const addBaseToUrl = (url: string, base = useRootRouter().base): string => {
+export const addBaseToUrl = (url: string, base = useRootRouter()?.base): string => {
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
 };

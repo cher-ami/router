@@ -3,19 +3,17 @@ import { Link, Router, TRoute } from "../src";
 import { render, fireEvent } from "@testing-library/react";
 import { ROUTERS } from "../src/api/routers";
 
+const routesList: TRoute[] = [
+  { path: "/", component: null },
+  { path: "/foo", component: null },
+];
+
 describe("Link", () => {
   it("should be defined", () => {
     expect(Link).toBeDefined();
   });
 
   it("should renders proper attributes", () => {
-    const routesList: TRoute[] = [
-      {
-        path: "/",
-        component: null,
-      },
-    ];
-
     const { container } = render(
       <Router base={"/"} routes={routesList}>
         <Link to={"/foo"} className={"containerLink"}>
@@ -27,6 +25,19 @@ describe("Link", () => {
     expect(link.tagName).toBe("A");
     expect(link.className).toBe("Link containerLink");
     expect(link.getAttribute("href")).toBe("/foo");
+    expect(link.textContent).toBe("Foo");
+  });
+
+  it("sould add formatted URL to href attr if custom base is set", () => {
+    const { container } = render(
+      <Router base={"/master"} routes={routesList}>
+        <Link to={"/foo"} className={"containerLink"}>
+          Foo
+        </Link>
+      </Router>
+    );
+    const link: any = container.firstChild;
+    expect(link.getAttribute("href")).toBe("/master/foo");
     expect(link.textContent).toBe("Foo");
   });
 
