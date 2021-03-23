@@ -1,6 +1,6 @@
 import { Path } from "path-parser";
 import { TRoute } from "./RouterInstance";
-import LanguagesService from "..";
+import { LangService } from "..";
 import { useRootRouter } from "../hooks/useRouter";
 const debug = require("debug")("router:helpers");
 
@@ -153,8 +153,8 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  */
 export const addLangToUrl = (
   url: string,
-  lang: string = LanguagesService.currentLang?.key,
-  enable = LanguagesService.showLangInUrl()
+  lang: string = LangService.currentLang?.key,
+  enable = LangService.showLangInUrl()
 ): string => {
   if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);

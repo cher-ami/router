@@ -1,6 +1,6 @@
 import { Router, TRoute, useLang } from "../src";
 import React from "react";
-import LangService from "../src";
+import { LangService }from "../src";
 import { render } from "@testing-library/react";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useRouteCounter, Stack, useHistory } from "../src";
-import LangService from "../src";
+import { LangService } from "../src";
 import { useLang } from "../src";
 
 const componentName = "App";

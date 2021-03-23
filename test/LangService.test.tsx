@@ -1,4 +1,4 @@
-import LangService, { langMiddleware, Link, Router, TRoute } from "../src";
+import { LangService, langMiddleware, Link, Router, TRoute } from "../src";
 import { act, render } from "@testing-library/react";
 import React from "react";
 

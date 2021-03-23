@@ -16,5 +16,4 @@ export { langMiddleware } from "./lang/LangMiddleware";
 export { TLanguage } from "./lang/LangService";
 
 // export as singleton
-import { LangService } from "./lang/LangService";
-export default new LangService() as LangService;
+export const LangService = require("./lang/LangService").default;
