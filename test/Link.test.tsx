@@ -2,7 +2,7 @@ import React from "react";
 import { Link, Router, TRoute } from "../src";
 import { render, fireEvent } from "@testing-library/react";
 import { ROUTERS } from "../src/api/routers";
-import LangService from "../src";
+import { LangService } from "../src";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [

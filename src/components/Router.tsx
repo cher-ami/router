@@ -9,7 +9,7 @@ import React, {
 } from "react";
 import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
-import LanguagesService from "..";
+import { LangService } from "..";
 
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);
@@ -40,7 +40,7 @@ export const Router = memo((props: IProps) => {
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
 
-  const showLang = LanguagesService.showLangInUrl();
+  const showLang = LangService.showLangInUrl();
 
   // join each parent router base
   const base = joinPaths([
