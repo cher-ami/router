@@ -1,4 +1,4 @@
-export { RouterInstance, TRoute, ERouterEvent, EHistoryMode } from "./api/RouterInstance";
+export { CreateRouter, TRoute, ERouterEvent, EHistoryMode } from "./api/CreateRouter";
 
 export { Router } from "./components/Router";
 export { Link } from "./components/Link";
@@ -13,7 +13,5 @@ export { useStack, IRouteStack } from "./hooks/useStack";
 export { useLang } from "./hooks/useLang";
 
 export { langMiddleware } from "./lang/LangMiddleware";
-export { TLanguage } from "./lang/LangService";
+export { default as LangService, TLanguage } from "./lang/LangService";
 
-// export as singleton
-export const LangService = require("./lang/LangService").default;
