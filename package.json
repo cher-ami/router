@@ -1,6 +1,6 @@
 {
   "name": "@cher-ami/router",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "description": "A fresh react router designed for flexible route transitions",
   "author": "Willy Brauner",
   "license": "MIT",
