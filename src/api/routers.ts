@@ -1,4 +1,4 @@
-import { RouterInstance, TRoute } from "./RouterInstance";
+import { CreateRouter, TRoute } from "./CreateRouter";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 export type TRoutersConfig = {
@@ -9,7 +9,7 @@ export type TRoutersConfig = {
   /**
    * Routers instances list
    */
-  instances: RouterInstance[];
+  instances: CreateRouter[];
   /**
    * Global browser history
    */

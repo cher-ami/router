@@ -12,7 +12,7 @@ import {
   MemoryHistory,
 } from "history";
 
-const debug = require("debug")("router:RouterInstance");
+const debug = require("debug")("router:CreateRouter");
 
 export type TRoute = {
   path: string;
@@ -47,7 +47,7 @@ export enum ERouterEvent {
 /**
  * RouterInstance
  */
-export class RouterInstance {
+export class CreateRouter {
   // base URL
   public base: string;
   // routes list
@@ -78,7 +78,7 @@ export class RouterInstance {
     routes = null,
     middlewares,
     id = 1,
-    historyMode,
+    historyMode = EHistoryMode.BROWSER,
   }: {
     base?: string;
     routes?: TRoute[];
@@ -153,18 +153,15 @@ export class RouterInstance {
   protected getHistory(
     historyMode: EHistoryMode
   ): HashHistory | MemoryHistory | BrowserHistory {
+    if (historyMode === EHistoryMode.BROWSER) {
+      return createBrowserHistory();
+    }
     if (historyMode === EHistoryMode.HASH) {
       return createHashHistory();
     }
     if (historyMode === EHistoryMode.MEMORY) {
       return createMemoryHistory();
     }
-    if (historyMode === EHistoryMode.BROWSER) {
-      return createBrowserHistory();
-    }
-
-    // in other case, return a browser history
-    return createBrowserHistory();
   }
 
   /**

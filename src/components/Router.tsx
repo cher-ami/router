@@ -1,4 +1,4 @@
-import { EHistoryMode, RouterInstance, TRoute, useRouter } from "..";
+import { EHistoryMode, CreateRouter, TRoute, useRouter } from "..";
 import React, {
   createContext,
   memo,
@@ -26,7 +26,7 @@ interface IProps {
 // Router instance will be keep on this context
 // Big thing is you can access this context from the closest provider in the tree.
 // This allow to manage easily nested stack instances.
-export const RouterContext = createContext<RouterInstance>(null);
+export const RouterContext = createContext<CreateRouter>(null);
 RouterContext.displayName = componentName;
 
 /**
@@ -70,8 +70,8 @@ export const Router = memo((props: IProps) => {
   const middlewares = props.middlewares;
 
   // keep router instance in state
-  const [routerState] = useState<RouterInstance>(() => {
-    const newRouter = new RouterInstance({
+  const [routerState] = useState<CreateRouter>(() => {
+    const newRouter = new CreateRouter({
       base,
       routes,
       id,
