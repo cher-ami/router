@@ -49,7 +49,7 @@ export const routesList: TRoute[] = [
   },
 ];
 
-const baseUrl = "/master";
+const baseUrl = "/ma-base";
 
 export type TLangs = "en" | "fr" | "de";
 const languages: TLangs[] = ["en", "de", "fr"];
