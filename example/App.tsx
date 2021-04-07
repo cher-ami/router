@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Link, useRouteCounter, Stack, useHistory } from "../src";
 import { LangService } from "../src";
 import { useLang } from "../src";
+import { TLangs } from "./index";
 
 const componentName = "App";
 const debug = require("debug")(`router:${componentName}`);
@@ -37,7 +38,7 @@ export default function App() {
       </button>
       <button
         onClick={() => {
-          setLang("fr");
+          LangService.setLang({ key: "fr" });
         }}
       >
         CHANGE LANGUAGE TO FR

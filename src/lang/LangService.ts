@@ -8,8 +8,8 @@ import {
 import { useRootRouter } from "../hooks/useRouter";
 const debug = require("debug")(`router:LangService`);
 
-export type TLanguage = {
-  key: string;
+export type TLanguage<TKey = any> = {
+  key: TKey;
   name?: string;
   default?: boolean;
 };
@@ -51,14 +51,28 @@ class LangService {
    * @param showDefaultLangInUrl
    * @param base
    */
-  public init(languages: TLanguage[], showDefaultLangInUrl = true, base = "/"): void {
+  public init<T = string>(
+    languages: TLanguage<T>[] | T[],
+    showDefaultLangInUrl = true,
+    base = "/"
+  ): void {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
     }
-    this.languages = languages;
+
+    let formatedLangages = languages as TLanguage<T>[];
+
+    // if languages is string array, transform it to object
+    if (typeof languages[0] === "string") {
+      formatedLangages = (languages as T[]).map((lang) => ({
+        key: lang,
+      }));
+    }
+
+    this.languages = formatedLangages;
     // remove extract / at the end, if exist
     this.base = removeLastCharFromString(base, "/", true);
-    this.defaultLang = this.getDefaultLang(languages);
+    this.defaultLang = this.getDefaultLang(formatedLangages);
     this.currentLang = this.getLangFromUrl() || this.defaultLang;
     this.showDefaultLangInUrl = showDefaultLangInUrl;
     this.isInit = true;
@@ -70,7 +84,8 @@ class LangService {
    * @param toLang
    * @param forcePageReload
    */
-  public setLang(toLang: TLanguage, forcePageReload = true): void {
+
+  public setLang<T>(toLang: TLanguage<T>, forcePageReload = true): void {
     if (!this.isInit) {
       console.warn("setLang: LangService is not init, exit.");
       return;
