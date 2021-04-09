@@ -103,7 +103,7 @@ export class CreateRouter {
       ROUTERS.locationsHistory.push(ROUTERS.history.location);
     }
 
-    // patch: create root path '/' if doesn't exist
+    // patch: create root route object with path '/' if doesn't exist
     const rootPathExist = routes.some((route) => route.path === "/");
     if (!rootPathExist) {
       routes.push({ path: "/", component: null });
@@ -112,15 +112,18 @@ export class CreateRouter {
     // format routes
     this.preMiddlewareRoutes = routes.map((route: TRoute) => ({
       ...route,
+      name: route?.name || route?.component?.displayName,
       parser: new Path(route.path),
     }));
+
     debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
 
-    // ex: language service devrait pouvoir patcher les routes une a une
-    // prettier-ignore
     this.routes =
-      this.middlewares?.reduce((routes, middleware) => middleware(routes), this.preMiddlewareRoutes)
-      || this.preMiddlewareRoutes;
+      this.middlewares?.reduce(
+        (routes, middleware) => middleware(routes),
+        this.preMiddlewareRoutes
+      ) || this.preMiddlewareRoutes;
+
     debug(this.id, "this.routes", this.routes);
 
     this.updateRoute();
@@ -245,6 +248,7 @@ export class CreateRouter {
           component: route?.component,
           children: route?.children,
           parser: pPathParser || pathParser,
+          name: route?.name,
           props: {
             params,
             ...(route?.props || {}),
