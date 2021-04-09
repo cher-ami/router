@@ -395,10 +395,11 @@ Trig new route.
 
 **Props:**
 
-- **to** `string` Path ex: "/foo". Can be absolute `/path/foo` or
-  relative `path/foo`
-- **className** `string` _(optional)_ Class name added to component root DOM
-  element
+- **to** `string | TOpenRouteParams` Path ex: `/foo` or `{name: "FooPage" params: { id: bar }}`. 
+  "to" props accepts same params than setLocation.
+- **children** `ReactNode` children link DOM element 
+- **onClick** `()=> void` _(optional)_ execute callback on the click event
+- **className** `string` _(optional)_ Class name added to component root DOM element
 
 ### <a name="Stack"></a>Stack
 
@@ -712,7 +713,6 @@ Return languages list
 ```jsx
 const langages = LangService.languages;
 ```
-
 
 #### currentLang `TLanguage`
 
