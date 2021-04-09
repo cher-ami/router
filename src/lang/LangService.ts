@@ -218,8 +218,6 @@ class LangService {
    */
   protected getLangFromUrl(pathname = window.location.pathname): TLanguage {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
-
-    // format and get only second part (lang)
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
 
     const currentLanguageObj = this.languages.find((language) => {
