@@ -3,6 +3,7 @@ import {
   getUrlByPath,
   getUrlByRouteName,
   joinPaths,
+  preventSlashes,
   removeLastCharFromString,
 } from "../src/api/helpers";
 
@@ -31,8 +32,21 @@ describe("joinPaths", () => {
     expect(joinPaths(["/foo", "/bar"])).toBe("/foo/bar");
   });
   it("should join paths and remove multi slash", () => {
-    expect(joinPaths(["/foo///", "/bar"])).toBe("/foo/bar");
     expect(joinPaths(["////foo/////////", "///bar//////////"])).toBe("/foo/bar/");
+  });
+});
+
+describe("buildUrl", () => {
+  it("should build url", () => {
+    const parh = buildUrl("/foo/:id/bar", { id: "2" });
+    expect(parh).toBe("/foo/2/bar");
+  });
+});
+
+describe("preventSlashes", () => {
+  it("should remove multi slashs", () => {
+    expect(preventSlashes("///foo/")).toBe("/foo/");
+    expect(preventSlashes("///foo/bar/////zoo")).toBe("/foo/bar/zoo");
   });
 });
 

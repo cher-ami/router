@@ -74,17 +74,17 @@ export class CreateRouter {
   public id: number | string;
 
   constructor({
-    base = "/",
-    routes = null,
+    routes,
     middlewares,
+    base = "/",
     id = 1,
     historyMode = EHistoryMode.BROWSER,
   }: {
     base?: string;
-    routes?: TRoute[];
+    routes: TRoute[];
     middlewares?: any[];
     id?: number | string;
-    historyMode: EHistoryMode;
+    historyMode?: EHistoryMode;
   }) {
     this.base = base;
     this.id = id;
@@ -96,9 +96,8 @@ export class CreateRouter {
     }
 
     if (!ROUTERS.history) {
-      debug("No ROUTERS.history exist, create a new one", this.historyMode);
+      // create new history
       ROUTERS.history = this.getHistory(this.historyMode);
-
       // push first location history object in global locationsHistory
       ROUTERS.locationsHistory.push(ROUTERS.history.location);
     }
@@ -180,7 +179,9 @@ export class CreateRouter {
    * - get route object matching with current URL
    * - emit selected route object on route-change event (listen by Stack)
    */
-  protected updateRoute(url: string = ROUTERS.history.location.pathname): void {
+  protected updateRoute(
+    url: string = ROUTERS.history.location.pathname
+  ): { currentRoute: TRoute; previousRoute: TRoute } {
     // get matching route depending of current URL
     const matchingRoute: TRoute = this.getRouteFromUrl({ pUrl: url });
 
@@ -198,22 +199,26 @@ export class CreateRouter {
       this.currentRoute?.matchUrl != null &&
       this.currentRoute?.matchUrl === matchingRoute?.matchUrl
     ) {
-      debug(this.id, "updateRoute > THIS IS THE SAME URL, RETURN.");
+      debug(this.id, "updateRoute: THIS IS THE SAME URL, RETURN.");
       return;
     }
 
     this.previousRoute = this.currentRoute;
     this.currentRoute = matchingRoute || notFoundRoute;
-
+    
     this.events.emit(ERouterEvent.PREVIOUS_ROUTE_CHANGE, this.previousRoute);
     this.events.emit(ERouterEvent.CURRENT_ROUTE_CHANGE, this.currentRoute);
+
+    return {
+      currentRoute: this.currentRoute,
+      previousRoute: this.previousRoute,
+    };
   }
 
   /**
    * Get current route from URL using path-parser
    * @doc https://www.npmjs.com/package/path-parser
    */
-
   protected getRouteFromUrl({
     pUrl,
     pRoutes = this.routes,
