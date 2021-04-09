@@ -9,6 +9,7 @@ const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
   { path: "/", component: null, name: "HomePage" },
   { path: "/foo", component: null, name: "FooPage" },
+  { path: "/bar/:id", component: null, name: "BarPage" },
 ];
 
 afterEach(() => {
@@ -64,11 +65,19 @@ describe("Link", () => {
     fireEvent.click(container.firstChild);
     expect(mockClickHandler.mock.calls.length).toBe(3);
   });
-  
+
   it("should return the right href URL", () => {
     const { container } = render(<App base={"/"} to={{ name: "FooPage" }} />);
     fireEvent.click(container.firstChild);
     expect(ROUTERS.history.location.pathname).toBe("/foo");
+  });
+
+  it("should return the right href URL with param", () => {
+    const { container } = render(
+      <App base={"/"} to={{ name: "BarPage", params: { id: "test" } }} />
+    );
+    fireEvent.click(container.firstChild);
+    expect(ROUTERS.history.location.pathname).toBe("/bar/test");
   });
 
   it("should push in history on click", () => {
@@ -77,5 +86,4 @@ describe("Link", () => {
     expect(ROUTERS.history.location.pathname).toBe("/bar");
     expect(ROUTERS.history.action).toBe("PUSH");
   });
-
 });
