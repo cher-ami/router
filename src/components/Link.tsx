@@ -1,9 +1,9 @@
 import React, { ReactNode, useMemo } from "react";
 import { prepareSetLocationUrl, useLocation } from "..";
-import { joinPaths } from "../api/helpers";
+import { joinPaths, TOpenRouteParams } from "../api/helpers";
 
 interface IProps {
-  to: string;
+  to: string | TOpenRouteParams;
   onClick?: () => void;
   className?: string;
   children: ReactNode;
