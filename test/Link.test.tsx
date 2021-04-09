@@ -3,11 +3,12 @@ import { Link, Router, TRoute } from "../src";
 import { render, fireEvent } from "@testing-library/react";
 import { ROUTERS } from "../src/api/routers";
 import { LangService } from "../src";
+import { TOpenRouteParams } from "../src/api/helpers";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
-  { path: "/", component: null },
-  { path: "/foo", component: null },
+  { path: "/", component: null, name: "HomePage" },
+  { path: "/foo", component: null, name: "FooPage" },
 ];
 
 afterEach(() => {
@@ -15,7 +16,7 @@ afterEach(() => {
 });
 
 const mockClickHandler = jest.fn();
-const App = ({ base = "/", to = "/foo" }) => {
+const App = ({ base = "/", to }: { base: string; to: string | TOpenRouteParams }) => {
   return (
     <Router base={base} routes={routesList}>
       <Link to={to} className={"containerLink"} onClick={mockClickHandler}>
@@ -63,11 +64,18 @@ describe("Link", () => {
     fireEvent.click(container.firstChild);
     expect(mockClickHandler.mock.calls.length).toBe(3);
   });
+  
+  it("should return the right href URL", () => {
+    const { container } = render(<App base={"/"} to={{ name: "FooPage" }} />);
+    fireEvent.click(container.firstChild);
+    expect(ROUTERS.history.location.pathname).toBe("/foo");
+  });
 
   it("should push in history on click", () => {
-    const { container } = render(<App to={"/bar"} />);
+    const { container } = render(<App base={"/"} to={"/bar"} />);
     fireEvent.click(container.firstChild);
     expect(ROUTERS.history.location.pathname).toBe("/bar");
     expect(ROUTERS.history.action).toBe("PUSH");
   });
+
 });
