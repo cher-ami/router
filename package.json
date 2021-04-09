@@ -22,8 +22,16 @@
     "dev": "parcel example/index.html --out-dir example/dist --open",
     "build": "parcel build example/index.html --out-dir example/dist",
     "compile": "tsc -p tsconfig.json",
-    "test": "jest"
+    "size": "npm run compile && size-limit",
+    "size-why": "npm run size -- --why",
+    "test": "jest && npm run size"
   },
+  "size-limit": [
+    {
+      "limit": "18 kB",
+      "path": "dist/**/*.js"
+    }
+  ],
   "dependencies": {
     "debug": "^4.1.1",
     "history": "^5.0.0",
