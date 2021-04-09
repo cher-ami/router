@@ -69,6 +69,9 @@ export default function App() {
               Blog id:article-1
             </Link>
           </li>
+          <li>
+            <Link to={"/not/found/"}>Not found route</Link>
+          </li>
         </ul>
       </nav>
       <Stack className={"App_stack"} />

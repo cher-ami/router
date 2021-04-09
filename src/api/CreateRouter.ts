@@ -184,18 +184,26 @@ export class CreateRouter {
     // get matching route depending of current URL
     const matchingRoute: TRoute = this.getRouteFromUrl({ pUrl: url });
 
-    if (!matchingRoute) {
-      debug(this.id, "updateRoute: NO MATCHING ROUTE. RETURN.");
+    // get not found route
+    const notFoundRoute: TRoute = this.preMiddlewareRoutes.find(
+      (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage"
+    );
+
+    if (!matchingRoute && !notFoundRoute) {
+      debug(this.id, "updateRoute: NO MATCHING ROUTE & NO NOTFOUND ROUTE. RETURN.");
       return;
     }
 
-    if (this.currentRoute?.matchUrl === matchingRoute?.matchUrl) {
+    if (
+      this.currentRoute?.matchUrl != null &&
+      this.currentRoute?.matchUrl === matchingRoute?.matchUrl
+    ) {
       debug(this.id, "updateRoute > THIS IS THE SAME URL, RETURN.");
       return;
     }
 
     this.previousRoute = this.currentRoute;
-    this.currentRoute = matchingRoute;
+    this.currentRoute = matchingRoute || notFoundRoute;
 
     this.events.emit(ERouterEvent.PREVIOUS_ROUTE_CHANGE, this.previousRoute);
     this.events.emit(ERouterEvent.CURRENT_ROUTE_CHANGE, this.currentRoute);
