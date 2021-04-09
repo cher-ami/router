@@ -17,10 +17,18 @@ export type TOpenRouteParams = {
  * @param join
  */
 export function joinPaths(paths: string[], join: string = ""): string {
-  return paths
-    ?.filter((str) => str)
-    .join(join)
-    .replace(/(https?:\/\/)|(\/)+/g, "$1$2");
+  const preparePath = paths?.filter((str) => str).join(join);
+  return preventSlashes(preparePath);
+}
+
+/**
+ * Prevent Multi Slashes
+ * ex:
+ *  - '///foo/' will return '/foo/'
+ * @param str
+ */
+export function preventSlashes(str: string): string {
+  return str.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
 }
 
 /**

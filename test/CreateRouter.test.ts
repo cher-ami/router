@@ -1,6 +1,7 @@
 import React from "react";
 import { CreateRouter, ERouterEvent, TRoute } from "../src";
 import { ROUTERS } from "../src/api/routers";
+import { preventSlashes } from "../src/api/helpers";
 
 /**
  * Create Router Test
@@ -27,7 +28,7 @@ const routesList: TRoute[] = [
   { path: "/bar/:id", component: null, name: "BarPage", props: { color: "blue" } },
   { path: "/:rest", component: null, name: "NotFoundPage" },
 ];
-const base = "/master";
+const base = "/custom/base";
 const router = new CreateRouterTest({
   base: base,
   routes: routesList,
@@ -38,7 +39,7 @@ const router = new CreateRouterTest({
  */
 describe("CreateRouter", () => {
   it("should get right route from URL", () => {
-    const getRoute = router.getRouteFromUrl({ pUrl: `${base}/bar/foo` });
+    const getRoute = router.getRouteFromUrl({ pUrl: preventSlashes(`${base}/bar/foo`) });
     expect(getRoute.fullUrl).toBe(`${base}/bar/foo`);
     expect(getRoute.fullPath).toBe(`${base}/bar/:id`);
     expect(getRoute.path).toBe("/bar/:id");
@@ -48,27 +49,31 @@ describe("CreateRouter", () => {
   });
 
   it("should not get route from bad URL and return undefined", () => {
-    const getRoute = router.getRouteFromUrl({ pUrl: `${base}/bar/foo/bar/` });
+    const getRoute = router.getRouteFromUrl({
+      pUrl: preventSlashes(`${base}/bar/foo/bar/`),
+    });
     expect(getRoute).toBeUndefined();
   });
 
   it("updateRoute method should return prev & current routes objects", () => {
     // to bar page
-    const updateRoute = router.updateRoute(`${base}/bar/foo`);
+    const updateRoute = router.updateRoute(preventSlashes(`${base}/bar/foo`));
     expect(updateRoute.currentRoute.name).toBe("BarPage");
 
     // to not found
-    const updateRouteToNotFound = router.updateRoute(`${base}/bar/foo/dlksd`);
+    const updateRouteToNotFound = router.updateRoute(
+      preventSlashes(`${base}/bar/foo/dlksd`)
+    );
     expect(updateRouteToNotFound.currentRoute.path).toBe("/:rest");
     expect(updateRouteToNotFound.previousRoute.path).toBe("/bar/:id");
 
     // to home page
-    const updateRouteToHome = router.updateRoute(`${base}/`);
+    const updateRouteToHome = router.updateRoute(preventSlashes(`${base}/`));
     expect(updateRouteToHome.currentRoute.name).toBe("HomePage");
     expect(updateRouteToHome.previousRoute.name).toBe("NotFoundPage");
 
     // same URL
-    const updateRouteToHomeAgain = router.updateRoute(`${base}/`);
+    const updateRouteToHomeAgain = router.updateRoute(preventSlashes(`${base}/`));
     expect(updateRouteToHomeAgain).toBeUndefined();
   });
 });
