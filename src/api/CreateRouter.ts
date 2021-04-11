@@ -134,7 +134,6 @@ export class CreateRouter {
    */
   public initEvents() {
     this.unlistenHistory = ROUTERS.history.listen(({ location, action }) => {
-      debug(this.id, " initEvents > history", { location, action });
       this.handleHistory(location.pathname);
     });
   }
@@ -205,7 +204,7 @@ export class CreateRouter {
 
     this.previousRoute = this.currentRoute;
     this.currentRoute = matchingRoute || notFoundRoute;
-    
+
     this.events.emit(ERouterEvent.PREVIOUS_ROUTE_CHANGE, this.previousRoute);
     this.events.emit(ERouterEvent.CURRENT_ROUTE_CHANGE, this.currentRoute);
 

@@ -84,8 +84,6 @@ export function getUrlByPath(
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
       const matchChildrenPath = getUrlByPath(route.children, path, joinPaths(localPath));
-
-      debug("getUrlByPath > match children path", matchChildrenPath);
       // return recursive Fn only if match, else continue to next iteration
       if (matchChildrenPath) {
         // keep path in local array
@@ -107,10 +105,8 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
   const recursiveFn = (routes: TRoute[], params: TOpenRouteParams): string => {
     for (let i in routes) {
       const route = routes[i];
-
       const match =
         route?.name === params.name || route.component?.displayName === params.name;
-
       if (match) {
         if (!route?.path) {
           debug(
@@ -119,15 +115,10 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           );
           return;
         }
-
         // get full URL
         const urlByPath = getUrlByPath(pRoutes, route.path);
-        debug("getUrlByRouteName > urlByPath", urlByPath);
-
         // build URL with param and return
-        const url = buildUrl(urlByPath, params.params);
-        debug("getUrlByRouteName > url", url);
-        return url;
+        return buildUrl(urlByPath, params.params);
       }
 
       // if route has children
@@ -159,15 +150,15 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  * @param lang
  * @param enable
  */
-export const addLangToUrl = (
+export function addLangToUrl(
   url: string,
   lang: string = LangService.currentLang?.key,
   enable = LangService.showLangInUrl()
-): string => {
+): string {
   if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
   return url;
-};
+}
 
 /**
  * add base to URL
@@ -183,17 +174,17 @@ export const addLangToUrl = (
  * @param url
  * @param base
  */
-export const addBaseToUrl = (url: string, base = useRootRouter()?.base): string => {
+export function addBaseToUrl(url: string, base = useRootRouter()?.base): string {
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
-};
+}
 
 /**
  * Return path without his base
  * @param path
  * @param base
  */
-export const extractPathFromBase = (path: string, base: string): string => {
+export function extractPathFromBase(path: string, base: string): string {
   let baseStartIndex = path.indexOf(base);
   return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
-};
+}

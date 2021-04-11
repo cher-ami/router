@@ -36,8 +36,6 @@ function Stack(props: IProps) {
     currentPage,
     unmountPreviousPage,
   }: TManageTransitions): Promise<void> => {
-    debug(router.id, "start default sequencial transition");
-
     return new Promise(async (resolve) => {
       const $current = currentPage?.$element;
       if ($current) $current.style.visibility = "hidden";
@@ -89,7 +87,6 @@ function Stack(props: IProps) {
     } as TManageTransitions)
       // when transitions are ended
       .then(() => {
-        debug(router.id, "manageTransitions promise resolve!");
         // if previous page wasn't unmount manually, we force unmount here
         unmountPreviousPage();
 

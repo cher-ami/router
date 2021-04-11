@@ -9,9 +9,6 @@ interface IProps {
   children: ReactNode;
 }
 
-const componentName = "Link";
-const debug = require("debug")(`router:${componentName}`);
-
 /**
  * @name Link
  */
@@ -30,7 +27,7 @@ function Link(props: IProps) {
 
   return (
     <a
-      className={joinPaths([componentName, props.className, isActive && "active"], " ")}
+      className={joinPaths(["Link", props.className, isActive && "active"], " ")}
       onClick={handleClick}
       children={props.children}
       href={url}
