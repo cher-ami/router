@@ -1,6 +1,5 @@
 import { LangService, TRoute } from "..";
 import { joinPaths } from "../api/helpers";
-const debug = require("debug")(`router:languagesMiddleware`);
 
 /**
  * LanguagesMiddleware

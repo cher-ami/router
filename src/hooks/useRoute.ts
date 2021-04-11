@@ -2,9 +2,6 @@ import { ERouterEvent, TRoute } from "..";
 import { useRouter } from "./useRouter";
 import { useLayoutEffect, useState } from "react";
 
-const componentName = "useRoutes";
-const debug = require("debug")(`router:${componentName}`);
-
 /**
  * useRoutes
  */

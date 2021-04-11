@@ -12,7 +12,7 @@ import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
 
 const componentName = "Router";
-const debug = require("debug")(`router:${componentName}`);
+// const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;

@@ -95,7 +95,7 @@ class LangService {
 
     // if default language should be visible in URL, use history push
     if (this.showDefaultLangInUrl) {
-      debug("setLang: default language should be always visible in URL, set new /:lang");
+      // default language should be always visible in URL, set new /:lang
       fullPath = removeLastCharFromString(fullPath, "/", true);
       const newUrl = buildUrl(fullPath, {
         ...currentRoute?.props?.params,
@@ -113,23 +113,19 @@ class LangService {
     // if other, case default language need to be hidden from URL
     // process window open on the current URL without language
     let newPath: string;
-    debug("setLang: show default lang in URL is false...");
 
-    // if toLang is default lang
+    // if toLang is default lang, need to hidden lang from URL
     if (this.isDefaultLangKey(toLang.key)) {
-      debug("setLang: go to default lang, need to hidden lang from URL");
       newPath = fullPath.split("/:lang").join("");
       newPath = newPath === "" ? "/" : newPath;
 
-      // if curent lang is default lang
+      // if curent lang is default lang, add /:lang param after base
     } else if (this.isDefaultLangKey(this.currentLang.key)) {
-      debug("setLang: we are on default lang, add /:lang param after base");
       const path = extractPathFromBase(fullPath, this.base);
       newPath = joinPaths([this.base, "/:lang/", path]);
 
       // if we are on url with lang and switch to another lang visible in URL
     } else {
-      debug("setLang: switch to another lang, keep /:lang param");
       newPath = fullPath;
     }
 
@@ -220,12 +216,10 @@ class LangService {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
 
-    const currentLanguageObj = this.languages.find((language) => {
+    return this.languages.find((language) => {
       return firstPart === language.key;
     });
 
-    debug("getLangFromUrl > currentLanguageObj", currentLanguageObj);
-    return currentLanguageObj;
   }
 
   /**

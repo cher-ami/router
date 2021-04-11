@@ -3,11 +3,8 @@ import {
   MutableRefObject,
   useEffect,
   useImperativeHandle,
-  useMemo
+  useMemo,
 } from "react";
-
-const componentName = "useStack";
-const debug = require("debug")(`router:${componentName}`);
 
 export interface IUseStack extends Omit<IRouteStack, "$element" | "isReadyPromise"> {
   handleRef: ForwardedRef<any>;

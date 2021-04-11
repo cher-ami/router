@@ -9,9 +9,6 @@ import {
 import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
 
-const componentName = "useLocation";
-const debug = require("debug")(`router:${componentName}`);
-
 /**
  * Prepare setLocation URL
  * @param args can be string or TOpenRouteParams object

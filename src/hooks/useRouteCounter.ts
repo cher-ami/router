@@ -2,9 +2,6 @@ import { useHistory } from "..";
 import { useState } from "react";
 import { ROUTERS } from "../api/routers";
 
-const componentName = "useLocation";
-const debug = require("debug")(`router:${componentName}`);
-
 /**
  * use Route Counter
  */
