@@ -15,7 +15,8 @@ import {
 const debug = require("debug")("router:CreateRouter");
 
 export type TRoute = {
-  path: string;
+  path: any;
+  //| { [x: string]: string };
   component: React.ComponentType<any>;
   name?: string;
   parser?: Path;
@@ -112,7 +113,7 @@ export class CreateRouter {
     this.preMiddlewareRoutes = routes.map((route: TRoute) => ({
       ...route,
       name: route?.name || route?.component?.displayName,
-      parser: new Path(route.path),
+      // parser: new Path(route.path),
     }));
 
     debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);

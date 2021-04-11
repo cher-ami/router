@@ -19,18 +19,18 @@ const debug = require("debug")(`router:index`);
  */
 export const routesList: TRoute[] = [
   {
-    path: "/",
+    path: { en: "/", fr: "/" },
     component: HomePage,
   },
   {
-    path: "/blog/:id",
+    path: { en: "/blog/:id", fr: "/blog-fr/:id" },
     component: ArticlePage,
     props: {
       color: "red",
     },
   },
   {
-    path: "/about",
+    path: { en: "/about", fr: "/a-propos" },
     component: AboutPage,
     children: [
       {

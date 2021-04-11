@@ -219,7 +219,6 @@ class LangService {
     return this.languages.find((language) => {
       return firstPart === language.key;
     });
-
   }
 
   /**
