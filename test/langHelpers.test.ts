@@ -1,5 +1,5 @@
 import { TRoute } from "../src";
-import { selectLangPathByPath } from "../src/lang/langHelpers";
+import { getLangPathByPath } from "../src/lang/langHelpers";
 
 export const routesList: TRoute[] = [
   {
@@ -19,19 +19,24 @@ export const routesList: TRoute[] = [
 ];
 
 describe("langHelpers", () => {
-  it("selectAlternateLangPathByPath: sould return path if current path is string", () => {
+  it("getLangPathByPath: should return path if current path is string", () => {
     const testRoute = routesList.find((el) => el.name === "news");
-    const alternatePath = selectLangPathByPath(testRoute.path, "de", routesList);
+    const path = testRoute.path;
+    const alternatePath = getLangPathByPath(path, "de", routesList);
     expect(alternatePath).toBe(testRoute.path);
   });
 
-  it("selectAlternateLangPathByPath: sould return path if current path is object", () => {
+  it("getLangPathByPath: get path string as param, should return path properly", () => {
     const testRoute = routesList.find((el) => el.name === "home");
-    const alternatePath = selectLangPathByPath(
-      testRoute.path.fr,
-      "de",
-      routesList
-    );
+    const path: string = testRoute.path;
+    const alternatePath = getLangPathByPath(path, "de", routesList);
+    expect(alternatePath).toBe(testRoute?.path?.de);
+  });
+
+  it("getLangPathByPath: get path object as param, should return path properly", () => {
+    const testRoute = routesList.find((el) => el.name === "home");
+    const path: { [x: string]: string } = testRoute.path;
+    const alternatePath = getLangPathByPath(path, "de", routesList);
     expect(alternatePath).toBe(testRoute?.path?.de);
   });
 });

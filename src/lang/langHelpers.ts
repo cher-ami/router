@@ -4,7 +4,7 @@ import { ROUTERS } from "../api/routers";
 const debug = require("debug")("router:langHelpers");
 
 /**
- * Select current lang path by Lang
+ * Get current lang path by Lang
  *
  * ex:
  * const route = {
@@ -17,7 +17,7 @@ const debug = require("debug")("router:langHelpers");
  * @param route
  * @param lang
  */
-export function selectLangPathByLang(
+export function getLangPathByLang(
   route: TRoute,
   lang = LangService.currentLang?.key
 ): string {
@@ -33,35 +33,47 @@ export function selectLangPathByLang(
 }
 
 /**
- * Select lang path by another lang path
+ * Get lang path by another lang path
  * ex:
  *     path: { en: "/about", fr: "/a-propos", de: "uber", name: "about" },
  *
  * with "/about", we need "fr" path  "/a-propos"
  * selectLangPathByPath("/about", "fr", routes) // will return "/a-propos"
  *
+ *
+ * ex 2
+ * Path can be an object with all available related lang path string too:
+ *
+ *  const pathsObj = path: { en: "/about", fr: "/a-propos", de: "uber", name: "about" };
+ *  * selectLangPathByPath(pathsObj, "fr", routes) // will return "/a-propos"
+ *
  * @param path: current path
  * @param lang: Lang key we want to get the alternate path
  * @param routes: Route liste
  */
-export function selectLangPathByPath(
-  path: string,
+export function getLangPathByPath(
+  path: string | { [x: string]: string },
   lang = LangService.currentLang?.key,
   routes = ROUTERS?.routes
 ): string {
   if (!routes || !lang) return;
 
-  for (let route of routes) {
+  // selected path depend of what we recieve
+  const sPath = path?.[lang] || path;
+
+  for (let i in routes) {
+    const route = routes[i];
+
     // if route path is route.path, no alernate path, just return it.
     if (typeof route.path === "string") {
-      if (path === route.path) {
+      if (sPath === route.path) {
         return route.path;
       }
     }
     // if route path is an object with different paths by lang
     else if (typeof route.path === "object") {
       const matchingPathLang = Object.keys(route.path as { [x: string]: string }).find(
-        (langKey: string) => route.path?.[langKey] === path
+        (langKey: string) => route.path?.[langKey] === sPath
       );
       if (!matchingPathLang) continue;
       return route.path?.[lang];

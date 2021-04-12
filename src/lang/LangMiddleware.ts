@@ -1,6 +1,6 @@
 import { LangService, TRoute } from "..";
 import { joinPaths } from "../api/helpers";
-import { selectLangPathByLang } from "./langHelpers";
+import { getLangPathByLang } from "./langHelpers";
 const debug = require("debug")("router:LanguagesMiddleware");
 
 /**
@@ -14,10 +14,8 @@ export const langMiddleware = (
   enable = LangService.showLangInUrl()
 ): TRoute[] => {
   if (!enable) return pRoutes;
-
-  debug("langMiddleware: current lang", LangService.currentLang);
   return pRoutes.map((route: TRoute) => {
-    const path = selectLangPathByLang(route);
+    const path = getLangPathByLang(route);
     return {
       ...route,
       path: joinPaths(["/:lang", path !== "/" ? path : ""]),

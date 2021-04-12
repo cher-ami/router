@@ -10,9 +10,10 @@ import React, {
 import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
+import { getLangPathByPath } from "../lang/langHelpers";
 
 const componentName = "Router";
-// const debug = require("debug")(`router:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;
@@ -59,7 +60,7 @@ export const Router = memo((props: IProps) => {
       currentRoutesList = props.routes;
     } else {
       currentRoutesList = ROUTERS.routes?.find((el) => {
-        return `${el.path}` === props.base;
+        return getLangPathByPath(el.path) === getLangPathByPath(props.base);
       })?.children;
     }
 
