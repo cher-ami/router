@@ -1,30 +1,37 @@
 import { TRoute } from "../src";
-import { selectLangAlternatePathByPath } from "../src/lang/langHelpers";
+import { selectLangPathByPath } from "../src/lang/langHelpers";
 
 export const routesList: TRoute[] = [
-  { path: { en: "/home", fr: "/accueil" }, component: null },
-  { path: "/news", component: null },
   {
-    path: { en: "/about", fr: "/a-propos" },
+    path: { en: "/home", fr: "/accueil", de: "/zuhause" },
+    component: null,
+    name: "home",
+  },
+  { path: "/news", component: null, name: "news" },
+  {
+    path: { en: "/about", fr: "/a-propos", de: "uber", name: "about" },
     component: null,
     children: [
-      { path: "/foo", component: null },
-      { path: "/bar", component: null },
+      { path: "/foo", component: null, name: "foo" },
+      { path: "/bar", component: null, name: "bar" },
     ],
   },
 ];
 
 describe("langHelpers", () => {
-  it("selectLangPathByAlternatePath: sould return path if current path is string", () => {
-    const alternatePath = selectLangAlternatePathByPath("/news", "en", routesList);
-    const testRoute = routesList.find((el) => el.path === "/news");
-    console.log("testRoute", testRoute);
+  it("selectAlternateLangPathByPath: sould return path if current path is string", () => {
+    const testRoute = routesList.find((el) => el.name === "news");
+    const alternatePath = selectLangPathByPath(testRoute.path, "de", routesList);
     expect(alternatePath).toBe(testRoute.path);
   });
 
-  it("selectLangPathByAlternatePath: sould return path if current path is object", () => {
-    const alternatePath = selectLangAlternatePathByPath("/a-propos", "en", routesList);
-    const testRoute = routesList.find((el) => el.path?.fr === "/a-propos");
-    expect(alternatePath).toBe(testRoute.path?.en);
+  it("selectAlternateLangPathByPath: sould return path if current path is object", () => {
+    const testRoute = routesList.find((el) => el.name === "home");
+    const alternatePath = selectLangPathByPath(
+      testRoute.path.fr,
+      "de",
+      routesList
+    );
+    expect(alternatePath).toBe(testRoute?.path?.de);
   });
 });
