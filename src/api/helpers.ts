@@ -69,9 +69,7 @@ export function getUrlByPath(
   // prepare local path
   let localPath: string[] = [basePath];
 
-  for (let i in routes) {
-    const route = routes[i];
-
+  for (let route of routes) {
     // if path match on first level
     if (route.path === path) {
       // keep path in local array
@@ -103,8 +101,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
   // need to wrap the function to be able to access the preserved "pRoutes" param
   // in local scope after recursion
   const recursiveFn = (routes: TRoute[], params: TOpenRouteParams): string => {
-    for (let i in routes) {
-      const route = routes[i];
+    for (let route of routes) {
       const match =
         route?.name === params.name || route.component?.displayName === params.name;
       if (match) {
