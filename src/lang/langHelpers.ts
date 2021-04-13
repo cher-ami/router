@@ -49,40 +49,86 @@ export function getLangPathByLang(
  *  * selectLangPathByPath(pathsObj, "fr", routes) // will return "/a-propos"
  *
  * @param path: current path
+ * @param base
  * @param lang: Lang key we want to get the alternate path
  * @param routes: Route liste
  */
-export function getLangPathByPath(
-  path: string | { [x: string]: string },
+
+type TGetLangPathByPath = {
+  path: string | { [p: string]: string };
+  base?: string;
+  lang?: string | undefined;
+  routes?: TRoute[] | undefined;
+};
+
+export function getLangPathByPath({
+  path,
+  base = null,
   lang = LangService.currentLang?.key,
-  routes = ROUTERS?.routes
-): string {
+  routes = ROUTERS?.routes,
+}: TGetLangPathByPath): string {
+  // check
   if (!routes || !lang) {
     debug("No routes or no lang is set, return", { routes, lang });
     return;
   }
 
-  // selected path depend of what we recieve
-  const sPath = path?.[lang] || path;
+  const localPath = [];
 
-  const localPath: string[] = [];
+  /**
+   *
+   */
+  const recursive = ({ pPath, pBase, pLang, pRoutes }) => {
+    // selected path depend of what we recieve
+    const sPath = pPath?.[pLang] || pPath;
+    debug("sPath", sPath);
+    if (!sPath) {
+      debug("no sPath, return", sPath);
+      return;
+    }
 
-  for (let route of routes) {
-    debug("route.path:", route.path);
+    for (let route of pRoutes) {
+      // if route path is route.path, no alernate path, just return it.
+      if (typeof route.path === "string") {
+        if (route.path === sPath) {
+          localPath.push(route.path);
+          debug("match ! sPath === route.path", { localPath });
+          return joinPaths(localPath);
+        }
+      }
 
-    // if route path is route.path, no alernate path, just return it.
-    if (typeof route.path === "string") {
-      if (sPath === route.path) {
-        return route.path;
+      // if route path is an object with different paths by lang
+      else if (typeof route.path === "object") {
+        const matchingPathLang = Object.keys(route.path as { [x: string]: string }).find(
+          (langKey: string) => route.path?.[langKey] === sPath
+        );
+
+        if (matchingPathLang) {
+          debug("match ! matchingPathLang", matchingPathLang, route.path?.[pLang]);
+          return route.path?.[pLang];
+        }
+        // // if not matching but as children, return it
+        // else if (route?.children?.length > 0) {
+        //   for (let childRoute of route.children) {
+        //     const test = recursive({
+        //       pPath: childRoute.path?.[lang] || childRoute.path,
+        //       pBase: joinPaths(localPath),
+        //       pLang: lang,
+        //       pRoutes: route.children,
+        //     });
+        //     if (test) {
+        //       localPath.push(test);
+        //       debug("localPath >>>", test, localPath);
+        //       return test;
+        //     }
+        //   }
+        // }
       }
     }
-    // if route path is an object with different paths by lang
-    else if (typeof route.path === "object") {
-      const matchingPathLang = Object.keys(route.path as { [x: string]: string }).find(
-        (langKey: string) => route.path?.[langKey] === sPath
-      );
-      if (!matchingPathLang) continue;
-      return route.path?.[lang];
-    }
-  }
+  };
+
+  //debug("localPath ----", localPath);
+
+  // start
+  return recursive({ pPath: path, pBase: base, pLang: lang, pRoutes: routes });
 }

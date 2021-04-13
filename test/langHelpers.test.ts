@@ -26,18 +26,18 @@ export const routesList: TRoute[] = [
 ];
 
 describe("langHelpers", () => {
-  // FIXME REMOVE ONLY
-  it("getLangPathByPath: get path router + subrouter string as param, should return path properly", () => {
-    const alternatePath = getLangPathByPath({
-      path: "/foo-fr",
-      base: "/a-propos",
-      lang: "en",
-      routes: routesList
-    });
-    expect(alternatePath).toBe("/about/foo-en");
-  });
+  // // FIXME REMOVE ONLY
+  // it("getLangPathByPath: get path router + subrouter string as param, should return path properly", () => {
+  //   const alternatePath = getLangPathByPath({
+  //     path: "/foo-fr",
+  //     base: "/a-propos",
+  //     lang: "en",
+  //     routes: routesList
+  //   });
+  //   expect(alternatePath).toBe("/about/foo-en");
+  // });
 
-  it.only("getLangPathByPath: should return path if current path is string", () => {
+  it("getLangPathByPath: should return path if current path is string", () => {
     const testRoute = routesList.find((el) => el.name === "news");
     const path = testRoute.path;
     const alternatePath = getLangPathByPath({
