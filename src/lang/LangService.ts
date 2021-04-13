@@ -90,13 +90,27 @@ class LangService {
 
     const rootRouter = useRootRouter();
     const currentRoute = rootRouter.currentRoute;
-    const instances = ROUTERS.instances;
-    let fullPath = instances?.[instances?.length - 1]?.currentRoute?.fullPath || "/:lang";
+    const lastInstance = ROUTERS.instances?.[ROUTERS.instances?.length - 1];
+    let fullPath = lastInstance?.currentRoute?.fullPath || "/:lang";
+    let path = lastInstance?.currentRoute?.path;
 
     // if default language should be visible in URL, use history push
     if (this.showDefaultLangInUrl) {
       // default language should be always visible in URL, set new /:lang
       fullPath = removeLastCharFromString(fullPath, "/", true);
+
+      debug("fullPath", fullPath, currentRoute);
+      // /master/:lang/blog/:id
+
+      const getPathFromFullPath = fullPath.replace(`${currentRoute.base}/:lang`, "");
+      debug("formatFullPath", getPathFromFullPath);
+
+      // replace:  blog/:id ----> blog-fr/:id
+
+      // get current path with current lang
+      // replace by path[toLang.key]
+
+      //return;
       const newUrl = buildUrl(fullPath, {
         ...currentRoute?.props?.params,
         lang: toLang.key,

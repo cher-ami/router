@@ -24,13 +24,11 @@ export type TRoute = {
     params?: { [x: string]: any };
     [x: string]: any;
   };
-  children?: TRoute[];
-  // local match URL with params (needed by nested router)
-  matchUrl?: string;
-  // full URL who not depend of current instance
-  fullUrl?: string;
-  // full Path /base/:lang/foo/second-foo
+  children?: TRoute[]; // local match URL with params (needed by nested router)
+  url?: string; // full URL who not depend of current instance
+  fullUrl?: string; // full Path /base/:lang/foo/second-foo
   fullPath?: string;
+  base?: string;
 };
 
 export enum EHistoryMode {
@@ -110,12 +108,7 @@ export class CreateRouter {
     }
 
     // format routes
-    this.preMiddlewareRoutes = routes.map((route: TRoute) => ({
-      ...route,
-      name: route?.name || route?.component?.displayName,
-      // parser: new Path(route.path),
-    }));
-
+    this.preMiddlewareRoutes = routes;
     debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
 
     this.routes =
@@ -123,7 +116,6 @@ export class CreateRouter {
         (routes, middleware) => middleware(routes),
         this.preMiddlewareRoutes
       ) || this.preMiddlewareRoutes;
-
     debug(this.id, "this.routes", this.routes);
 
     this.updateRoute();
@@ -195,10 +187,7 @@ export class CreateRouter {
       return;
     }
 
-    if (
-      this.currentRoute?.matchUrl != null &&
-      this.currentRoute?.matchUrl === matchingRoute?.matchUrl
-    ) {
+    if (this.currentRoute?.url != null && this.currentRoute?.url === matchingRoute?.url) {
       debug(this.id, "updateRoute: THIS IS THE SAME URL, RETURN.");
       return;
     }
@@ -254,14 +243,15 @@ export class CreateRouter {
         const route = pCurrentRoute || currentRoute;
         const params = pMatch || match;
         const routeObj = {
-          fullUrl: pUrl,
           fullPath: currentRoutePath,
-          matchUrl: buildUrl(route.path, params),
           path: route?.path,
+          fullUrl: pUrl,
+          url: buildUrl(route.path, params),
+          base: pBase,
           component: route?.component,
           children: route?.children,
           parser: pPathParser || pathParser,
-          name: route?.name,
+          name: route?.name || route?.component?.displayName,
           props: {
             params,
             ...(route?.props || {}),

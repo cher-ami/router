@@ -34,7 +34,7 @@ export const routesList: TRoute[] = [
     component: AboutPage,
     children: [
       {
-        path: "/foo",
+        path: { en: "/foo", fr: "/foo-fr" },
         component: FooPage,
       },
       {

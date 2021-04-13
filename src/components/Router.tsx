@@ -46,7 +46,7 @@ export const Router = memo((props: IProps) => {
   // join each parent router base
   const base = joinPaths([
     parentRouter?.base,
-    // because language middleware nedd to patch only first level routes
+    // because language middleware need to patch only first level routes
     id !== 1 && showLang && "/:lang",
     props.base,
   ]);
@@ -63,12 +63,8 @@ export const Router = memo((props: IProps) => {
         return getLangPathByPath(el.path) === getLangPathByPath(props.base);
       })?.children;
     }
-
     return currentRoutesList;
   }, [props.routes, props.base]);
-
-  // middlewares are properties of root instance only?
-  const middlewares = props.middlewares;
 
   // keep router instance in state
   const [routerState] = useState<CreateRouter>(() => {
@@ -76,7 +72,7 @@ export const Router = memo((props: IProps) => {
       base,
       routes,
       id,
-      middlewares,
+      middlewares: props.middlewares,
       historyMode: props.historyMode,
     });
 
