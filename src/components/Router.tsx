@@ -51,7 +51,7 @@ export const Router = memo((props: IProps) => {
     } else {
       debug(id, ROUTERS.routes);
       currentRoutesList = ROUTERS.routes?.find((el) => {
-        return getLangPathByPath(el.path) === getLangPathByPath(props.base);
+        return getLangPathByPath({ path: el.path }) === getLangPathByPath({ path: props.base });
       })?.children;
 
       debug(currentRoutesList);
@@ -69,7 +69,7 @@ export const Router = memo((props: IProps) => {
   const base = useMemo(() => {
     const parentBase: string = parentRouter?.base;
     const addLang: boolean = id !== 1 && showLang;
-    const base: string = addLang ? getLangPathByPath(props.base) : props.base;
+    const base: string = addLang ? getLangPathByPath({ path: props.base }) : props.base;
     return joinPaths([
       parentBase, // ex: /master-base
       addLang && "/:lang",

@@ -111,7 +111,6 @@ class LangService {
       // get current path with current lang
       // replace by path[toLang.key]
 
-      return;
       const newUrl = buildUrl(fullPath, {
         ...currentRoute?.props?.params,
         lang: toLang.key,

@@ -60,7 +60,7 @@ export default function App() {
             <Link to={"/"}>Home</Link>
           </li>
           <li>
-            <Link to={getLangPathByPath("/about")}>About</Link>
+            <Link to={getLangPathByPath({ path: "/about" })}>About</Link>
           </li>
           <li>
             <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>
