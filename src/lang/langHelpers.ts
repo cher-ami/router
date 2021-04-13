@@ -1,5 +1,6 @@
 import { LangService, TRoute } from "..";
 import { ROUTERS } from "../api/routers";
+import { getUrlByPath, joinPaths } from "../api/helpers";
 
 const debug = require("debug")("router:langHelpers");
 
@@ -64,8 +65,10 @@ export function getLangPathByPath(
   // selected path depend of what we recieve
   const sPath = path?.[lang] || path;
 
-  for (let i in routes) {
-    const route = routes[i];
+  const localPath: string[] = [];
+
+  for (let route of routes) {
+    debug("route.path:", route.path);
 
     // if route path is route.path, no alernate path, just return it.
     if (typeof route.path === "string") {
