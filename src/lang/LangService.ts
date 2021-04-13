@@ -90,7 +90,9 @@ class LangService {
 
     const rootRouter = useRootRouter();
     const currentRoute = rootRouter.currentRoute;
+    debug("ROUTERS.instances", ROUTERS.instances);
     const lastInstance = ROUTERS.instances?.[ROUTERS.instances?.length - 1];
+    debug("ROUTERS.instances -1", lastInstance);
     let fullPath = lastInstance?.currentRoute?.fullPath || "/:lang";
     let path = lastInstance?.currentRoute?.path;
 
@@ -106,11 +108,10 @@ class LangService {
       debug("formatFullPath", getPathFromFullPath);
 
       // replace:  blog/:id ----> blog-fr/:id
-
       // get current path with current lang
       // replace by path[toLang.key]
 
-      //return;
+      return;
       const newUrl = buildUrl(fullPath, {
         ...currentRoute?.props?.params,
         lang: toLang.key,

@@ -11,6 +11,8 @@ import {
   HashHistory,
   MemoryHistory,
 } from "history";
+import { getLangPathByPath } from "../lang/langHelpers";
+import { LangService } from "../index";
 
 const debug = require("debug")("router:CreateRouter");
 
@@ -101,14 +103,8 @@ export class CreateRouter {
       ROUTERS.locationsHistory.push(ROUTERS.history.location);
     }
 
-    // patch: create root route object with path '/' if doesn't exist
-    const rootPathExist = routes.some((route) => route.path === "/");
-    if (!rootPathExist) {
-      routes.push({ path: "/", component: null });
-    }
-
-    // format routes
-    this.preMiddlewareRoutes = routes;
+    // add missing "/" route to routes list if doesn't exist
+    this.preMiddlewareRoutes = this.patchMissingRootRoute(routes);
     debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
 
     this.routes =
@@ -120,6 +116,24 @@ export class CreateRouter {
 
     this.updateRoute();
     this.initEvents();
+  }
+
+  /**
+   * Patch missing root route
+   * add missing "/" route to routes list if doesn't exist
+   * @param routes
+   */
+  protected patchMissingRootRoute(routes: TRoute[]): TRoute[] {
+    const rootPathExist = routes.some(
+      (route) =>
+        (typeof route.path === "object" &&
+          Object.keys(route.path).some((el) => route.path[el] === "/")) ||
+        route.path === "/"
+    );
+    if (!rootPathExist) {
+      routes.push({ path: "/", component: null });
+    }
+    return routes;
   }
 
   /**

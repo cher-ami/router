@@ -3,7 +3,7 @@ import React, {
   forwardRef,
   useRef
 } from "react";
-import { Router } from "../../src";
+import { langMiddleware, Router } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { Link } from "../../src";
@@ -32,7 +32,10 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
           <nav>
             <ul>
               <li>
-                <Link to={`/about/foo`}>Foo</Link>{" "}
+                <Link to={`/about/foo`}>Foo EN</Link>{" "}
+              </li>
+              <li>
+                <Link to={`/a-propos/foo-fr`}>Foo FR</Link>{" "}
               </li>
               <li>
                 <Link to={"/about/bar"}>Bar</Link>{" "}

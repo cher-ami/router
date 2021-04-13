@@ -1,4 +1,4 @@
-import { EHistoryMode, CreateRouter, TRoute, useRouter } from "..";
+import { EHistoryMode, CreateRouter, TRoute, useRouter, langMiddleware } from "..";
 import React, {
   createContext,
   memo,
@@ -41,16 +41,6 @@ export const Router = memo((props: IProps) => {
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
 
-  const showLang = LangService.showLangInUrl();
-
-  // join each parent router base
-  const base = joinPaths([
-    parentRouter?.base,
-    // because language middleware need to patch only first level routes
-    id !== 1 && showLang && "/:lang",
-    props.base,
-  ]);
-
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
@@ -59,15 +49,40 @@ export const Router = memo((props: IProps) => {
       ROUTERS.routes = props.routes;
       currentRoutesList = props.routes;
     } else {
+      debug(id, ROUTERS.routes);
       currentRoutesList = ROUTERS.routes?.find((el) => {
         return getLangPathByPath(el.path) === getLangPathByPath(props.base);
       })?.children;
+
+      debug(currentRoutesList);
+      // patch pre
+      if (LangService.isInit) {
+        currentRoutesList = langMiddleware(currentRoutesList, false);
+      }
     }
+
+    debug(currentRoutesList);
+
     return currentRoutesList;
   }, [props.routes, props.base]);
 
+  const showLang = LangService.showLangInUrl();
+  // join each parent router base
+  const base = useMemo(() => {
+    const parentBase: string = parentRouter?.base;
+    const addLang: boolean = id !== 1 && showLang;
+    const base: string = addLang ? getLangPathByPath(props.base) : props.base;
+    return joinPaths([
+      parentBase, // ex: /master-base
+      addLang && "/:lang",
+      base, // ex: "/about
+    ]);
+  }, [props.base]);
+
   // keep router instance in state
   const [routerState] = useState<CreateRouter>(() => {
+    debug("routes", routes);
+
     const newRouter = new CreateRouter({
       base,
       routes,

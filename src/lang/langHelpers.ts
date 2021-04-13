@@ -56,7 +56,10 @@ export function getLangPathByPath(
   lang = LangService.currentLang?.key,
   routes = ROUTERS?.routes
 ): string {
-  if (!routes || !lang) return;
+  if (!routes || !lang) {
+    debug("No routes or no lang is set, return", { routes, lang });
+    return;
+  }
 
   // selected path depend of what we recieve
   const sPath = path?.[lang] || path;

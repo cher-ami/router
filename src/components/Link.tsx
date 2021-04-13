@@ -1,6 +1,7 @@
 import React, { ReactNode, useMemo } from "react";
 import { prepareSetLocationUrl, useLocation } from "..";
 import { joinPaths, TOpenRouteParams } from "../api/helpers";
+import { getLangPathByPath } from "../lang/langHelpers";
 
 interface IProps {
   to: string | TOpenRouteParams;
@@ -22,7 +23,10 @@ function Link(props: IProps) {
   const handleClick = (e) => {
     e.preventDefault();
     props.onClick?.();
-    setLocation(props.to);
+    setLocation(
+      props.to
+      //typeof props.to === "string" ? getLangPathByPath(props.to) : props.to
+    );
   };
 
   return (

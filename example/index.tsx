@@ -51,7 +51,6 @@ export const routesList: TRoute[] = [
 
 const baseUrl = "/master";
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
-
 LangService.init(locales, true, baseUrl);
 
 /**
