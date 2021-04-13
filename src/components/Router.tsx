@@ -55,14 +55,12 @@ export const Router = memo((props: IProps) => {
       })?.children;
 
       debug(currentRoutesList);
-      // patch pre
       if (LangService.isInit) {
+        // If sub router, need to selected appropriate route path by lang
         currentRoutesList = langMiddleware(currentRoutesList, false);
       }
     }
-
     debug(currentRoutesList);
-
     return currentRoutesList;
   }, [props.routes, props.base]);
 
