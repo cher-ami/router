@@ -91,9 +91,7 @@ class LangService {
 
     const rootRouter = useRootRouter();
     const currentRoute = rootRouter.currentRoute;
-    debug("ROUTERS.instances", ROUTERS.instances);
     const lastInstance = ROUTERS.instances?.[ROUTERS.instances?.length - 1];
-    debug("ROUTERS.instances -1", lastInstance);
     let fullPath = lastInstance?.currentRoute?.fullPath || "/:lang";
     let path = lastInstance?.currentRoute?.path;
 
@@ -102,28 +100,25 @@ class LangService {
       // default language should be always visible in URL, set new /:lang
       fullPath = removeLastCharFromString(fullPath, "/", true);
 
-      debug("fullPath", fullPath, currentRoute);
-      // /master/:lang/blog/:id
+      debug("currentRoute", currentRoute);
 
-      const getPathFromFullPath = fullPath.replace(`${currentRoute.base}/:lang`, "");
-
-      const pre = prepareSetLocationUrl({
+      const newUrl = prepareSetLocationUrl({
         name: currentRoute.name,
         params: {
           lang: toLang.key,
         },
       });
+      // const newUrl = buildUrl(currentRoute.langPath[toLang.key], {
+      //   ...currentRoute?.props?.params,
+      //   lang: toLang.key,
+      // });
 
-      debug("trace: pre", pre);
-
-      const newUrl = buildUrl(fullPath, {
-        ...currentRoute?.props?.params,
-        lang: toLang.key,
-      });
+      debug("prepareSetLocationUrl", newUrl);
 
       // register current langage (usefull only if we don't reload the app.)
       this.currentLang = toLang;
 
+      // // TODO remove
       return;
       // reload application
       this.reloadOrRefresh(newUrl, forcePageReload);

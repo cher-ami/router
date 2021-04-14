@@ -63,17 +63,27 @@ export function buildUrl(path: string, params?: TParams): string {
  */
 export function getUrlByPath(
   routes: TRoute[],
-  path: string,
+  path: string | { [x: string]: string },
   basePath: string = null
 ): string {
   // prepare local path
   let localPath: string[] = [basePath];
 
   for (let route of routes) {
+    const routePath =
+      route.langPath?.[LangService.currentLang?.key] ||
+      route.path;
+
+    const oneMatch = Object.keys(route.langPath).some(l => route.langPath[l] === path)
+     if (oneMatch) {
+       debug('route> true')
+     }
+
+    debug("route>", route, path)
     // if path match on first level
-    if (route.path === path) {
+    if (oneMatch) {
       // keep path in local array
-      localPath.push(route.path);
+      localPath.push(routePath);
       // return it
       return joinPaths(localPath);
     }
@@ -85,7 +95,7 @@ export function getUrlByPath(
       // return recursive Fn only if match, else continue to next iteration
       if (matchChildrenPath) {
         // keep path in local array
-        localPath.push(route.path);
+        localPath.push(routePath);
         // Return the function after localPath push
         return getUrlByPath(route.children, path, joinPaths(localPath));
       }

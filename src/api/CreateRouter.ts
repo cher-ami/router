@@ -16,8 +16,9 @@ const debug = require("debug")("router:CreateRouter");
 
 export type TRoute = {
   path: any;
-  //| { [x: string]: string };
+  // string | { [x: string]: string };
   component?: React.ComponentType<any>;
+  langPath?: { [x: string]: string };
   name?: string;
   parser?: Path;
   props?: {
@@ -263,6 +264,7 @@ export class CreateRouter {
           component: route?.component,
           children: route?.children,
           parser: pPathParser || pathParser,
+          langPath: route.langPath,
           name: route?.name || route?.component?.displayName,
           props: {
             params,

@@ -37,10 +37,8 @@ RouterContext.displayName = componentName;
 export const Router = memo((props: IProps) => {
   // deduce a router ID
   const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
-
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
-
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
@@ -51,7 +49,9 @@ export const Router = memo((props: IProps) => {
     } else {
       debug(id, ROUTERS.routes);
       currentRoutesList = ROUTERS.routes?.find((el) => {
-        return getLangPathByPath({ path: el.path }) === getLangPathByPath({ path: props.base });
+        return (
+          getLangPathByPath({ path: el.path }) === getLangPathByPath({ path: props.base })
+        );
       })?.children;
 
       debug(currentRoutesList);
@@ -79,8 +79,6 @@ export const Router = memo((props: IProps) => {
 
   // keep router instance in state
   const [routerState] = useState<CreateRouter>(() => {
-    debug("routes", routes);
-
     const newRouter = new CreateRouter({
       base,
       routes,

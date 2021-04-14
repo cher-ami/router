@@ -33,6 +33,7 @@ export const prepareSetLocationUrl = (args: string | TOpenRouteParams): string =
       };
     }
 
+    debug('rootRouter.routes',rootRouter.routes)
     // Get URL by the route name
     urlToPush = getUrlByRouteName(rootRouter.routes, args);
 
