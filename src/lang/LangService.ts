@@ -119,9 +119,9 @@ class LangService {
       // register current langage (usefull only if we don't reload the app.)
       this.currentLang = toLang;
 
+      return;
       // reload application
       this.reloadOrRefresh(newUrl, forcePageReload);
-      return;
     }
 
     // if other, case default language need to be hidden from URL

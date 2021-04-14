@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useRouteCounter, Stack, useHistory } from "../src";
 import { LangService } from "../src";
-import { getLangPathByPath } from "../src/lang/langHelpers";
 
 const componentName = "App";
 const debug = require("debug")(`router:${componentName}`);
@@ -60,7 +59,7 @@ export default function App() {
             <Link to={"/"}>Home</Link>
           </li>
           <li>
-            <Link to={getLangPathByPath({ path: "/about" })}>About</Link>
+            <Link to={"/about"}>About</Link>
           </li>
           <li>
             <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>

@@ -26,8 +26,8 @@ export const langMiddleware = (
    *   ]
    *
    *  return:
-   *    { path: en: "/" },
-   *    { path: en: "/news" },
+   *    { path: "/" },
+   *    { path: "/news" },
    */
 
   const patchRoutes = (pRoutes, children = false) => {

@@ -3,7 +3,7 @@ import React, {
   forwardRef,
   useRef
 } from "react";
-import { langMiddleware, Router } from "../../src";
+import { Router } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { Link } from "../../src";
@@ -24,6 +24,7 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
+
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
@@ -32,10 +33,7 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
           <nav>
             <ul>
               <li>
-                <Link to={`/about/foo`}>Foo EN</Link>{" "}
-              </li>
-              <li>
-                <Link to={`/a-propos/foo-fr`}>Foo FR</Link>{" "}
+                <Link to={{name: "HomePage", params: {lang: "fr"}}}>Foo EN</Link>{" "}
               </li>
               <li>
                 <Link to={"/about/bar"}>Bar</Link>{" "}

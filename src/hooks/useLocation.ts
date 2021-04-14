@@ -16,6 +16,7 @@ const debug = require("debug")(`router:useLocation`);
  */
 export const prepareSetLocationUrl = (args: string | TOpenRouteParams): string => {
   const rootRouter = useRootRouter();
+
   let urlToPush: string;
 
   // in case we recieve a string

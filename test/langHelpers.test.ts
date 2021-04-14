@@ -1,5 +1,5 @@
 import { TRoute } from "../src";
-import { getLangPathByPath } from "../src/lang/langHelpers";
+//import { getLangPathByPath } from "../src/lang/langHelpers";
 
 export const routesList: TRoute[] = [
   {
@@ -54,13 +54,14 @@ describe("langHelpers", () => {
         path: { en: "/home", fr: "/accueil", de: "/zuhause" },
         children: [
           {
-            path: { en: "/foo-en", fr: "/foo-fr", de: "/foo-de" },
+            path: { en: "/foo-en", fr: "/:id", de: "/foo-de" },
           },
         ],
       },
     ];
     // prettier-ignore
     expect(getLangPathByPath({ path: "/accueil/foo-fr", base: "/accueil", lang: "en", routes }))
+//    /accueil/:id/
       .toBe("/home/foo-en");
     // prettier-ignore
     expect(getLangPathByPath({ path: "/zuhause/foo-de", base: "/zuhause", lang: "en", routes }))
