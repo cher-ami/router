@@ -6,6 +6,7 @@ import {
   removeLastCharFromString,
 } from "../api/helpers";
 import { useRootRouter } from "../hooks/useRouter";
+import { prepareSetLocationUrl } from "../hooks/useLocation";
 const debug = require("debug")(`router:LangService`);
 
 export type TLanguage = {
@@ -105,11 +106,15 @@ class LangService {
       // /master/:lang/blog/:id
 
       const getPathFromFullPath = fullPath.replace(`${currentRoute.base}/:lang`, "");
-      debug("formatFullPath", getPathFromFullPath);
 
-      // replace:  blog/:id ----> blog-fr/:id
-      // get current path with current lang
-      // replace by path[toLang.key]
+      const pre = prepareSetLocationUrl({
+        name: currentRoute.name,
+        params: {
+          lang: toLang.key,
+        },
+      });
+
+      debug("trace: pre", pre);
 
       const newUrl = buildUrl(fullPath, {
         ...currentRoute?.props?.params,

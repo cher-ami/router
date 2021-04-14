@@ -56,10 +56,10 @@ export default function App() {
       <nav>
         <ul>
           <li>
-            <Link to={"/"}>Home</Link>
+            <Link to={{ name:"HomePage" }}>Home</Link>
           </li>
           <li>
-            <Link to={"/about"}>About</Link>
+            <Link to={{ name:"AboutPage" }}>About</Link>
           </li>
           <li>
             <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>

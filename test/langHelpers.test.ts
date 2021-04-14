@@ -1,4 +1,5 @@
 import { TRoute } from "../src";
+import { getLangPathByPath } from "../src/lang/langHelpers";
 //import { getLangPathByPath } from "../src/lang/langHelpers";
 
 export const routesList: TRoute[] = [

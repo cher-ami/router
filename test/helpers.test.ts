@@ -70,7 +70,7 @@ describe("getUrlByPath", () => {
             path: "/foo",
             component: null,
             children: [
-              { path: "/zoo", component: null },
+              { path: "/:zoo", component: null },
               { path: "/bla", component: null },
             ],
           },
@@ -78,7 +78,7 @@ describe("getUrlByPath", () => {
       },
     ];
     expect(getUrlByPath(routesList, "/foo")).toBe("/hello/foo");
-    expect(getUrlByPath(routesList, "/zoo")).toBe("/hello/foo/zoo");
+    expect(getUrlByPath(routesList, "/zoo")).toBe("/hello/foo/:zoo");
   });
 });
 
