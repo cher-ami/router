@@ -1,6 +1,6 @@
 import { LangService, TRoute } from "..";
 import { ROUTERS } from "../api/routers";
-import { getUrlByPath, joinPaths } from "../api/helpers";
+import { extractPathFromBase, getUrlByPath, joinPaths } from "../api/helpers";
 
 const debug = require("debug")("router:langHelpers");
 
@@ -59,76 +59,70 @@ type TGetLangPathByPath = {
   base?: string;
   lang?: string | undefined;
   routes?: TRoute[] | undefined;
+  basePath?: string;
+  log?: boolean;
 };
 
 export function getLangPathByPath({
   path,
   base = null,
-  lang = LangService.currentLang?.key,
+  lang = LangService.currentLang?.key || undefined,
   routes = ROUTERS?.routes,
+  basePath = null,
+  log = false,
 }: TGetLangPathByPath): string {
-  // check
-  if (!routes || !lang) {
-    debug("No routes or no lang is set, return", { routes, lang });
+  if (!routes) {
+    log && debug("No routes is set, return", { routes });
     return;
   }
+  // store path
+  const storePaths: string[] = [basePath];
+  // inital path
+  const initialPath = path?.[lang] || path;
+  // quick fix in case base is a simple "/"
+  if (base === "/") base = "";
+  // path without base
+  const pathWithoutBase = extractPathFromBase(initialPath, base);
 
-  const localPath = [];
+  for (let route of routes) {
+    log && debug("> route", route);
+    // get current routePath
+    const routePath = route.path?.[lang] || route.path;
 
-  /**
-   *
-   */
-  const recursive = ({ pPath, pBase, pLang, pRoutes }) => {
-    // selected path depend of what we recieve
-    const sPath = pPath?.[pLang] || pPath;
-    debug("sPath", sPath);
-    if (!sPath) {
-      debug("no sPath, return", sPath);
-      return;
+    // check if path without base match with one of path lang
+    const pathWithoutBaseMatchWithOnePathLang =
+      typeof route.path === "object" &&
+      Object.keys(route.path).some((l) => route.path?.[l] === pathWithoutBase);
+
+    // prettier-ignore
+    log && debug({ "route.path": route.path, base, storePaths, routePath, pathWithoutBaseMatchWithOnePathLang, pathWithoutBase });
+
+    if (routePath === pathWithoutBase || pathWithoutBaseMatchWithOnePathLang) {
+      // pousser dans la tableau
+      storePaths.push(routePath);
+      log && debug("> !!!!!!!! FINAL return: ", joinPaths(storePaths));
+      // retourner le path final
+      return joinPaths(storePaths);
     }
+    // si ca match pas mais qu'il y a des children
+    else if (route.children?.length > 0) {
+      log && debug("children > has children");
 
-    for (let route of pRoutes) {
-      // if route path is route.path, no alernate path, just return it.
-      if (typeof route.path === "string") {
-        if (route.path === sPath) {
-          localPath.push(route.path);
-          debug("match ! sPath === route.path", { localPath });
-          return joinPaths(localPath);
-        }
-      }
+      // translate current base
+      // prettier-ignore
+      const translateBase = base ? getLangPathByPath({ path: base, lang, routes, log:false }) : base;
+      log && debug("translateBase", translateBase);
 
-      // if route path is an object with different paths by lang
-      else if (typeof route.path === "object") {
-        const matchingPathLang = Object.keys(route.path as { [x: string]: string }).find(
-          (langKey: string) => route.path?.[langKey] === sPath
-        );
+      // prettier-ignore
+      const match = getLangPathByPath({ path, base, lang, basePath: translateBase, routes: route.children });
+      log && debug("match >", match);
 
-        if (matchingPathLang) {
-          debug("match ! matchingPathLang", matchingPathLang, route.path?.[pLang]);
-          return route.path?.[pLang];
-        }
-        // // if not matching but as children, return it
-        // else if (route?.children?.length > 0) {
-        //   for (let childRoute of route.children) {
-        //     const test = recursive({
-        //       pPath: childRoute.path?.[lang] || childRoute.path,
-        //       pBase: joinPaths(localPath),
-        //       pLang: lang,
-        //       pRoutes: route.children,
-        //     });
-        //     if (test) {
-        //       localPath.push(test);
-        //       debug("localPath >>>", test, localPath);
-        //       return test;
-        //     }
-        //   }
-        // }
+      if (match) {
+        // keep path in local array
+        log && debug("children match, return it");
+        // prettier-ignore
+        return match
       }
     }
-  };
-
-  //debug("localPath ----", localPath);
-
-  // start
-  return recursive({ pPath: path, pBase: base, pLang: lang, pRoutes: routes });
+  }
 }

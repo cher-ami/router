@@ -11,15 +11,13 @@ import {
   HashHistory,
   MemoryHistory,
 } from "history";
-import { getLangPathByPath } from "../lang/langHelpers";
-import { LangService } from "../index";
 
 const debug = require("debug")("router:CreateRouter");
 
 export type TRoute = {
   path: any;
   //| { [x: string]: string };
-  component: React.ComponentType<any>;
+  component?: React.ComponentType<any>;
   name?: string;
   parser?: Path;
   props?: {
