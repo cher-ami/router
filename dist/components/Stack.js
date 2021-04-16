@@ -153,7 +153,7 @@ function Stack(props) {
         });
     }, [currentRoute]);
     return (react_1.default.createElement("div", { className: [componentName, props.className].filter(function (e) { return e; }).join(" ") },
-        (previousRoute === null || previousRoute === void 0 ? void 0 : previousRoute.component) && (react_1.default.createElement(previousRoute.component, __assign({ ref: prevRef, key: "" + previousRoute.fullUrl }, (previousRoute.props || {})))),
-        (currentRoute === null || currentRoute === void 0 ? void 0 : currentRoute.component) && (react_1.default.createElement(currentRoute.component, __assign({ ref: currentRef, key: "" + currentRoute.fullUrl }, (currentRoute.props || {}))))));
+        (previousRoute === null || previousRoute === void 0 ? void 0 : previousRoute.component) && (react_1.default.createElement(previousRoute.component, __assign({ ref: prevRef, key: previousRoute.fullUrl + "_" + (index - 1) }, (previousRoute.props || {})))),
+        (currentRoute === null || currentRoute === void 0 ? void 0 : currentRoute.component) && (react_1.default.createElement(currentRoute.component, __assign({ ref: currentRef, key: currentRoute.fullUrl + "_" + index }, (currentRoute.props || {}))))));
 }
 exports.Stack = Stack;
