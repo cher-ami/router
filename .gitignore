@@ -4,5 +4,4 @@ node_modules
 .idea
 tsconfig.tsbuildinfo
 .cache
-dist
 example/dist
