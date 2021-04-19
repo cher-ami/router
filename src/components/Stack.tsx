@@ -100,14 +100,14 @@ function Stack(props: IProps) {
       {previousRoute?.component && (
         <previousRoute.component
           ref={prevRef}
-          key={`${previousRoute.fullUrl}_${index - 1}`}
+          key={`${previousRoute?.fullUrl || ""}_${index - 1}`}
           {...(previousRoute.props || {})}
         />
       )}
       {currentRoute?.component && (
         <currentRoute.component
           ref={currentRef}
-          key={`${currentRoute.fullUrl}_${index}`}
+          key={`${currentRoute?.fullUrl || ""}_${index}`}
           {...(currentRoute.props || {})}
         />
       )}
