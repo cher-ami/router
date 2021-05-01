@@ -1,16 +1,13 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
-import { EHistoryMode, Router, TRoute } from "../src";
-import { LangService, langMiddleware } from "../src";
+import { Router, TRoute } from "../src";
 
 import App from "./App";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
-import ArticlePage from "./pages/ArticlePage";
-import FooPage from "./pages/FooPage";
-import BarPage from "./pages/BarPage";
 import "./index.css";
+import ArticlePage from "./pages/ArticlePage";
 
 const debug = require("debug")(`router:index`);
 
@@ -25,23 +22,10 @@ export const routesList: TRoute[] = [
   {
     path: "/blog/:id",
     component: ArticlePage,
-    props: {
-      color: "red",
-    },
   },
   {
     path: "/about",
     component: AboutPage,
-    children: [
-      {
-        path: "/foo",
-        component: FooPage,
-      },
-      {
-        path: "/bar",
-        component: BarPage,
-      },
-    ],
   },
   {
     path: "/:rest",
@@ -49,21 +33,16 @@ export const routesList: TRoute[] = [
   },
 ];
 
-const baseUrl = "/master";
-const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
-
-LangService.init(locales, true, baseUrl);
+// const baseUrl = "/master";
+// const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+//
+// LangService.init(locales, true, baseUrl);
 
 /**
  * Init Application
  */
 ReactDOM.render(
-  <Router
-    routes={routesList}
-    base={baseUrl}
-    middlewares={[langMiddleware]}
-    historyMode={EHistoryMode.BROWSER}
-  >
+  <Router routes={routesList} base={"/"}>
     <App />
   </Router>,
   document.getElementById("root")

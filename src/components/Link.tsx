@@ -1,9 +1,9 @@
 import React, { ReactNode, useMemo } from "react";
-import { prepareSetLocationUrl, useLocation } from "..";
+import { useLocation } from "..";
 import { joinPaths, TOpenRouteParams } from "../api/helpers";
 
 interface IProps {
-  to: string | TOpenRouteParams;
+  to: string;
   onClick?: () => void;
   className?: string;
   children: ReactNode;
@@ -14,10 +14,7 @@ interface IProps {
  */
 function Link(props: IProps) {
   const [location, setLocation] = useLocation();
-
-  const url = useMemo(() => prepareSetLocationUrl(props.to), [props.to]);
-
-  const isActive = useMemo(() => location === url, [location, url]);
+  //  const url = useMemo(() => prepareSetLocationUrl(props.to), [props.to]);
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -27,10 +24,10 @@ function Link(props: IProps) {
 
   return (
     <a
-      className={joinPaths(["Link", props.className, isActive && "active"], " ")}
+      className={joinPaths(["Link", props.className], " ")}
       onClick={handleClick}
       children={props.children}
-      href={url}
+      href={props.to}
     />
   );
 }
