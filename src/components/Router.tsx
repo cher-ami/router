@@ -16,6 +16,9 @@ interface IProps {
   children: ReactElement;
 }
 
+/**
+ * Context store
+ */
 // Router instance will be keep on this context
 // Big thing is you can access this context from the closest provider in the tree.
 // This allow to manage easily nested stack instances.
@@ -47,13 +50,13 @@ const initialState: TRouteReducerState = {
   index: 0,
 };
 
-export type TRouteReducerActionType = "update-current" | "unmount-previous-page";
+export type TRouteReducerActionType = "update-current-route" | "unmount-previous-page";
 const reducer = (
   state: TRouteReducerState,
   action: { type: TRouteReducerActionType; value: TRoute }
 ) => {
   switch (action.type) {
-    case "update-current":
+    case "update-current-route":
       return {
         previousRoute: state.currentRoute,
         currentRoute: action.value,
@@ -61,36 +64,70 @@ const reducer = (
         previousPageIsMount: true,
       };
     case "unmount-previous-page":
-      return { ...state, previousPageIsMount: false };
+      return { ...state, previousPageIsMount: !action.value };
   }
 };
 
 /**
  * Router
+ *
+ *
+ * Main Router component
+ * Wrap Stack and Link Component
+ *
  */
+// prettier-ignore
 export const Router = memo((props: IProps) => {
+
   const [routesState, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    updateRoute();
+    updateRoute(defaultRouterContext.history.location.pathname);
   }, []);
 
-  useHistory((e) => {
-    updateRoute(e.location.pathname);
-  });
+  useHistory((event) => {
+      updateRoute(event.location.pathname);
+    }, [routesState]
+  );
 
-  const updateRoute = (url = defaultRouterContext.history.location.pathname) => {
-    const matchingRoute: TRoute = getRouteFromUrl(url);
-    if (matchingRoute) {
-      dispatch({ type: "update-current", value: matchingRoute });
-    }
-  };
-
-  const unmountPreviousPage = () => {
+  const unmountPreviousPage = (): void => {
     dispatch({ type: "unmount-previous-page", value: true });
   };
 
-  const getRouteFromUrl = (url) => {
+  const getNotFoundRoute = (routes = props.routes): TRoute =>
+    routes.find(
+      (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage"
+    );
+
+  /**
+   * Update Route
+   */
+  const updateRoute = (
+    url = defaultRouterContext.history.location.pathname,
+    matchingRoute = getRouteFromUrl(url),
+    notFoundRoute = getNotFoundRoute()
+  ) => {
+    if (!matchingRoute && !notFoundRoute) {
+      debug("updateRoute: NO MATCHING ROUTE & NO NOTFOUND ROUTE. RETURN.");
+      return;
+    }
+    if (
+      routesState.currentRoute?.matchUrl != null &&
+      routesState.currentRoute?.matchUrl === matchingRoute?.matchUrl
+    ) {
+      debug("updateRoute: THIS IS THE SAME URL, RETURN.");
+      return;
+    }
+    if (matchingRoute) {
+      dispatch({ type: "update-current-route", value: matchingRoute });
+    }
+  };
+
+  /**
+   * Get route from URL
+   * @param url
+   */
+  const getRouteFromUrl = (url:string) => {
     let match;
     for (let route of props.routes) {
       const currentRoutePath = joinPaths([props.base, route.path]);
@@ -111,8 +148,8 @@ export const Router = memo((props: IProps) => {
           name: route?.name,
           props: {
             params,
-            ...(route?.props || {}),
-          },
+            ...(route?.props || {})
+          }
         };
         debug("getRouteFromUrl: MATCH routeObj", routeObj);
         return routeObj;
@@ -129,7 +166,7 @@ export const Router = memo((props: IProps) => {
         previousRoute: routesState.previousRoute,
         routeIndex: routesState.index,
         unmountPreviousPage,
-        previousPageIsMount: routesState.previousPageIsMount,
+        previousPageIsMount: routesState.previousPageIsMount
       }}
     />
   );

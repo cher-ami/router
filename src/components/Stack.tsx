@@ -25,7 +25,7 @@ function Stack(props: IProps) {
     previousRoute,
     routeIndex,
     unmountPreviousPage,
-    previousPageIsMount: previousRouteIsMounted,
+    previousPageIsMount,
   } = useRouter();
 
   // handle components with refs
@@ -69,8 +69,6 @@ function Stack(props: IProps) {
       debug("local current route doesn't exist, return.");
       return;
     }
-    debug(">", { currentRoute, previousRoute });
-
     selectedTransition({
       previousPage: prevRef.current,
       currentPage: currentRef.current,
@@ -82,7 +80,7 @@ function Stack(props: IProps) {
 
   return (
     <div className={[componentName, props.className].filter((e) => e).join(" ")}>
-      {previousRouteIsMounted && previousRoute?.component && (
+      {previousPageIsMount && previousRoute?.component && (
         <previousRoute.component
           ref={prevRef}
           key={`${previousRoute?.fullUrl || ""}_${routeIndex - 1}`}
