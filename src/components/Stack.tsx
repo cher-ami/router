@@ -1,9 +1,4 @@
-import React, {
-  useCallback, useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef, useState
-} from "react";
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { IRouteStack, useRouter } from "..";
 
 export type TManageTransitions = {
@@ -25,7 +20,13 @@ const debug = require("debug")(`router:${componentName}`);
  */
 function Stack(props: IProps) {
   // 1 get routes
-  const { currentRoute, previousRoute, routeIndex } = useRouter();
+  const {
+    currentRoute,
+    previousRoute,
+    routeIndex,
+    unmountPreviousPage,
+    previousPageIsMount: previousRouteIsMounted,
+  } = useRouter();
 
   // handle components with refs
   const prevRef = useRef(null);
@@ -68,11 +69,8 @@ function Stack(props: IProps) {
       debug("local current route doesn't exist, return.");
       return;
     }
-    debug(">",{currentRoute, previousRoute});
+    debug(">", { currentRoute, previousRoute });
 
-    const unmountPreviousPage = (): void => {
-      // FIXME
-    };
     selectedTransition({
       previousPage: prevRef.current,
       currentPage: currentRef.current,
@@ -80,11 +78,11 @@ function Stack(props: IProps) {
     } as TManageTransitions).then(() => {
       unmountPreviousPage();
     });
-  }, [currentRoute]);
+  }, [routeIndex]);
 
   return (
     <div className={[componentName, props.className].filter((e) => e).join(" ")}>
-      {previousRoute?.component && (
+      {previousRouteIsMounted && previousRoute?.component && (
         <previousRoute.component
           ref={prevRef}
           key={`${previousRoute?.fullUrl || ""}_${routeIndex - 1}`}

@@ -1,13 +1,5 @@
 import { useHistory } from "..";
-import React, {
-  createContext,
-  memo,
-  ReactElement,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
+import React, { createContext, memo, ReactElement, useEffect, useReducer } from "react";
 import { createBrowserHistory } from "history";
 import { buildUrl, joinPaths } from "../api/helpers";
 import { Path } from "path-parser";
@@ -32,6 +24,8 @@ const defaultRouterContext = {
   currentRoute: null,
   previousRoute: null,
   routeIndex: 0,
+  unmountPreviousPage: () => {},
+  previousPageIsMount: false,
 };
 
 export const RouterContext = createContext(defaultRouterContext);
@@ -43,15 +37,17 @@ RouterContext.displayName = componentName;
 export type TRouteReducerState = {
   currentRoute: TRoute;
   previousRoute: TRoute;
+  previousPageIsMount: boolean;
   index: number;
 };
 const initialState: TRouteReducerState = {
   currentRoute: null,
   previousRoute: null,
+  previousPageIsMount: true,
   index: 0,
 };
 
-export type TRouteReducerActionType = "update-current" | "clean-previous";
+export type TRouteReducerActionType = "update-current" | "unmount-previous-page";
 const reducer = (
   state: TRouteReducerState,
   action: { type: TRouteReducerActionType; value: TRoute }
@@ -62,9 +58,10 @@ const reducer = (
         previousRoute: state.currentRoute,
         currentRoute: action.value,
         index: state.index + 1,
+        previousPageIsMount: true,
       };
-    case "clean-previous":
-      return { ...state, previousRoute: null };
+    case "unmount-previous-page":
+      return { ...state, previousPageIsMount: false };
   }
 };
 
@@ -87,6 +84,10 @@ export const Router = memo((props: IProps) => {
     if (matchingRoute) {
       dispatch({ type: "update-current", value: matchingRoute });
     }
+  };
+
+  const unmountPreviousPage = () => {
+    dispatch({ type: "unmount-previous-page", value: true });
   };
 
   const getRouteFromUrl = (url) => {
@@ -127,6 +128,8 @@ export const Router = memo((props: IProps) => {
         currentRoute: routesState.currentRoute,
         previousRoute: routesState.previousRoute,
         routeIndex: routesState.index,
+        unmountPreviousPage,
+        previousPageIsMount: routesState.previousPageIsMount,
       }}
     />
   );
