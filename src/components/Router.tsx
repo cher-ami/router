@@ -38,18 +38,41 @@ export const RouterContext = createContext(defaultRouterContext);
 RouterContext.displayName = componentName;
 
 /**
+ * Routes Reducer
+ */
+export type TRouteReducerState = {
+  currentRoute: TRoute;
+  previousRoute: TRoute;
+  index: number;
+};
+const initialState: TRouteReducerState = {
+  currentRoute: null,
+  previousRoute: null,
+  index: 0,
+};
+
+export type TRouteReducerActionType = "update-current" | "clean-previous";
+const reducer = (
+  state: TRouteReducerState,
+  action: { type: TRouteReducerActionType; value: TRoute }
+) => {
+  switch (action.type) {
+    case "update-current":
+      return {
+        previousRoute: state.currentRoute,
+        currentRoute: action.value,
+        index: state.index + 1,
+      };
+    case "clean-previous":
+      return { ...state, previousRoute: null };
+  }
+};
+
+/**
  * Router
  */
 export const Router = memo((props: IProps) => {
-  const [routeIndex, setRouteIndex] = useState<number>(0);
-  const [currentRoute, setCurrentRoute] = useState(null);
-  // FIXME, il y a un render de trop, la stack ne suit pas.
-  // Mettre les deux states dans use Reducer ?
-  const [previousRoute, setPreviousRoute] = useState(null);
-  useEffect(() => {
-    setRouteIndex(routeIndex + 1);
-    setPreviousRoute(currentRoute);
-  }, [currentRoute]);
+  const [routesState, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     updateRoute();
@@ -62,7 +85,7 @@ export const Router = memo((props: IProps) => {
   const updateRoute = (url = defaultRouterContext.history.location.pathname) => {
     const matchingRoute: TRoute = getRouteFromUrl(url);
     if (matchingRoute) {
-      setCurrentRoute(matchingRoute);
+      dispatch({ type: "update-current", value: matchingRoute });
     }
   };
 
@@ -101,9 +124,9 @@ export const Router = memo((props: IProps) => {
       children={props.children}
       value={{
         ...defaultRouterContext,
-        currentRoute,
-        previousRoute,
-        routeIndex,
+        currentRoute: routesState.currentRoute,
+        previousRoute: routesState.previousRoute,
+        routeIndex: routesState.index,
       }}
     />
   );
