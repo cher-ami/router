@@ -1,5 +1,11 @@
 import { useHistory, useRouter } from "..";
-import React, { createContext, memo, ReactElement, useEffect, useReducer } from "react";
+import React, {
+  createContext,
+  ReactElement,
+  useEffect,
+  useMemo,
+  useReducer,
+} from "react";
 import {
   BrowserHistory,
   createBrowserHistory,
@@ -22,10 +28,6 @@ interface IProps {
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);
 
-const ROUTER = {
-  history: null,
-};
-
 /**
  * Context store
  *
@@ -35,7 +37,7 @@ const ROUTER = {
 // Big thing is you can access this context from the closest provider in the tree.
 // This allow to manage easily nested stack instances.
 const defaultRouterContext = {
-  history: createBrowserHistory(),
+  history: null,
   currentRoute: null,
   previousRoute: null,
   routeIndex: 0,
@@ -48,7 +50,6 @@ RouterContext.displayName = componentName;
 
 /**
  * Routes Reducer
- *
  *
  *
  */
@@ -92,31 +93,27 @@ const reducer = (
  *
  */
 
-// const defaultProps = {
-//   base: "/",
-//   history: createBrowserHistory(),
-//   children: null,
-// };
-
 const Router = (props: IProps) => {
   const parentrouter = useRouter();
   const [routesState, dispatch] = useReducer(reducer, initialState);
 
-  useEffect(() => {
-    debug("parent router history", parentrouter.history);
-  }, [parentrouter]);
+  const pathname = useMemo(
+    () => parentrouter?.history?.location.pathname || props.history?.location.pathname,
+    [parentrouter, props.history]
+  );
 
   // init first route listenning
   useEffect(() => {
-    updateRoute(parentrouter.history.location.pathname);
+    updateRoute(pathname);
   }, []);
 
   useHistory(
     (event) => {
       updateRoute(event.location.pathname);
-      debug("use hISTORY ---------- ", event);
+      debug('ICI ---------')
     },
-    [routesState]
+    [routesState, parentrouter, props.history],
+    props.history
   );
 
   const unmountPreviousPage = (): void => {
@@ -132,10 +129,14 @@ const Router = (props: IProps) => {
    * Update Route
    */
   const updateRoute = (
-    url = defaultRouterContext.history.location.pathname,
+    url = pathname,
     matchingRoute = getRouteFromUrl({ url }),
     notFoundRoute = getNotFoundRoute()
   ) => {
+    if (!url) {
+      debug("URL params doesnt exist, return.");
+      return;
+    }
     if (!matchingRoute && !notFoundRoute) {
       debug("updateRoute: NO MATCHING ROUTE & NO NOTFOUND ROUTE. RETURN.");
       return;
@@ -218,7 +219,7 @@ const Router = (props: IProps) => {
       children={props.children}
       value={{
         ...defaultRouterContext,
-        history: parentrouter.history || props.history,
+        history: parentrouter?.history || props.history,
         currentRoute: routesState.currentRoute,
         previousRoute: routesState.previousRoute,
         routeIndex: routesState.index,
@@ -230,4 +231,8 @@ const Router = (props: IProps) => {
 };
 
 Router.displayName = componentName;
+Router.defaultProps = {
+  base: "/",
+  history: createBrowserHistory(),
+};
 export { Router };

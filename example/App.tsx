@@ -13,6 +13,8 @@ export default function App() {
       <nav>
         <Link to={"/"}>Home</Link>
         <br />
+        <Link to={"/blog/test"}>Blog</Link>
+        <br />
         <Link to={"/about"}>About</Link>
       </nav>
       <Stack className={"App_stack"} />

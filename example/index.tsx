@@ -10,6 +10,7 @@ import "./index.css";
 import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
+import { createHashHistory } from "history";
 
 const debug = require("debug")(`router:index`);
 
@@ -49,7 +50,7 @@ export const routesList: TRoute[] = [
  * Init Application
  */
 ReactDOM.render(
-  <Router routes={routesList} base={"/"}>
+  <Router routes={routesList} base={"/"} history={createHashHistory()}>
     <App />
   </Router>,
   document.getElementById("root")
