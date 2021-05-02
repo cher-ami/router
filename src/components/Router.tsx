@@ -1,11 +1,13 @@
-import { useHistory } from "..";
+import { useHistory, useRouter } from "..";
 import React, { createContext, memo, ReactElement, useEffect, useReducer } from "react";
-import { createBrowserHistory } from "history";
+import {
+  BrowserHistory,
+  createBrowserHistory,
+  HashHistory,
+  MemoryHistory,
+} from "history";
 import { buildUrl, joinPaths } from "../api/helpers";
 import { Path } from "path-parser";
-
-const componentName = "Router";
-const debug = require("debug")(`router:${componentName}`);
 
 export type TRoute = any;
 
@@ -13,11 +15,21 @@ interface IProps {
   base: string;
   routes?: TRoute[];
   middlewares?: any;
+  history?: BrowserHistory | HashHistory | MemoryHistory;
   children: ReactElement;
 }
 
+const componentName = "Router";
+const debug = require("debug")(`router:${componentName}`);
+
+const ROUTER = {
+  history: null,
+};
+
 /**
  * Context store
+ *
+ *
  */
 // Router instance will be keep on this context
 // Big thing is you can access this context from the closest provider in the tree.
@@ -36,6 +48,9 @@ RouterContext.displayName = componentName;
 
 /**
  * Routes Reducer
+ *
+ *
+ *
  */
 export type TRouteReducerState = {
   currentRoute: TRoute;
@@ -76,18 +91,32 @@ const reducer = (
  * Wrap Stack and Link Component
  *
  */
-// prettier-ignore
-export const Router = memo((props: IProps) => {
 
+// const defaultProps = {
+//   base: "/",
+//   history: createBrowserHistory(),
+//   children: null,
+// };
+
+const Router = (props: IProps) => {
+  const parentrouter = useRouter();
   const [routesState, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
-    updateRoute(defaultRouterContext.history.location.pathname);
+    debug("parent router history", parentrouter.history);
+  }, [parentrouter]);
+
+  // init first route listenning
+  useEffect(() => {
+    updateRoute(parentrouter.history.location.pathname);
   }, []);
 
-  useHistory((event) => {
+  useHistory(
+    (event) => {
       updateRoute(event.location.pathname);
-    }, [routesState]
+      debug("use hISTORY ---------- ", event);
+    },
+    [routesState]
   );
 
   const unmountPreviousPage = (): void => {
@@ -104,7 +133,7 @@ export const Router = memo((props: IProps) => {
    */
   const updateRoute = (
     url = defaultRouterContext.history.location.pathname,
-    matchingRoute = getRouteFromUrl(url),
+    matchingRoute = getRouteFromUrl({ url }),
     notFoundRoute = getNotFoundRoute()
   ) => {
     if (!matchingRoute && !notFoundRoute) {
@@ -125,34 +154,61 @@ export const Router = memo((props: IProps) => {
 
   /**
    * Get route from URL
-   * @param url
    */
-  const getRouteFromUrl = (url:string) => {
+  const getRouteFromUrl = ({
+    url,
+    routes = props.routes,
+    base = props.base,
+    pRoute = null,
+    pPathParser = null,
+    pMatch = null,
+  }) => {
     let match;
-    for (let route of props.routes) {
-      const currentRoutePath = joinPaths([props.base, route.path]);
+    for (let route of routes) {
+      const currentRoutePath = joinPaths([base, route.path]);
       const pathParser: Path = new Path(currentRoutePath);
-      // prettier-ignore
-      debug(`getRouteFromUrl: url "${url}" match with "${currentRoutePath}"?`, !!pathParser.test(url));
+      // debug(
+      //   `getRouteFromUrl: url "${url}" match with "${currentRoutePath}"?`,
+      //   !!pathParser.test(url)
+      // );
       match = pathParser.test(url);
+
       if (match) {
-        const params = match;
+        const current = pRoute || route;
+        const params = pMatch || match;
         const routeObj = {
           fullUrl: url,
           fullPath: currentRoutePath,
-          matchUrl: buildUrl(route.path, params),
-          path: route?.path,
-          component: route?.component,
-          children: route?.children,
-          parser: pathParser,
-          name: route?.name,
+          matchUrl: buildUrl(current.path, params),
+          path: current?.path,
+          component: current?.component,
+          children: current?.children,
+          parser: pPathParser || pathParser,
+          name: current?.name || current?.component?.displayName,
           props: {
             params,
-            ...(route?.props || {})
-          }
+            ...(current?.props || {}),
+          },
         };
         debug("getRouteFromUrl: MATCH routeObj", routeObj);
         return routeObj;
+      }
+
+      // if not match
+      else if (route?.children) {
+        // else, call recursively this same method with new params
+        const matchingChildren = getRouteFromUrl({
+          url,
+          routes: route.children,
+          base: currentRoutePath,
+          pRoute: route,
+          pPathParser: pathParser,
+          pMatch: match,
+        });
+
+        debug("matchingChildren", matchingChildren);
+        // only if matching, return this match, else continue to next iteration
+        if (matchingChildren) return matchingChildren;
       }
     }
   };
@@ -162,14 +218,16 @@ export const Router = memo((props: IProps) => {
       children={props.children}
       value={{
         ...defaultRouterContext,
+        history: parentrouter.history || props.history,
         currentRoute: routesState.currentRoute,
         previousRoute: routesState.previousRoute,
         routeIndex: routesState.index,
         unmountPreviousPage,
-        previousPageIsMount: routesState.previousPageIsMount
+        previousPageIsMount: routesState.previousPageIsMount,
       }}
     />
   );
-});
+};
 
 Router.displayName = componentName;
+export { Router };

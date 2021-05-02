@@ -8,6 +8,8 @@ import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import "./index.css";
 import ArticlePage from "./pages/ArticlePage";
+import FooPage from "./pages/FooPage";
+import BarPage from "./pages/BarPage";
 
 const debug = require("debug")(`router:index`);
 
@@ -26,17 +28,22 @@ export const routesList: TRoute[] = [
   {
     path: "/about",
     component: AboutPage,
+    children: [
+      {
+        path: "/foo",
+        component: FooPage,
+      },
+      {
+        path: "/bar",
+        component: BarPage,
+      },
+    ],
   },
   {
     path: "/:rest",
     component: forwardRef((props, r) => <div className="NotFoundPage">Not Found</div>),
   },
 ];
-
-// const baseUrl = "/master";
-// const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
-//
-// LangService.init(locales, true, baseUrl);
 
 /**
  * Init Application
