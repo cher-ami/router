@@ -1,18 +1,17 @@
-import ReactDOM from "react-dom";
-import * as React from "react";
-import { forwardRef } from "react";
-import { Router, TRoute } from "../src";
+import ReactDOM from "react-dom"
+import * as React from "react"
+import { forwardRef } from "react"
+import { Router, TRoute } from "../src"
 
-import App from "./App";
-import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
-import "./index.css";
-import ArticlePage from "./pages/ArticlePage";
-import FooPage from "./pages/FooPage";
-import BarPage from "./pages/BarPage";
-import { createHashHistory } from "history";
+import App from "./App"
+import HomePage from "./pages/HomePage"
+import AboutPage from "./pages/AboutPage"
+import "./index.css"
+import ArticlePage from "./pages/ArticlePage"
+import FooPage from "./pages/FooPage"
+import BarPage from "./pages/BarPage"
 
-const debug = require("debug")(`router:index`);
+const debug = require("debug")(`router:index`)
 
 /**
  * Define routes list
@@ -44,14 +43,14 @@ export const routesList: TRoute[] = [
     path: "/:rest",
     component: forwardRef((props, r) => <div className="NotFoundPage">Not Found</div>),
   },
-];
+]
 
 /**
  * Init Application
  */
 ReactDOM.render(
-  <Router routes={routesList} base={"/"} history={createHashHistory()}>
+  <Router routes={routesList} base={"/"}>
     <App />
   </Router>,
   document.getElementById("root")
-);
+)
