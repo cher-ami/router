@@ -1,7 +1,5 @@
 import { Path } from "path-parser";
-import { TRoute } from "./CreateRouter";
-import { LangService } from "..";
-import { useRootRouter } from "../hooks/useRouter";
+import { TRoute } from "..";
 const debug = require("debug")("router:helpers");
 
 export type TParams = { [x: string]: any };
@@ -150,11 +148,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  * @param lang
  * @param enable
  */
-export function addLangToUrl(
-  url: string,
-  lang: string = LangService.currentLang?.key,
-  enable = LangService.showLangInUrl()
-): string {
+export function addLangToUrl(url: string, lang: string, enable: true): string {
   if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
   return url;
@@ -174,7 +168,7 @@ export function addLangToUrl(
  * @param url
  * @param base
  */
-export function addBaseToUrl(url: string, base = useRootRouter()?.base): string {
+export function addBaseToUrl(url: string, base): string {
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
 }
