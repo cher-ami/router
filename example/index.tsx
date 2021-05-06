@@ -19,22 +19,22 @@ const debug = require("debug")(`router:index`);
  */
 export const routesList: TRoute[] = [
   {
-    path: { en: "/", fr: "/" },
+    path: { en: "/", fr: "/", de: "/" },
     component: HomePage,
   },
   {
-    path: { en: "/blog/:id", fr: "/blog-fr/:id" },
+    path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
     component: ArticlePage,
     props: {
       color: "red",
     },
   },
   {
-    path: { en: "/about", fr: "/a-propos" },
+    path: { en: "/about", fr: "/a-propos", de: "/uber" },
     component: AboutPage,
     children: [
       {
-        path: { en: "/foo", fr: "/foo-fr" },
+        path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
         component: FooPage,
       },
       {

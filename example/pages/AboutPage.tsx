@@ -1,8 +1,4 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  useRef
-} from "react";
+import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { Router } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
@@ -24,28 +20,24 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
-
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      {/*<Router base={"/about"}>*/}
-      {/*  <div className={componentName}>*/}
-      {/*    <nav>*/}
-      {/*      <ul>*/}
-      {/*        <li>*/}
-      {/*          <Link to={{name: "HomePage", params: {lang: "fr"}}}>Foo EN</Link>{" "}*/}
-      {/*        </li>*/}
-      {/*        <li>*/}
-      {/*          <Link to={"/about/bar"}>Bar</Link>{" "}*/}
-      {/*        </li>*/}
-      {/*        <li>*/}
-      {/*          <Link to={`/error`}>NotFound route</Link>{" "}*/}
-      {/*        </li>*/}
-      {/*      </ul>*/}
-      {/*    </nav>*/}
-      {/*    <Stack key={"about-stack"} />*/}
-      {/*  </div>*/}
-      {/*</Router>*/}
+      <Router base={"/about"}>
+        <div className={componentName}>
+          <nav>
+            <ul>
+              <li>
+                <Link to={{ name: "FooPage" }}>Foo</Link>
+              </li>
+              <li>
+                <Link to={{ name: "BarPage" }}>Bar</Link>{" "}
+              </li>
+            </ul>
+          </nav>
+          <Stack key={"about-stack"} />
+        </div>
+      </Router>
     </div>
   );
 });

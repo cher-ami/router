@@ -130,7 +130,7 @@ export class CreateRouter {
         route.path === "/"
     );
     if (!rootPathExist) {
-      routes.push({ path: "/", component: null });
+      routes.unshift({ path: "/", component: null });
     }
     return routes;
   }

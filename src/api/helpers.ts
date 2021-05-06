@@ -93,7 +93,7 @@ export function getUrlByPath(
       // return recursive Fn only if match, else continue to next iteration
       if (matchChildrenPath) {
         // keep path in local array
-        localPath.push(routePath);
+        localPath.push(langPath || routePath);
         // Return the function after localPath push
         return getUrlByPath(route.children, path, lang, joinPaths(localPath));
       }

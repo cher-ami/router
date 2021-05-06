@@ -47,20 +47,16 @@ export const Router = memo((props: IProps) => {
       ROUTERS.routes = props.routes;
       currentRoutesList = props.routes;
     } else {
-      debug(id, ROUTERS.routes);
       currentRoutesList = ROUTERS.routes?.find((el) => {
         return (
           getLangPathByPath({ path: el.path }) === getLangPathByPath({ path: props.base })
         );
       })?.children;
-
-      debug(currentRoutesList);
       if (LangService.isInit) {
         // If sub router, need to selected appropriate route path by lang
         currentRoutesList = langMiddleware(currentRoutesList, false);
       }
     }
-    debug(currentRoutesList);
     return currentRoutesList;
   }, [props.routes, props.base]);
 

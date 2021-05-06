@@ -6,7 +6,7 @@ import {
   removeLastCharFromString,
 } from "../api/helpers";
 import { useRootRouter } from "../hooks/useRouter";
-import { prepareSetLocationUrl } from "../hooks/useLocation";
+import { prepareSetLocationFullUrl, prepareSetLocationUrl } from "../hooks/useLocation";
 const debug = require("debug")(`router:LangService`);
 
 export type TLanguage = {
@@ -84,35 +84,31 @@ class LangService {
       debug(`setLang: lang ${toLang.key} is not available in languages list, exit.`);
       return;
     }
-    if (!useRootRouter()) {
+
+    const rootRouter = ROUTERS.instances?.[ROUTERS.instances?.length - 1];
+    if (!rootRouter) {
       debug("setLang: useRootRouter is not available before his initialisation, exit.");
       return;
     }
 
-    const rootRouter = useRootRouter();
-    const currentRoute = rootRouter.currentRoute;
+    debug("ROUTERS.instances", ROUTERS.instances);
     const lastInstance = ROUTERS.instances?.[ROUTERS.instances?.length - 1];
+    const lastInstanceCurrentRoute = lastInstance.currentRoute;
     let fullPath = lastInstance?.currentRoute?.fullPath || "/:lang";
-    let path = lastInstance?.currentRoute?.path;
+    debug({ lastInstance });
 
     // if default language should be always visible in URL
     if (this.showDefaultLangInUrl) {
       // prepare new URL
-      // ex:
-      //   "/base/en/foo-en"
-      // should become:
-      //   "/base/fr/foo-fr"
-      const newUrl = prepareSetLocationUrl({
-        name: currentRoute.name,
-        params: {
-          ...currentRoute.props.params,
-          lang: toLang.key,
-        },
-      });
+      const newUrl = prepareSetLocationFullUrl(toLang);
+
       // register current langage (usefull only if we don't reload the app.)
       this.currentLang = toLang;
+
       // reload application
-      return this.reloadOrRefresh(newUrl, forcePageReload);
+      debug("newUrl TO PUSH", newUrl);
+      this.reloadOrRefresh(newUrl, forcePageReload);
+      return;
     }
 
     // if other, case default language need to be hidden from URL
@@ -121,6 +117,9 @@ class LangService {
 
     // if toLang is default lang, need to hidden lang from URL
     if (this.isDefaultLangKey(toLang.key)) {
+
+      // FIXME revoir maintenant qu'on a un full path
+
       newPath = fullPath.split("/:lang").join("");
       newPath = newPath === "" ? "/" : newPath;
 
@@ -140,7 +139,7 @@ class LangService {
 
     // build new URL
     const newUrl = buildUrl(newPath, {
-      ...currentRoute.props?.params,
+      ...lastInstanceCurrentRoute.props?.params,
       lang: toLang.key,
     });
 
