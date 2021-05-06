@@ -28,24 +28,24 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <Router base={"/about"}>
-        <div className={componentName}>
-          <nav>
-            <ul>
-              <li>
-                <Link to={{name: "HomePage", params: {lang: "fr"}}}>Foo EN</Link>{" "}
-              </li>
-              <li>
-                <Link to={"/about/bar"}>Bar</Link>{" "}
-              </li>
-              <li>
-                <Link to={`/error`}>NotFound route</Link>{" "}
-              </li>
-            </ul>
-          </nav>
-          <Stack key={"about-stack"} />
-        </div>
-      </Router>
+      {/*<Router base={"/about"}>*/}
+      {/*  <div className={componentName}>*/}
+      {/*    <nav>*/}
+      {/*      <ul>*/}
+      {/*        <li>*/}
+      {/*          <Link to={{name: "HomePage", params: {lang: "fr"}}}>Foo EN</Link>{" "}*/}
+      {/*        </li>*/}
+      {/*        <li>*/}
+      {/*          <Link to={"/about/bar"}>Bar</Link>{" "}*/}
+      {/*        </li>*/}
+      {/*        <li>*/}
+      {/*          <Link to={`/error`}>NotFound route</Link>{" "}*/}
+      {/*        </li>*/}
+      {/*      </ul>*/}
+      {/*    </nav>*/}
+      {/*    <Stack key={"about-stack"} />*/}
+      {/*  </div>*/}
+      {/*</Router>*/}
     </div>
   );
 });

@@ -61,14 +61,14 @@ export default function App() {
           <li>
             <Link to={{ name:"AboutPage" }}>About</Link>
           </li>
-          <li>
-            <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>
-              Blog id:article-1
-            </Link>
-          </li>
-          <li>
-            <Link to={"/not/found/"}>Not found route</Link>
-          </li>
+          {/*<li>*/}
+          {/*  <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>*/}
+          {/*    Blog id:article-1*/}
+          {/*  </Link>*/}
+          {/*</li>*/}
+          {/*<li>*/}
+          {/*  <Link to={"/not/found/"}>Not found route</Link>*/}
+          {/*</li>*/}
         </ul>
       </nav>
       <Stack className={"App_stack"} />

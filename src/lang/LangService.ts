@@ -95,33 +95,24 @@ class LangService {
     let fullPath = lastInstance?.currentRoute?.fullPath || "/:lang";
     let path = lastInstance?.currentRoute?.path;
 
-    // if default language should be visible in URL, use history push
+    // if default language should be always visible in URL
     if (this.showDefaultLangInUrl) {
-      // default language should be always visible in URL, set new /:lang
-      fullPath = removeLastCharFromString(fullPath, "/", true);
-
-      debug("currentRoute", currentRoute);
-
+      // prepare new URL
+      // ex:
+      //   "/base/en/foo-en"
+      // should become:
+      //   "/base/fr/foo-fr"
       const newUrl = prepareSetLocationUrl({
         name: currentRoute.name,
         params: {
+          ...currentRoute.props.params,
           lang: toLang.key,
         },
       });
-      // const newUrl = buildUrl(currentRoute.langPath[toLang.key], {
-      //   ...currentRoute?.props?.params,
-      //   lang: toLang.key,
-      // });
-
-      debug("prepareSetLocationUrl", newUrl);
-
       // register current langage (usefull only if we don't reload the app.)
       this.currentLang = toLang;
-
-      // // TODO remove
-      return;
       // reload application
-      this.reloadOrRefresh(newUrl, forcePageReload);
+      return this.reloadOrRefresh(newUrl, forcePageReload);
     }
 
     // if other, case default language need to be hidden from URL

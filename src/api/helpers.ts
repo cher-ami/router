@@ -64,40 +64,38 @@ export function buildUrl(path: string, params?: TParams): string {
 export function getUrlByPath(
   routes: TRoute[],
   path: string | { [x: string]: string },
+  lang: string,
   basePath: string = null
 ): string {
-  // prepare local path
   let localPath: string[] = [basePath];
 
   for (let route of routes) {
-    const routePath =
-      route.langPath?.[LangService.currentLang?.key] ||
-      route.path;
+    const langPath = route.langPath?.[lang];
+    const routePath = route.path;
+    const pathMatch = langPath === path || routePath === path;
 
-    const oneMatch = Object.keys(route.langPath).some(l => route.langPath[l] === path)
-     if (oneMatch) {
-       debug('route> true')
-     }
-
-    debug("route>", route, path)
-    // if path match on first level
-    if (oneMatch) {
-      // keep path in local array
-      localPath.push(routePath);
-      // return it
+    // if path match on first level, keep path in local array and return it, stop here.
+    if (pathMatch) {
+      debug("route > pathMatch", { path, langPath, routePath, pathMatch });
+      localPath.push(langPath || routePath);
       return joinPaths(localPath);
     }
 
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = getUrlByPath(route.children, path, joinPaths(localPath));
+      const matchChildrenPath = getUrlByPath(
+        route.children,
+        path,
+        lang,
+        joinPaths(localPath)
+      );
       // return recursive Fn only if match, else continue to next iteration
       if (matchChildrenPath) {
         // keep path in local array
         localPath.push(routePath);
         // Return the function after localPath push
-        return getUrlByPath(route.children, path, joinPaths(localPath));
+        return getUrlByPath(route.children, path, lang, joinPaths(localPath));
       }
     }
   }
@@ -123,7 +121,8 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           return;
         }
         // get full URL
-        const urlByPath = getUrlByPath(pRoutes, route.path);
+        const urlByPath = getUrlByPath(pRoutes, route.path, pParams?.params?.lang);
+        debug("urlByPath", urlByPath);
         // build URL with param and return
         return buildUrl(urlByPath, params.params);
       }
