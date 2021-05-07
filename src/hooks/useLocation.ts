@@ -12,11 +12,11 @@ const debug = require("debug")(`router:useLocation`);
 
 /**
  * prepare set location new URL
+ *
  * ex:
  *   "/base/en/foo-en-path/sub-en-path"
  * should become:
  *   "/base/fr/foo-fr-path/sub-fr-path"
- *
  *
  */
 export const prepareSetLocationFullUrl = (

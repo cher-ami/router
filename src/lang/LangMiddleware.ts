@@ -22,7 +22,7 @@ export const langMiddleware = (
    * @param pShowLang
    */
   const patchLangParam = (pPath: string, pShowLang): string =>
-    joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : ""]);
+    joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : "/"]);
 
   /**
    * Patch routes

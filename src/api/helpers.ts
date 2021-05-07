@@ -56,12 +56,12 @@ export function buildUrl(path: string, params?: TParams): string {
 }
 
 /**
- * Get URL by path
+ * Get URL by path part
  *  if path "/foo" is a children of path "/bar", his full url is "/bar/foo"
  *  With "/foo" this function will return "/bar/foo"
  * @returns string
  */
-export function getUrlByPath(
+export function getUrlByPathPart(
   routes: TRoute[],
   path: string | { [x: string]: string },
   lang: string,
@@ -76,7 +76,6 @@ export function getUrlByPath(
 
     // if path match on first level, keep path in local array and return it, stop here.
     if (pathMatch) {
-      debug("route > pathMatch", { path, langPath, routePath, pathMatch });
       localPath.push(langPath || routePath);
       return joinPaths(localPath);
     }
@@ -84,7 +83,7 @@ export function getUrlByPath(
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = getUrlByPath(
+      const matchChildrenPath = getUrlByPathPart(
         route.children,
         path,
         lang,
@@ -95,7 +94,7 @@ export function getUrlByPath(
         // keep path in local array
         localPath.push(langPath || routePath);
         // Return the function after localPath push
-        return getUrlByPath(route.children, path, lang, joinPaths(localPath));
+        return getUrlByPathPart(route.children, path, lang, joinPaths(localPath));
       }
     }
   }
@@ -121,8 +120,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           return;
         }
         // get full URL
-        const urlByPath = getUrlByPath(pRoutes, route.path, pParams?.params?.lang);
-        debug("urlByPath", urlByPath);
+        const urlByPath = getUrlByPathPart(pRoutes, route.path, pParams?.params?.lang);
         // build URL with param and return
         return buildUrl(urlByPath, params.params);
       }
@@ -186,11 +184,15 @@ export function addBaseToUrl(url: string, base = useRootRouter()?.base): string 
 }
 
 /**
- * Return path without his base
+ * Return path without his URL
+ *
+ * before: "/custom-base/foo"
+ * after:  "/foo"
+ *
  * @param path
  * @param base
  */
-export function extractPathFromBase(path: string, base: string): string {
+export function removeBaseToUrl(path: string, base: string): string {
   let baseStartIndex = path.indexOf(base);
   return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
 }

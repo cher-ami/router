@@ -1,6 +1,6 @@
 import {
   buildUrl,
-  getUrlByPath,
+  getUrlByPathPart,
   getUrlByRouteName,
   joinPaths,
   preventSlashes,
@@ -73,8 +73,8 @@ describe("getUrlByPath", () => {
         ],
       },
     ];
-    expect(getUrlByPath(routesList, "/foo")).toBe("/hello/foo");
-    expect(getUrlByPath(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
+    expect(getUrlByPathPart(routesList, "/foo")).toBe("/hello/foo");
+    expect(getUrlByPathPart(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
   });
 
   it("sound return full URL ", () => {
@@ -92,7 +92,7 @@ describe("getUrlByPath", () => {
       },
     ];
 
-    expect(getUrlByPath(routesListLang, "/foo-fr")).toBe("/salut/bar-fr/foo-fr");
+    expect(getUrlByPathPart(routesListLang, "/foo-fr")).toBe("/salut/bar-fr/foo-fr");
   });
 });
 

@@ -1,6 +1,6 @@
 import { LangService, TRoute } from "..";
 import { ROUTERS } from "../api/routers";
-import { extractPathFromBase, getUrlByPath, joinPaths } from "../api/helpers";
+import { removeBaseToUrl, joinPaths } from "../api/helpers";
 
 const debug = require("debug")("router:langHelpers");
 
@@ -36,7 +36,7 @@ export function getLangPathByLang(
 /**
  * Get lang path by another lang path
  * ex:
- *     path: { en: "/about", fr: "/a-propos", de: "uber", name: "about" },
+ *     path: { en: "/about", fr: "/a-propos", de: "uber" },
  *
  * with "/about", we need "fr" path  "/a-propos"
  * selectLangPathByPath("/about", "fr", routes) // will return "/a-propos"
@@ -45,7 +45,7 @@ export function getLangPathByLang(
  * ex 2
  * Path can be an object with all available related lang path string too:
  *
- *  const pathsObj = path: { en: "/about", fr: "/a-propos", de: "uber", name: "about" };
+ *  const pathsObj = path: { en: "/about", fr: "/a-propos", de: "uber" };
  *  * selectLangPathByPath(pathsObj, "fr", routes) // will return "/a-propos"
  *
  * @param path: current path
@@ -82,7 +82,7 @@ export function getLangPathByPath({
   // quick fix in case base is a simple "/"
   if (base === "/") base = "";
   // path without base
-  const pathWithoutBase = extractPathFromBase(initialPath, base);
+  const pathWithoutBase = removeBaseToUrl(initialPath, base);
 
   for (let route of routes) {
     log && debug("> route", route);
@@ -100,7 +100,7 @@ export function getLangPathByPath({
     if (routePath === pathWithoutBase || pathWithoutBaseMatchWithOnePathLang) {
       // pousser dans la tableau
       storePaths.push(routePath);
-      log && debug("> !!!!!!!! FINAL return: ", joinPaths(storePaths));
+      log && debug("> FINAL return: ", joinPaths(storePaths));
       // retourner le path final
       return joinPaths(storePaths);
     }
