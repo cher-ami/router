@@ -56,7 +56,7 @@ export const langMiddleware = (
       return {
         ...route,
         path: patchLangParam(path, showLang),
-        langPath: Object.entries(langPath).length !== 0 && langPath,
+        langPath: Object.entries(langPath).length !== 0 ? langPath : null,
         ...(hasChildren ? { children: patchRoutes(route.children, true) } : {}),
       };
     });

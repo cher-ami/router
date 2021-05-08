@@ -1,6 +1,5 @@
 import { TRoute } from "../src";
 import { getLangPathByPath } from "../src/lang/langHelpers";
-//import { getLangPathByPath } from "../src/lang/langHelpers";
 
 export const routesList: TRoute[] = [
   {
@@ -11,7 +10,6 @@ export const routesList: TRoute[] = [
   {
     path: { en: "/about", fr: "/a-propos", de: "uber" },
     name: "about",
-
     children: [
       {
         path: { en: "/foo-en", fr: "/foo-fr", de: "foo-de" },
@@ -55,7 +53,7 @@ describe("langHelpers", () => {
         path: { en: "/home", fr: "/accueil", de: "/zuhause" },
         children: [
           {
-            path: { en: "/foo-en", fr: "/:id", de: "/foo-de" },
+            path: { en: "/foo-en", fr: "/foo-fr", de: "/foo-de" },
           },
         ],
       },

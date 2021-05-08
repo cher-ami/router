@@ -45,7 +45,7 @@ export function getLangPathByLang(
  * ex 2
  * Path can be an object with all available related lang path string too:
  *
- *  const pathsObj = path: { en: "/about", fr: "/a-propos", de: "uber" };
+ *  const pathsObj = path: { en: "/about", fr: "/a-propos", de: "/uber" };
  *  * selectLangPathByPath(pathsObj, "fr", routes) // will return "/a-propos"
  *
  * @param path: current path

@@ -1,40 +1,47 @@
-import { langMiddleware, TRoute } from "../src";
+import { langMiddleware, LangService, TRoute } from "../src";
 
-const routesList: TRoute[] = [
+/**
+ * Add lang path param allows to test the same array before and after middleware
+ * The middleware added langPath param even if it doesn't patch all routes
+ * @param addLangPath
+ */
+const routesList = (addLangPath = false): TRoute[] => [
   {
     path: "/",
-    component: null,
+    ...(addLangPath ? { langPath: null } : {}),
   },
   {
     path: "/hello",
-    component: null,
+    ...(addLangPath ? { langPath: null } : {}),
     children: [
-      { path: "/zoo", component: null },
-      { path: "/:id", component: null },
+      { path: "/zoo", ...(addLangPath ? { langPath: null } : {}) },
+      { path: "/:id", ...(addLangPath ? { langPath: null } : {}) },
     ],
   },
 ];
 
 const patchRoutesList: TRoute[] = [
   {
-    path: "/:lang",
-    component: null,
+    path: "/:lang/",
+    langPath: null,
   },
   {
     path: "/:lang/hello",
-    component: null,
+    langPath: null,
     children: [
-      { path: "/zoo", component: null },
-      { path: "/:id", component: null },
+      { path: "/zoo", langPath: null },
+      { path: "/:id", langPath: null },
     ],
   },
 ];
 
 describe("LangMiddleware", () => {
+  LangService.init([{ key: "fr" }, { key: "en" }], true);
   it("should patch all first level routes if LangService is init", () => {
-    expect(langMiddleware(routesList, true)).toEqual(patchRoutesList);
+    expect(langMiddleware(routesList(), true)).toEqual(patchRoutesList);
   });
+
   it("should not patch routes if LangService is not init", () => {
-    expect(langMiddleware(routesList, false)).toEqual(routesList);
+    expect(langMiddleware(routesList(), false)).toEqual(routesList(true));
   });
 });

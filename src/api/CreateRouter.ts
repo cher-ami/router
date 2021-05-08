@@ -18,7 +18,7 @@ export type TRoute = {
   path: any;
   // string | { [x: string]: string };
   component?: React.ComponentType<any>;
-  langPath?: { [x: string]: string };
+  langPath?: { [x: string]: string } | null;
   name?: string;
   parser?: Path;
   props?: {
