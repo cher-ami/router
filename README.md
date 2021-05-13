@@ -64,6 +64,7 @@ Middlewares:
 Services:
 
 - [`LangService`](#LangService) Manage `:lang` params
+- [`Translate Path`](#TranslatePath)
 
 ## <a name="Installation"></a>Installation
 
@@ -395,9 +396,9 @@ Trig new route.
 
 **Props:**
 
-- **to** `string | TOpenRouteParams` Path ex: `/foo` or `{name: "FooPage" params: { id: bar }}`. 
+- **to** `string | TOpenRouteParams` Path ex: `/foo` or `{name: "FooPage" params: { id: bar }}`.
   "to" props accepts same params than setLocation.
-- **children** `ReactNode` children link DOM element 
+- **children** `ReactNode` children link DOM element
 - **onClick** `()=> void` _(optional)_ execute callback on the click event
 - **className** `string` _(optional)_ Class name added to component root DOM element
 
@@ -763,6 +764,17 @@ only.
 
 ```jsx
 LangService.redirect();
+```
+
+### <a name="TranslatePath"></a>Translate Path
+
+Paths can be translated by lang in route path property:
+
+```js
+  {
+    path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
+    component: FooPage,
+  }
 ```
 
 ## Credits
