@@ -46,9 +46,10 @@ export function getLangPathByLang(
  * Path can be an object with all available related lang path string too:
  *
  *  const pathsObj = path: { en: "/about", fr: "/a-propos", de: "/uber" };
+ *  So, with pathObj, we need fr path "/a-propos"
  *  * selectLangPathByPath(pathsObj, "fr", routes) // will return "/a-propos"
  *
- * @param path: current path
+ * @param path: current path string or object
  * @param base
  * @param lang: Lang key we want to get the alternate path
  * @param routes: Route liste
