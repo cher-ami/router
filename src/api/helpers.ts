@@ -64,7 +64,7 @@ export function buildUrl(path: string, params?: TParams): string {
 export function getUrlByPathPart(
   routes: TRoute[],
   path: string | { [x: string]: string },
-  lang: string,
+  lang: string = LangService.currentLang?.key || undefined,
   basePath: string = null
 ): string {
   let localPath: string[] = [basePath];

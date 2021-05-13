@@ -240,8 +240,7 @@ export class CreateRouter {
     let match;
 
     // test each routes
-    for (let i in pRoutes) {
-      let currentRoute = pRoutes[i];
+    for (let currentRoute of pRoutes) {
       // create parser & matcher
       const currentRoutePath = joinPaths([pBase, currentRoute.path]);
       // prepare parser

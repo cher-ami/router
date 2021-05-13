@@ -77,15 +77,25 @@ describe("getUrlByPath", () => {
     expect(getUrlByPathPart(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
   });
 
-  it("sound return full URL ", () => {
+  it("should return full URL ", () => {
     LangService.init([{ key: "fr" }, { key: "en" }], true);
     const routesListLang = [
       {
-        path: { fr: "/salut", en: "/hello" },
+        path: "/hello",
+        langPath: { fr: "/salut", en: "/hello" },
         children: [
           {
-            path: { en: "/bar-en", fr: "/bar-fr" },
-            children: [{ path: { en: "/foo-en", fr: "/foo-fr" } }, { path: "/foo" }],
+            path: "/bar-en",
+            langPath: { en: "/bar-en", fr: "/bar-fr" },
+            children: [
+              {
+                path: "/foo-en",
+                langPath: { en: "/foo-en", fr: "/foo-fr" },
+              },
+              {
+                path: "/zoo",
+              },
+            ],
           },
           { path: "/foo" },
         ],

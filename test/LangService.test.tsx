@@ -4,8 +4,8 @@ import React from "react";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
-  { path: "/", component: null },
-  { path: "/foo", component: null },
+  { path: "/", name: "home" },
+  { path: "/foo", name: "foo" },
 ];
 
 const mockClickHandler = jest.fn();
@@ -22,27 +22,6 @@ const App = ({ base = "/", to = "/foo" }) => {
   );
 };
 
-const setUrl = (url) => {
-  const parser = document.createElement("a");
-  parser.href = url;
-  [
-    "href",
-    "protocol",
-    "host",
-    "hostname",
-    "origin",
-    "port",
-    "pathname",
-    "search",
-    "hash",
-  ].forEach((prop) => {
-    Object.defineProperty(window.location, prop, {
-      value: parser[prop],
-      writable: true,
-    });
-  });
-};
-
 const windowOpenMock = jest.fn();
 
 beforeAll(() => {
@@ -57,7 +36,7 @@ afterEach(() => {
 });
 
 describe("LangService", () => {
-  it("should turn init to true after init", () => {
+  it("should turn isInit property to true after init", () => {
     LangService.init(locales);
     expect(LangService.isInit).toBe(true);
   });
@@ -66,7 +45,7 @@ describe("LangService", () => {
    * setLang
    */
   it("should set lang properly", () => {
-    LangService.init(locales, true);
+    LangService.init(locales, false);
     render(<App />);
     act(() => LangService.setLang(locales[1]));
     expect(window.open).toHaveBeenCalledWith(`/${locales[1].key}`, "_self");
