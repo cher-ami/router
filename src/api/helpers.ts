@@ -56,40 +56,45 @@ export function buildUrl(path: string, params?: TParams): string {
 }
 
 /**
- * Get URL by path
+ * Get URL by path part
  *  if path "/foo" is a children of path "/bar", his full url is "/bar/foo"
  *  With "/foo" this function will return "/bar/foo"
  * @returns string
  */
-export function getUrlByPath(
+export function getUrlByPathPart(
   routes: TRoute[],
-  path: string,
+  path: string | { [x: string]: string },
+  lang: string = LangService.currentLang?.key || undefined,
   basePath: string = null
 ): string {
-  // prepare local path
   let localPath: string[] = [basePath];
 
-  for (let i in routes) {
-    const route = routes[i];
+  for (let route of routes) {
+    const langPath = route.langPath?.[lang];
+    const routePath = route.path as string;
+    const pathMatch = langPath === path || routePath === path;
 
-    // if path match on first level
-    if (route.path === path) {
-      // keep path in local array
-      localPath.push(route.path);
-      // return it
+    // if path match on first level, keep path in local array and return it, stop here.
+    if (pathMatch) {
+      localPath.push(langPath || routePath);
       return joinPaths(localPath);
     }
 
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = getUrlByPath(route.children, path, joinPaths(localPath));
+      const matchChildrenPath = getUrlByPathPart(
+        route.children,
+        path,
+        lang,
+        joinPaths(localPath)
+      );
       // return recursive Fn only if match, else continue to next iteration
       if (matchChildrenPath) {
         // keep path in local array
-        localPath.push(route.path);
+        localPath.push(langPath || routePath);
         // Return the function after localPath push
-        return getUrlByPath(route.children, path, joinPaths(localPath));
+        return getUrlByPathPart(route.children, path, lang, joinPaths(localPath));
       }
     }
   }
@@ -103,8 +108,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
   // need to wrap the function to be able to access the preserved "pRoutes" param
   // in local scope after recursion
   const recursiveFn = (routes: TRoute[], params: TOpenRouteParams): string => {
-    for (let i in routes) {
-      const route = routes[i];
+    for (let route of routes) {
       const match =
         route?.name === params.name || route.component?.displayName === params.name;
       if (match) {
@@ -116,7 +120,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           return;
         }
         // get full URL
-        const urlByPath = getUrlByPath(pRoutes, route.path);
+        const urlByPath = getUrlByPathPart(pRoutes, route.path, pParams?.params?.lang);
         // build URL with param and return
         return buildUrl(urlByPath, params.params);
       }
@@ -180,11 +184,15 @@ export function addBaseToUrl(url: string, base = useRootRouter()?.base): string 
 }
 
 /**
- * Return path without his base
+ * Return path without his URL
+ *
+ * before: "/custom-base/foo"
+ * after:  "/foo"
+ *
  * @param path
  * @param base
  */
-export function extractPathFromBase(path: string, base: string): string {
+export function removeBaseToUrl(path: string, base: string): string {
   let baseStartIndex = path.indexOf(base);
   return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
 }

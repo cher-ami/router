@@ -19,11 +19,13 @@ const debug = require("debug")(`router:index`);
  */
 export const routesList: TRoute[] = [
   {
-    path: "/",
+    // path: "/",
+    path: { en: "/", fr: "/", de: "/" },
     component: HomePage,
   },
   {
     path: "/blog/:id",
+    //path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
     component: ArticlePage,
     props: {
       color: "red",
@@ -31,10 +33,12 @@ export const routesList: TRoute[] = [
   },
   {
     path: "/about",
+    //path: { en: "/about", fr: "/a-propos", de: "/uber" },
     component: AboutPage,
     children: [
       {
         path: "/foo",
+        // path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
         component: FooPage,
       },
       {
@@ -49,10 +53,9 @@ export const routesList: TRoute[] = [
   },
 ];
 
-const baseUrl = "/master";
+const baseUrl = "/custom-base";
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
-
-LangService.init(locales, true, baseUrl);
+LangService.init(locales, false, baseUrl);
 
 /**
  * Init Application

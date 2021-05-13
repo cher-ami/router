@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useHistory, useRootRouter } from "..";
+import { CreateRouter, useHistory, useRootRouter } from "..";
 import {
   addBaseToUrl,
   addLangToUrl,
@@ -8,6 +8,36 @@ import {
 } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
+const debug = require("debug")(`router:useLocation`);
+
+/**
+ * prepare set location new URL
+ *
+ * ex:
+ *   "/base/en/foo-en-path/sub-en-path"
+ * should become:
+ *   "/base/fr/foo-fr-path/sub-fr-path"
+ *
+ */
+export const prepareSetLocationFullUrl = (
+  toLang,
+  instances: CreateRouter[] = ROUTERS.instances
+) => {
+  let pathToGenerate = [];
+
+  for (let instance of instances) {
+    const newUrl = prepareSetLocationUrl({
+      name: instance.currentRoute.name,
+      params: {
+        ...(instance.currentRoute.props?.params || {}),
+        lang: toLang.key,
+      },
+    });
+    pathToGenerate.push(newUrl);
+  }
+  // get last item of array
+  return pathToGenerate.filter((v) => v).slice(-1)[0];
+};
 
 /**
  * Prepare setLocation URL
@@ -15,11 +45,12 @@ import { LangService } from "..";
  */
 export const prepareSetLocationUrl = (args: string | TOpenRouteParams): string => {
   const rootRouter = useRootRouter();
+
   let urlToPush: string;
 
   // in case we recieve a string
   if (typeof args === "string") {
-    urlToPush = args;
+    urlToPush = args as string;
     urlToPush = addLangToUrl(urlToPush);
 
     // in case we recieve an object
@@ -30,13 +61,12 @@ export const prepareSetLocationUrl = (args: string | TOpenRouteParams): string =
         ...{ lang: LangService.currentLang.key },
       };
     }
-
     // Get URL by the route name
     urlToPush = getUrlByRouteName(rootRouter.routes, args);
 
     // in other case return.
   } else {
-    console.warn("setLocation param isn't valid. return.");
+    console.warn("setLocation param isn't valid. return.", args);
     return;
   }
 

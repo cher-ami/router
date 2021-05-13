@@ -1,8 +1,4 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  useRef
-} from "react";
+import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { Router } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
@@ -32,13 +28,10 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
           <nav>
             <ul>
               <li>
-                <Link to={`/about/foo`}>Foo</Link>{" "}
+                <Link to={{ name: "FooPage" }}>Foo</Link>
               </li>
               <li>
-                <Link to={"/about/bar"}>Bar</Link>{" "}
-              </li>
-              <li>
-                <Link to={`/error`}>NotFound route</Link>{" "}
+                <Link to={{ name: "BarPage" }}>Bar</Link>{" "}
               </li>
             </ul>
           </nav>

@@ -2,6 +2,8 @@ import { CreateRouter, TRoute } from "./CreateRouter";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 export type TRoutersConfig = {
+
+  preMiddelwareRoutes: TRoute[]
   /**
    * Global routes list
    */
@@ -34,6 +36,7 @@ export type TRoutersConfig = {
  * This object values do not depend of one single router
  */
 export const ROUTERS: TRoutersConfig = {
+  preMiddelwareRoutes: null,
   routes: null,
   instances: [],
   history: null,

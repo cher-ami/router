@@ -1,4 +1,4 @@
-import { EHistoryMode, CreateRouter, TRoute, useRouter } from "..";
+import { EHistoryMode, CreateRouter, TRoute, useRouter, langMiddleware } from "..";
 import React, {
   createContext,
   memo,
@@ -10,9 +10,10 @@ import React, {
 import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
+import { getLangPathByPath } from "../lang/langHelpers";
 
 const componentName = "Router";
-// const debug = require("debug")(`router:${componentName}`);
+const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;
@@ -36,20 +37,8 @@ RouterContext.displayName = componentName;
 export const Router = memo((props: IProps) => {
   // deduce a router ID
   const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
-
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
-
-  const showLang = LangService.showLangInUrl();
-
-  // join each parent router base
-  const base = joinPaths([
-    parentRouter?.base,
-    // because language middleware nedd to patch only first level routes
-    id !== 1 && showLang && "/:lang",
-    props.base,
-  ]);
-
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
@@ -59,15 +48,30 @@ export const Router = memo((props: IProps) => {
       currentRoutesList = props.routes;
     } else {
       currentRoutesList = ROUTERS.routes?.find((el) => {
-        return `${el.path}` === props.base;
+        return (
+          getLangPathByPath({ path: el.path }) === getLangPathByPath({ path: props.base })
+        );
       })?.children;
+      if (LangService.isInit) {
+        // If sub router, need to selected appropriate route path by lang
+        currentRoutesList = langMiddleware(currentRoutesList, false);
+      }
     }
-
     return currentRoutesList;
   }, [props.routes, props.base]);
 
-  // middlewares are properties of root instance only?
-  const middlewares = props.middlewares;
+  const showLang = LangService.showLangInUrl();
+  // join each parent router base
+  const base = useMemo(() => {
+    const parentBase: string = parentRouter?.base;
+    const addLang: boolean = id !== 1 && showLang;
+    const base: string = addLang ? getLangPathByPath({ path: props.base }) : props.base;
+    return joinPaths([
+      parentBase, // ex: /master-base
+      addLang && "/:lang",
+      base, // ex: "/about
+    ]);
+  }, [props.base]);
 
   // keep router instance in state
   const [routerState] = useState<CreateRouter>(() => {
@@ -75,7 +79,7 @@ export const Router = memo((props: IProps) => {
       base,
       routes,
       id,
-      middlewares,
+      middlewares: props.middlewares,
       historyMode: props.historyMode,
     });
 

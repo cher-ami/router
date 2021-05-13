@@ -1,5 +1,4 @@
-import React from "react";
-import { CreateRouter, ERouterEvent, TRoute } from "../src";
+import { CreateRouter, TRoute } from "../src";
 import { ROUTERS } from "../src/api/routers";
 import { preventSlashes } from "../src/api/helpers";
 
@@ -43,7 +42,7 @@ describe("CreateRouter", () => {
     expect(getRoute.fullUrl).toBe(`${base}/bar/foo`);
     expect(getRoute.fullPath).toBe(`${base}/bar/:id`);
     expect(getRoute.path).toBe("/bar/:id");
-    expect(getRoute.matchUrl).toBe("/bar/foo");
+    expect(getRoute.url).toBe("/bar/foo");
     expect(getRoute.name).toBe(`BarPage`);
     expect(getRoute.props).toEqual({ params: { id: "foo" }, color: "blue" });
   });

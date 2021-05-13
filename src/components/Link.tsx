@@ -1,6 +1,6 @@
 import React, { ReactNode, useMemo } from "react";
 import { prepareSetLocationUrl, useLocation } from "..";
-import { joinPaths, TOpenRouteParams } from "../api/helpers";
+import { joinPaths, removeLastCharFromString, TOpenRouteParams } from "../api/helpers";
 
 interface IProps {
   to: string | TOpenRouteParams;
@@ -17,7 +17,10 @@ function Link(props: IProps) {
 
   const url = useMemo(() => prepareSetLocationUrl(props.to), [props.to]);
 
-  const isActive = useMemo(() => location === url, [location, url]);
+  const isActive = useMemo(
+    () => location === url || location === removeLastCharFromString(url, "/", true),
+    [location, url]
+  );
 
   const handleClick = (e) => {
     e.preventDefault();

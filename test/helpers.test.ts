@@ -1,11 +1,12 @@
 import {
   buildUrl,
-  getUrlByPath,
+  getUrlByPathPart,
   getUrlByRouteName,
   joinPaths,
   preventSlashes,
   removeLastCharFromString,
 } from "../src/api/helpers";
+import { LangService } from "../src";
 
 describe("removeLastCharFromString", () => {
   it("should not remove last character if string === lastChar", () => {
@@ -60,39 +61,61 @@ describe("buildUrl", () => {
 describe("getUrlByPath", () => {
   it("should return full URL", () => {
     const routesList = [
-      { path: "/", component: null },
+      { path: "/" },
       {
         path: "/hello",
-        component: null,
         children: [
-          { path: "/bar", component: null },
+          { path: "/bar" },
           {
             path: "/foo",
-            component: null,
-            children: [
-              { path: "/zoo", component: null },
-              { path: "/bla", component: null },
-            ],
+            children: [{ path: "/:zoo" }, { path: "/bla" }],
           },
         ],
       },
     ];
-    expect(getUrlByPath(routesList, "/foo")).toBe("/hello/foo");
-    expect(getUrlByPath(routesList, "/zoo")).toBe("/hello/foo/zoo");
+    expect(getUrlByPathPart(routesList, "/foo")).toBe("/hello/foo");
+    expect(getUrlByPathPart(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
+  });
+
+  it("should return full URL ", () => {
+    LangService.init([{ key: "fr" }, { key: "en" }], true);
+    const routesListLang = [
+      {
+        path: "/hello",
+        langPath: { fr: "/salut", en: "/hello" },
+        children: [
+          {
+            path: "/bar-en",
+            langPath: { en: "/bar-en", fr: "/bar-fr" },
+            children: [
+              {
+                path: "/foo-en",
+                langPath: { en: "/foo-en", fr: "/foo-fr" },
+              },
+              {
+                path: "/zoo",
+              },
+            ],
+          },
+          { path: "/foo" },
+        ],
+      },
+    ];
+
+    expect(getUrlByPathPart(routesListLang, "/foo-fr")).toBe("/salut/bar-fr/foo-fr");
   });
 });
 
 describe("getUrlByRouteName", () => {
   it("should return full URL with only page name and params", () => {
     const routesList = [
-      { path: "/", component: null, name: "foo" },
+      { path: "/", name: "foo" },
       {
         path: "/hello",
-        component: null,
         name: "bar",
         children: [
-          { path: "/zoo", component: null, name: "ZooPage" },
-          { path: "/:id", component: null, name: "BlaPage" },
+          { path: "/zoo", name: "ZooPage" },
+          { path: "/:id", name: "BlaPage" },
         ],
       },
     ];

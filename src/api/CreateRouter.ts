@@ -14,22 +14,29 @@ import {
 
 const debug = require("debug")("router:CreateRouter");
 
+export type TParams = {
+  [x: string]: any;
+};
+
+export type TProps = {
+  params?: TParams;
+  [x: string]: any;
+};
+
+export type TPathLangObject = { [x: string]: string };
+
 export type TRoute = {
-  path: string;
-  component: React.ComponentType<any>;
+  path: string | TPathLangObject;
+  component?: React.ComponentType<any>;
+  base?: string;
   name?: string;
   parser?: Path;
-  props?: {
-    params?: { [x: string]: any };
-    [x: string]: any;
-  };
+  props?: TProps;
   children?: TRoute[];
-  // local match URL with params (needed by nested router)
-  matchUrl?: string;
-  // full URL who not depend of current instance
-  fullUrl?: string;
-  // full Path /base/:lang/foo/second-foo
-  fullPath?: string;
+  url?: string;
+  fullUrl?: string; // full URL who not depend of current instance
+  fullPath?: string; // full Path /base/:lang/foo/second-foo
+  langPath?: { [x: string]: string } | null;
 };
 
 export enum EHistoryMode {
@@ -50,26 +57,21 @@ export enum ERouterEvent {
 export class CreateRouter {
   // base URL
   public base: string;
-  // routes list
+  // before execute middleware routes list
   public preMiddlewareRoutes: TRoute[] = [];
+  // routes list
   public routes: TRoute[] = [];
-
   // middlewares list to exectute in specific order
   public middlewares: any[];
-
   // create event emitter
   public events: EventEmitter = new EventEmitter();
-
   // current / previous route object
   public currentRoute: TRoute;
   public previousRoute: TRoute;
-
   // history mode choice used by history library›
   public historyMode: EHistoryMode;
-
   // store history listener
   protected unlistenHistory;
-
   // router instance ID, useful for debug if there is multiple router instance
   public id: number | string;
 
@@ -102,19 +104,8 @@ export class CreateRouter {
       ROUTERS.locationsHistory.push(ROUTERS.history.location);
     }
 
-    // patch: create root route object with path '/' if doesn't exist
-    const rootPathExist = routes.some((route) => route.path === "/");
-    if (!rootPathExist) {
-      routes.push({ path: "/", component: null });
-    }
-
-    // format routes
-    this.preMiddlewareRoutes = routes.map((route: TRoute) => ({
-      ...route,
-      name: route?.name || route?.component?.displayName,
-      parser: new Path(route.path),
-    }));
-
+    // add missing "/" route to routes list if doesn't exist
+    this.preMiddlewareRoutes = this.patchMissingRootRoute(routes);
     debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
 
     this.routes =
@@ -122,11 +113,28 @@ export class CreateRouter {
         (routes, middleware) => middleware(routes),
         this.preMiddlewareRoutes
       ) || this.preMiddlewareRoutes;
-
     debug(this.id, "this.routes", this.routes);
 
     this.updateRoute();
     this.initEvents();
+  }
+
+  /**
+   * Patch missing root route
+   * add missing "/" route to routes list if doesn't exist
+   * @param routes
+   */
+  protected patchMissingRootRoute(routes: TRoute[]): TRoute[] {
+    const rootPathExist = routes.some(
+      (route) =>
+        (typeof route.path === "object" &&
+          Object.keys(route.path).some((el) => route.path[el] === "/")) ||
+        route.path === "/"
+    );
+    if (!rootPathExist) {
+      routes.unshift({ path: "/", component: null });
+    }
+    return routes;
   }
 
   /**
@@ -194,10 +202,7 @@ export class CreateRouter {
       return;
     }
 
-    if (
-      this.currentRoute?.matchUrl != null &&
-      this.currentRoute?.matchUrl === matchingRoute?.matchUrl
-    ) {
+    if (this.currentRoute?.url != null && this.currentRoute?.url === matchingRoute?.url) {
       debug(this.id, "updateRoute: THIS IS THE SAME URL, RETURN.");
       return;
     }
@@ -237,10 +242,9 @@ export class CreateRouter {
     let match;
 
     // test each routes
-    for (let i in pRoutes) {
-      let currentRoute = pRoutes[i];
+    for (let currentRoute of pRoutes) {
       // create parser & matcher
-      const currentRoutePath = joinPaths([pBase, currentRoute.path]);
+      const currentRoutePath = joinPaths([pBase, currentRoute.path as string]);
       // prepare parser
       const pathParser: Path = new Path(currentRoutePath);
       // prettier-ignore
@@ -253,14 +257,16 @@ export class CreateRouter {
         const route = pCurrentRoute || currentRoute;
         const params = pMatch || match;
         const routeObj = {
-          fullUrl: pUrl,
           fullPath: currentRoutePath,
-          matchUrl: buildUrl(route.path, params),
           path: route?.path,
+          fullUrl: pUrl,
+          url: buildUrl(route.path as string, params),
+          base: pBase,
           component: route?.component,
           children: route?.children,
           parser: pPathParser || pathParser,
-          name: route?.name,
+          langPath: route.langPath,
+          name: route?.name || route?.component?.displayName,
           props: {
             params,
             ...(route?.props || {}),
