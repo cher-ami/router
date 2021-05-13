@@ -29,7 +29,7 @@ export const prepareSetLocationFullUrl = (
     const newUrl = prepareSetLocationUrl({
       name: instance.currentRoute.name,
       params: {
-        ...instance.currentRoute.props.params,
+        ...(instance.currentRoute.props?.params || {}),
         lang: toLang.key,
       },
     });
