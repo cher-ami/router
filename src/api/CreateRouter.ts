@@ -14,22 +14,29 @@ import {
 
 const debug = require("debug")("router:CreateRouter");
 
+export type TParams = {
+  [x: string]: any;
+};
+
+export type TProps = {
+  params?: TParams;
+  [x: string]: any;
+};
+
+export type TPathLangObject = { [x: string]: string };
+
 export type TRoute = {
-  path: any;
-  // string | { [x: string]: string };
+  path: string | TPathLangObject;
   component?: React.ComponentType<any>;
-  langPath?: { [x: string]: string } | null;
+  base?: string;
   name?: string;
   parser?: Path;
-  props?: {
-    params?: { [x: string]: any };
-    [x: string]: any;
-  };
-  children?: TRoute[]; // local match URL with params (needed by nested router)
-  url?: string; // full URL who not depend of current instance
-  fullUrl?: string; // full Path /base/:lang/foo/second-foo
-  fullPath?: string;
-  base?: string;
+  props?: TProps;
+  children?: TRoute[];
+  url?: string;
+  fullUrl?: string; // full URL who not depend of current instance
+  fullPath?: string; // full Path /base/:lang/foo/second-foo
+  langPath?: { [x: string]: string } | null;
 };
 
 export enum EHistoryMode {
@@ -50,26 +57,21 @@ export enum ERouterEvent {
 export class CreateRouter {
   // base URL
   public base: string;
-  // routes list
+  // before execute middleware routes list
   public preMiddlewareRoutes: TRoute[] = [];
+  // routes list
   public routes: TRoute[] = [];
-
   // middlewares list to exectute in specific order
   public middlewares: any[];
-
   // create event emitter
   public events: EventEmitter = new EventEmitter();
-
   // current / previous route object
   public currentRoute: TRoute;
   public previousRoute: TRoute;
-
   // history mode choice used by history library›
   public historyMode: EHistoryMode;
-
   // store history listener
   protected unlistenHistory;
-
   // router instance ID, useful for debug if there is multiple router instance
   public id: number | string;
 
@@ -242,7 +244,7 @@ export class CreateRouter {
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
-      const currentRoutePath = joinPaths([pBase, currentRoute.path]);
+      const currentRoutePath = joinPaths([pBase, currentRoute.path as string]);
       // prepare parser
       const pathParser: Path = new Path(currentRoutePath);
       // prettier-ignore
@@ -258,7 +260,7 @@ export class CreateRouter {
           fullPath: currentRoutePath,
           path: route?.path,
           fullUrl: pUrl,
-          url: buildUrl(route.path, params),
+          url: buildUrl(route.path as string, params),
           base: pBase,
           component: route?.component,
           children: route?.children,

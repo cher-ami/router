@@ -71,7 +71,7 @@ export function getUrlByPathPart(
 
   for (let route of routes) {
     const langPath = route.langPath?.[lang];
-    const routePath = route.path;
+    const routePath = route.path as string;
     const pathMatch = langPath === path || routePath === path;
 
     // if path match on first level, keep path in local array and return it, stop here.

@@ -1,5 +1,4 @@
-import React from "react";
-import { CreateRouter, ERouterEvent, TRoute } from "../src";
+import { CreateRouter, TRoute } from "../src";
 import { ROUTERS } from "../src/api/routers";
 import { preventSlashes } from "../src/api/helpers";
 

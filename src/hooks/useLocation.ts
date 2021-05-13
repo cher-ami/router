@@ -26,8 +26,6 @@ export const prepareSetLocationFullUrl = (
   let pathToGenerate = [];
 
   for (let instance of instances) {
-    debug('instance.currentRoute.name',instance.currentRoute?.name)
-
     const newUrl = prepareSetLocationUrl({
       name: instance.currentRoute.name,
       params: {
