@@ -1,12 +1,9 @@
 import { Path } from "path-parser";
 import React from "react";
-import { EventEmitter } from "events";
 import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
 import {
   createBrowserHistory,
-  createHashHistory,
-  createMemoryHistory,
   BrowserHistory,
   HashHistory,
   MemoryHistory,
@@ -39,18 +36,6 @@ export type TRoute = {
   langPath?: { [x: string]: string } | null;
 };
 
-export enum EHistoryMode {
-  BROWSER = "browser",
-  HASH = "hash",
-  MEMORY = "memory",
-}
-
-export enum ERouterEvent {
-  PREVIOUS_ROUTE_CHANGE = "previous-route-change",
-  CURRENT_ROUTE_CHANGE = "current-route-change",
-  STACK_IS_ANIMATING = "stack-is-animating",
-}
-
 /**
  * RouterInstance
  */
@@ -63,35 +48,37 @@ export class CreateRouter {
   public routes: TRoute[] = [];
   // middlewares list to exectute in specific order
   public middlewares: any[];
-  // create event emitter
-  public events: EventEmitter = new EventEmitter();
-  // current / previous route object
-  public currentRoute: TRoute;
+  // previous route object
   public previousRoute: TRoute;
-  // history mode choice used by history library›
-  public historyMode: EHistoryMode;
+  // current route object
+  public currentRoute: TRoute;
   // store history listener
   protected unlistenHistory;
   // router instance ID, useful for debug if there is multiple router instance
   public id: number | string;
+  // dispatch new current route function
+  protected setNewCurrentRoute: (newCurrentRoute: TRoute) => void;
 
   constructor({
     routes,
     middlewares,
     base = "/",
     id = 1,
-    historyMode = EHistoryMode.BROWSER,
+    createHistory = createBrowserHistory,
+    setNewCurrentRoute,
   }: {
     base?: string;
     routes: TRoute[];
     middlewares?: any[];
     id?: number | string;
-    historyMode?: EHistoryMode;
+    createHistory?: () => BrowserHistory | HashHistory | MemoryHistory;
+    setNewCurrentRoute: any;
   }) {
     this.base = base;
     this.id = id;
     this.middlewares = middlewares;
-    this.historyMode = historyMode;
+
+    this.setNewCurrentRoute = setNewCurrentRoute;
 
     if (!routes) {
       throw new Error(`Router id ${id} > no routes array is set.`);
@@ -99,7 +86,7 @@ export class CreateRouter {
 
     if (!ROUTERS.history) {
       // create new history
-      ROUTERS.history = this.getHistory(this.historyMode);
+      ROUTERS.history = createHistory();
       // push first location history object in global locationsHistory
       ROUTERS.locationsHistory.push(ROUTERS.history.location);
     }
@@ -155,25 +142,6 @@ export class CreateRouter {
   }
 
   /**
-   * Select History mode
-   * doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
-   * @param historyMode
-   */
-  protected getHistory(
-    historyMode: EHistoryMode
-  ): HashHistory | MemoryHistory | BrowserHistory {
-    if (historyMode === EHistoryMode.BROWSER) {
-      return createBrowserHistory();
-    }
-    if (historyMode === EHistoryMode.HASH) {
-      return createHashHistory();
-    }
-    if (historyMode === EHistoryMode.MEMORY) {
-      return createMemoryHistory();
-    }
-  }
-
-  /**
    * Handle history
    * Call each time new event is fired by history
    */
@@ -210,9 +178,10 @@ export class CreateRouter {
     this.previousRoute = this.currentRoute;
     this.currentRoute = matchingRoute || notFoundRoute;
 
-    this.events.emit(ERouterEvent.PREVIOUS_ROUTE_CHANGE, this.previousRoute);
-    this.events.emit(ERouterEvent.CURRENT_ROUTE_CHANGE, this.currentRoute);
+    // dispatch current Route
+    this.setNewCurrentRoute(matchingRoute || notFoundRoute);
 
+    // only for test
     return {
       currentRoute: this.currentRoute,
       previousRoute: this.previousRoute,
