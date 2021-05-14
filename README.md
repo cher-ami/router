@@ -50,7 +50,6 @@ Hooks:
 
 - [`useRouter`](#useRouter) Get router instance from any component
 - [`useLocation`](#useLocation) Get current location and set new location
-- [`useRoute`](#useRoute) Get previous and current route object
 - [`useStack`](#useStack) Allow to the parent Stack to handle page transitions
   and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
@@ -473,33 +472,6 @@ An array with these properties:
 type TOpenRouteParams = {
   name: string;
   params?: { [x: string]: any };
-};
-```
-
-### <a name="useRoute"></a>useRoute
-
-Get previous and current route properties (TRoute)
-
-```jsx
-const { currentRoute, previousRoute } = useRoute();
-```
-
-**Returns:**
-
-An object with these properties:
-
-- **currentRoute** `TRoute` Current route object
-- **previousRoute** `TRoute` Previous route object
-
-```ts
-type TRoute = {
-  path: string;
-  component: React.ComponentType<any>;
-  props?: { [x: string]: any };
-  parser?: Path;
-  children?: TRoute[];
-  matchUrl?: string;
-  fullUrl?: string;
 };
 ```
 

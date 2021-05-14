@@ -53,7 +53,7 @@ export const routesList: TRoute[] = [
   },
 ];
 
-const baseUrl = "/custom-base";
+const baseUrl = "/base/";
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 LangService.init(locales, true, baseUrl);
 
@@ -61,6 +61,7 @@ LangService.init(locales, true, baseUrl);
  * Init Application
  */
 ReactDOM.render(
+
   <Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
     <App />
   </Router>,

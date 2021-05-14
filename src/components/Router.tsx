@@ -5,6 +5,7 @@ import React, {
   ReactElement,
   useEffect,
   useMemo,
+  useReducer,
   useState,
 } from "react";
 import { joinPaths } from "../api/helpers";
@@ -26,22 +27,71 @@ interface IProps {
   // default is BrowserHistory in "CreateRouter"
   history?: BrowserHistory | HashHistory | MemoryHistory;
 }
+/**
+ * Context
+ *
+ *
+ */
+const defaultRouterContext = {
+  history: null,
+  currentRoute: null,
+  previousRoute: null,
+  routeIndex: 0,
+  unmountPreviousPage: () => {},
+  previousPageIsMount: false,
+  base: "/",
+};
 
-// Router instance will be keep on this context
-// Big thing is you can access this context from the closest provider in the tree.
-// This allow to manage easily nested stack instances.
-export const RouterContext = createContext<CreateRouter>(null);
+export const RouterContext = createContext(defaultRouterContext);
 RouterContext.displayName = componentName;
+
+/**
+ * Routes Reducer
+ *
+ *
+ */
+export type TRouteReducerState = {
+  currentRoute: TRoute;
+  previousRoute: TRoute;
+  previousPageIsMount: boolean;
+  index: number;
+};
+const initialState: TRouteReducerState = {
+  currentRoute: null,
+  previousRoute: null,
+  previousPageIsMount: true,
+  index: 0,
+};
+
+export type TRouteReducerActionType = "update-current-route" | "unmount-previous-page";
+const reducer = (
+  state: TRouteReducerState,
+  action: { type: TRouteReducerActionType; value }
+) => {
+  switch (action.type) {
+    case "update-current-route":
+      return {
+        previousRoute: state.currentRoute,
+        currentRoute: action.value,
+        index: state.index + 1,
+        previousPageIsMount: true,
+      };
+    case "unmount-previous-page":
+      return { ...state, previousPageIsMount: !action.value };
+  }
+};
 
 /**
  * Router
  * This component returns children wrapped by provider who contains router instance
  */
 export const Router = memo((props: IProps) => {
-  // deduce a router ID
-  const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
+  //
+  const [reducerState, dispatch] = useReducer(reducer, initialState);
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
+  // deduce a router ID
+  const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
@@ -63,11 +113,10 @@ export const Router = memo((props: IProps) => {
     return currentRoutesList;
   }, [props.routes, props.base]);
 
-  const showLang = LangService.showLangInUrl();
   // join each parent router base
   const base = useMemo(() => {
     const parentBase: string = parentRouter?.base;
-    const addLang: boolean = id !== 1 && showLang;
+    const addLang: boolean = id !== 1 && LangService.showLangInUrl();
     const base: string = addLang ? getLangPathByPath({ path: props.base }) : props.base;
     return joinPaths([
       parentBase, // ex: /master-base
@@ -84,8 +133,9 @@ export const Router = memo((props: IProps) => {
       id,
       middlewares: props.middlewares,
       history: props.history,
+      setNewCurrentRoute: (newCurrentRoute) =>
+        dispatch({ type: "update-current-route", value: newCurrentRoute }),
     });
-
     // keep new router in global constant
     ROUTERS.instances.push(newRouter);
     // return it as state
@@ -104,7 +154,24 @@ export const Router = memo((props: IProps) => {
     };
   }, [routerState]);
 
-  return <RouterContext.Provider value={routerState} children={props.children} />;
+  return (
+    <RouterContext.Provider
+      children={props.children}
+      value={{
+        ...defaultRouterContext,
+        currentRoute: reducerState.currentRoute,
+        previousRoute: reducerState.previousRoute,
+        routeIndex: reducerState.index,
+        base: base,
+        previousPageIsMount: reducerState.previousPageIsMount,
+        unmountPreviousPage: () =>
+          dispatch({
+            type: "unmount-previous-page",
+            value: true,
+          }),
+      }}
+    />
+  );
 });
 
 Router.displayName = componentName;
