@@ -25,7 +25,8 @@
     "size": "npm run compile && size-limit",
     "size-why": "npm run size -- --why",
     "test": "jest && npm run size",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "pre-publish": "npm run compile && npm run test"
   },
   "size-limit": [
     {
