@@ -24,7 +24,8 @@
     "compile": "tsc -p tsconfig.json",
     "size": "npm run compile && size-limit",
     "size-why": "npm run size -- --why",
-    "test": "jest && npm run size"
+    "test": "jest && npm run size",
+    "test:watch": "jest --watch"
   },
   "size-limit": [
     {

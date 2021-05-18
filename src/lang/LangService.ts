@@ -116,7 +116,7 @@ class LangService {
         this.base.length,
         preparedNewUrl.length
       );
-      newUrl = joinPaths([this.base, "/", toLang.key, newUrlWithoutBase]);
+      newUrl = joinPaths([this.base, "/", toLang.key, "/", newUrlWithoutBase]);
     }
 
     // 4. other cases
