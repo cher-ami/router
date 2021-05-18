@@ -51,15 +51,6 @@ describe("LangService", () => {
     expect(window.open).toHaveBeenCalledWith(`/${locales[1].key}`, "_self");
   });
 
-  it("should set lang properly with showDefaultLangInUrl set to false and with window.open", () => {
-    LangService.init(locales, false);
-    render(<App />);
-    act(() => {
-      LangService.setLang(locales[1]);
-    });
-    expect(window.open).toHaveBeenCalledWith(`/${locales[1].key}`, "_self");
-  });
-
   /**
    * redirect
    */
@@ -73,7 +64,7 @@ describe("LangService", () => {
     expect(window.open).toHaveBeenCalledWith(`/${defaultLangKey}`, "_self");
   });
 
-  it("should redirect to default lang with custom base", async () => {
+  it("should redirect to default lang with custom base", () => {
     LangService.init(locales, true);
     render(<App base={"/foo-base"} />);
     act(() => {
