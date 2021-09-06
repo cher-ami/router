@@ -4,6 +4,7 @@ import { render, fireEvent } from "@testing-library/react";
 import { ROUTERS } from "../src/api/routers";
 import { LangService } from "../src";
 import { TOpenRouteParams } from "../src/api/helpers";
+import { createBrowserHistory } from "history";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
@@ -18,8 +19,9 @@ afterEach(() => {
 
 const mockClickHandler = jest.fn();
 const App = ({ base = "/", to }: { base: string; to: string | TOpenRouteParams }) => {
+  const history = createBrowserHistory();
   return (
-    <Router base={base} routes={routesList}>
+    <Router base={base} routes={routesList} history={history}>
       <Link to={to} className={"containerLink"} onClick={mockClickHandler}>
         Foo
       </Link>

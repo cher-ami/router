@@ -11,19 +11,14 @@ import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
 import { getLangPathByPath } from "../lang/langHelpers";
-import {
-  BrowserHistory,
-  createBrowserHistory,
-  HashHistory,
-  MemoryHistory,
-} from "history";
+import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;
-  history?: BrowserHistory | HashHistory | MemoryHistory;
+  history: BrowserHistory | HashHistory | MemoryHistory;
   children: ReactElement;
   // routes array is required for 1st instance only
   routes?: TRoute[];
@@ -86,7 +81,7 @@ export const Router = memo((props: IProps) => {
       routes,
       id,
       middlewares: props.middlewares,
-      history: props.history || createBrowserHistory(),
+      history: props.history,
     });
 
     // keep new router in global constant

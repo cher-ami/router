@@ -7,7 +7,7 @@ import {
   BrowserHistory,
   createBrowserHistory,
   HashHistory,
-  MemoryHistory
+  MemoryHistory,
 } from "history";
 
 const debug = require("debug")("router:CreateRouter");

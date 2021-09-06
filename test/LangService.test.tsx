@@ -1,5 +1,6 @@
 import { LangService, langMiddleware, Link, Router, TRoute } from "../src";
 import { act, render } from "@testing-library/react";
+import { createBrowserHistory } from "history";
 import React from "react";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
@@ -10,8 +11,15 @@ const routesList: TRoute[] = [
 
 const mockClickHandler = jest.fn();
 const App = ({ base = "/", to = "/foo" }) => {
+  const history = createBrowserHistory();
+
   return (
-    <Router base={base} routes={routesList} middlewares={[langMiddleware]}>
+    <Router
+      base={base}
+      routes={routesList}
+      history={history}
+      middlewares={[langMiddleware]}
+    >
       <Link
         to={to}
         className={"containerLink"}

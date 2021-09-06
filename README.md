@@ -374,7 +374,7 @@ Router component creates a new router instance.
 
 - **routes** `TRoute[]` Routes list
 - **base** `string` Base URL - default: `"/"``
-- **history** `BrowserHistory | HashHistory | MemoryHistory` _(optional)_ create and set an history () -
+- **history** `BrowserHistory | HashHistory | MemoryHistory` create and set an history () -
   default : `BrowserHistory`
   History mode can
   be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory)
