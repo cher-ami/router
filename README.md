@@ -77,6 +77,7 @@ $ npm i @cher-ami/router -s
 ```jsx
 import React from "react";
 import { Router, Link, Stack } from "@cher-ami/router";
+import { createBrowserHistory } from "history";
 
 const routesList = [
   {
@@ -89,9 +90,11 @@ const routesList = [
   },
 ];
 
+const history = createBrowserHistory();
+
 function App() {
   return (
-    <Router routes={routesList} base={"/"}>
+    <Router routes={routesList} history={history} base={"/"}>
       <nav>
         <Link to={"/"} />
         <Link to={"/foo"} />
@@ -373,8 +376,8 @@ Router component creates a new router instance.
 **Props:**
 
 - **routes** `TRoute[]` Routes list
-- **base** `string` Base URL - default: `"/"``
-- **history** `BrowserHistory | HashHistory | MemoryHistory` create and set an history () -
+- **base** `string` Base URL - default: `"/"`
+- **history** `BrowserHistory | HashHistory | MemoryHistory` _(optional)_ create and set an history () -
   default : `BrowserHistory`
   History mode can
   be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory)
