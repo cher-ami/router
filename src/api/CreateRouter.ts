@@ -72,7 +72,7 @@ export class CreateRouter {
     middlewares,
     base = "/",
     id = 1,
-    history = createBrowserHistory(),
+    history,
   }: {
     base?: string;
     routes: TRoute[];
@@ -83,7 +83,7 @@ export class CreateRouter {
     this.base = base;
     this.id = id;
     this.middlewares = middlewares;
-    this.history = history;
+    this.history = history || createBrowserHistory();
 
     if (!routes) {
       throw new Error(`Router id ${id} > no routes array is set.`);

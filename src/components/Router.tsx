@@ -18,11 +18,13 @@ const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;
-  history: BrowserHistory | HashHistory | MemoryHistory;
   children: ReactElement;
   // routes array is required for 1st instance only
   routes?: TRoute[];
+  // middleware list (like LangMiddleware)
   middlewares?: any[];
+  // default is BrowserHistory in "CreateRouter"
+  history?: BrowserHistory | HashHistory | MemoryHistory;
 }
 
 // Router instance will be keep on this context

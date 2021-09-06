@@ -11,7 +11,7 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
-import { createBrowserHistory } from "history";
+import { createBrowserHistory, createMemoryHistory } from "history";
 
 const debug = require("debug")(`router:index`);
 
@@ -58,18 +58,11 @@ const baseUrl = "/custom-base";
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 LangService.init(locales, true, baseUrl);
 
-const history = createBrowserHistory();
-
 /**
  * Init Application
  */
 ReactDOM.render(
-  <Router
-    routes={routesList}
-    base={baseUrl}
-    middlewares={[langMiddleware]}
-    history={history}
-  >
+  <Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
     <App />
   </Router>,
   document.getElementById("root")
