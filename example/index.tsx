@@ -11,7 +11,6 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
-import { createBrowserHistory, createMemoryHistory } from "history";
 
 const debug = require("debug")(`router:index`);
 
