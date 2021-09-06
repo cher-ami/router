@@ -1,4 +1,4 @@
-export { CreateRouter, TRoute, ERouterEvent, EHistoryMode } from "./api/CreateRouter";
+export { CreateRouter, TRoute, ERouterEvent } from "./api/CreateRouter";
 
 export { Router } from "./components/Router";
 export { Link } from "./components/Link";
@@ -13,4 +13,3 @@ export { useStack, IRouteStack } from "./hooks/useStack";
 
 export { langMiddleware } from "./lang/LangMiddleware";
 export { default as LangService, TLanguage } from "./lang/LangService";
-

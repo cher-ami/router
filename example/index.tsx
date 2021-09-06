@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
-import { EHistoryMode, Router, TRoute } from "../src";
+import { Router, TRoute } from "../src";
 import { LangService, langMiddleware } from "../src";
 
 import App from "./App";
@@ -11,6 +11,7 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
+import { createBrowserHistory, createMemoryHistory } from "history";
 
 const debug = require("debug")(`router:index`);
 
@@ -20,7 +21,7 @@ const debug = require("debug")(`router:index`);
 export const routesList: TRoute[] = [
   {
     path: "/",
-    //path: { en: "/", fr: "/", de: "/" },
+    // path: { en: "/", fr: "/", de: "/" },
     component: HomePage,
   },
   {
@@ -65,7 +66,7 @@ ReactDOM.render(
     routes={routesList}
     base={baseUrl}
     middlewares={[langMiddleware]}
-    historyMode={EHistoryMode.BROWSER}
+    history={createMemoryHistory()}
   >
     <App />
   </Router>,
