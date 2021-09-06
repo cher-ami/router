@@ -365,7 +365,7 @@ $ npm run dev
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={} historyMode={} middlewares={}>
+<Router routes={} base={} history={} middlewares={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -374,8 +374,8 @@ Router component creates a new router instance.
 
 - **routes** `TRoute[]` Routes list
 - **base** `string` Base URL - default: `"/"``
-- **historyMode** `EHistoryMode` _(optional)_ choose history mode. -
-  default : `EHistoryMode.BROWSER`
+- **history** `BrowserHistory | HashHistory | MemoryHistory` _(optional)_ create and set an history () -
+  default : `BrowserHistory`
   History mode can
   be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory)
   ,
