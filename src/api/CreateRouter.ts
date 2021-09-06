@@ -4,10 +4,8 @@ import { EventEmitter } from "events";
 import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
 import {
-  createBrowserHistory,
-  createHashHistory,
-  createMemoryHistory,
   BrowserHistory,
+  createBrowserHistory,
   HashHistory,
   MemoryHistory,
 } from "history";
@@ -39,12 +37,6 @@ export type TRoute = {
   langPath?: { [x: string]: string } | null;
 };
 
-export enum EHistoryMode {
-  BROWSER = "browser",
-  HASH = "hash",
-  MEMORY = "memory",
-}
-
 export enum ERouterEvent {
   PREVIOUS_ROUTE_CHANGE = "previous-route-change",
   CURRENT_ROUTE_CHANGE = "current-route-change",
@@ -69,7 +61,7 @@ export class CreateRouter {
   public currentRoute: TRoute;
   public previousRoute: TRoute;
   // history mode choice used by history library›
-  public historyMode: EHistoryMode;
+  public history: BrowserHistory | HashHistory | MemoryHistory;
   // store history listener
   protected unlistenHistory;
   // router instance ID, useful for debug if there is multiple router instance
@@ -80,18 +72,18 @@ export class CreateRouter {
     middlewares,
     base = "/",
     id = 1,
-    historyMode = EHistoryMode.BROWSER,
+    history,
   }: {
     base?: string;
     routes: TRoute[];
     middlewares?: any[];
     id?: number | string;
-    historyMode?: EHistoryMode;
+    history?: BrowserHistory | HashHistory | MemoryHistory;
   }) {
     this.base = base;
     this.id = id;
     this.middlewares = middlewares;
-    this.historyMode = historyMode;
+    this.history = history || createBrowserHistory();
 
     if (!routes) {
       throw new Error(`Router id ${id} > no routes array is set.`);
@@ -99,7 +91,7 @@ export class CreateRouter {
 
     if (!ROUTERS.history) {
       // create new history
-      ROUTERS.history = this.getHistory(this.historyMode);
+      ROUTERS.history = this.history;
       // push first location history object in global locationsHistory
       ROUTERS.locationsHistory.push(ROUTERS.history.location);
     }
@@ -152,25 +144,6 @@ export class CreateRouter {
   public destroyEvents(): void {
     // To stop listening, call the function returned from listen().
     this.unlistenHistory();
-  }
-
-  /**
-   * Select History mode
-   * doc: https://github.com/ReactTraining/history/blob/master/docs/getting-started.md
-   * @param historyMode
-   */
-  protected getHistory(
-    historyMode: EHistoryMode
-  ): HashHistory | MemoryHistory | BrowserHistory {
-    if (historyMode === EHistoryMode.BROWSER) {
-      return createBrowserHistory();
-    }
-    if (historyMode === EHistoryMode.HASH) {
-      return createHashHistory();
-    }
-    if (historyMode === EHistoryMode.MEMORY) {
-      return createMemoryHistory();
-    }
   }
 
   /**

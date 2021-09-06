@@ -1,4 +1,4 @@
-import { EHistoryMode, CreateRouter, TRoute, useRouter, langMiddleware } from "..";
+import { CreateRouter, TRoute, useRouter, langMiddleware } from "..";
 import React, {
   createContext,
   memo,
@@ -11,17 +11,20 @@ import { joinPaths } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
 import { getLangPathByPath } from "../lang/langHelpers";
+import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 const componentName = "Router";
 const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;
+  children: ReactElement;
   // routes array is required for 1st instance only
   routes?: TRoute[];
+  // middleware list (like LangMiddleware)
   middlewares?: any[];
-  children: ReactElement;
-  historyMode?: EHistoryMode;
+  // default is BrowserHistory in "CreateRouter"
+  history?: BrowserHistory | HashHistory | MemoryHistory;
 }
 
 // Router instance will be keep on this context
@@ -80,7 +83,7 @@ export const Router = memo((props: IProps) => {
       routes,
       id,
       middlewares: props.middlewares,
-      historyMode: props.historyMode,
+      history: props.history,
     });
 
     // keep new router in global constant

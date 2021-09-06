@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
-import { EHistoryMode, Router, TRoute } from "../src";
+import { Router, TRoute } from "../src";
 import { LangService, langMiddleware } from "../src";
 
 import App from "./App";
@@ -55,18 +55,13 @@ export const routesList: TRoute[] = [
 
 const baseUrl = "/custom-base";
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
-LangService.init(locales, false, baseUrl);
+LangService.init(locales, true, baseUrl);
 
 /**
  * Init Application
  */
 ReactDOM.render(
-  <Router
-    routes={routesList}
-    base={baseUrl}
-    middlewares={[langMiddleware]}
-    historyMode={EHistoryMode.BROWSER}
-  >
+  <Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
     <App />
   </Router>,
   document.getElementById("root")
