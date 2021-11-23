@@ -20,28 +20,28 @@ export default function App() {
           LangService.setLang({ key: "en" });
         }}
       >
-        CHANGE LANGUAGE TO EN
+        EN
       </button>
       <button
         onClick={() => {
           LangService.setLang({ key: "fr" });
         }}
       >
-        CHANGE LANGUAGE TO FR
+        FR
       </button>
       <button
         onClick={() => {
           LangService.setLang({ key: "de" });
         }}
       >
-        CHANGE LANGUAGE TO DE
+        DE
       </button>
       <button
         onClick={() => {
           LangService.setLang({ key: "nl" });
         }}
       >
-        CHANGE LANGUAGE TO NL
+        NL
       </button>
       <nav>
         <ul>
