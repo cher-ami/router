@@ -438,7 +438,7 @@ interface IRouteStack {
 
 ### <a name="useRouter"></a>useRouter
 
-Get current router informations :
+Get current router informations:
 
 ```jsx
 const router = useRouter();

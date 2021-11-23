@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, Stack } from "../src";
+import { Link, Stack, useRouter } from "../src";
 import { LangService } from "../src";
 
 const componentName = "App";
@@ -9,6 +9,9 @@ const debug = require("debug")(`router:${componentName}`);
  * @name App
  */
 export default function App() {
+
+  const {currentRoute} = useRouter()
+
   useEffect(() => {
     LangService.redirect();
   }, []);

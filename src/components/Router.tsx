@@ -27,6 +27,19 @@ interface IProps {
   // default is BrowserHistory in "CreateRouter"
   history?: BrowserHistory | HashHistory | MemoryHistory;
 }
+
+export interface IRouterContextAdditional {
+  history: BrowserHistory | HashHistory | MemoryHistory;
+  unmountPreviousPage: () => void;
+  previousPageIsMount: boolean;
+}
+export interface IRouterContext extends IRouterContextAdditional {
+  currentRoute: TRoute;
+  previousRoute: TRoute;
+  routeIndex: number;
+  base: string;
+}
+
 /**
  * Context
  *
@@ -42,7 +55,7 @@ const defaultRouterContext = {
   base: "/",
 };
 
-export const RouterContext = createContext(defaultRouterContext);
+export const RouterContext = createContext<IRouterContext>(defaultRouterContext);
 RouterContext.displayName = componentName;
 
 /**
