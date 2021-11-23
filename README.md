@@ -48,10 +48,9 @@ Components:
 
 Hooks:
 
-- [`useRouter`](#useRouter) Get router instance from any component
+- [`useRouter`](#useRouter) Get current router informations like currentRoute and previousRoute
 - [`useLocation`](#useLocation) Get current location and set new location
-- [`useStack`](#useStack) Allow to the parent Stack to handle page transitions
-  and refs
+- [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
 - [`useHistory`](#useHistory) Get global router history and handle history
   changes
@@ -156,7 +155,7 @@ const routesList = [
 ];
 ```
 
-You can access route parameters by page component props or by `useRoute()` hook.
+You can access route parameters by page component props or by `useRouter()` hook.
 
 ```jsx
 import React, { useEffect, forwardRef } from "react";
@@ -168,7 +167,7 @@ const ArticlePage = forwardRef((props, handleRef) => {
   }, [props]);
 
   // or from any nested components
-  const { currentRoute } = useRoute();
+  const { currentRoute } = useRouter();
   useEffect(() => {
     console.log(currentRoute.props.params); // { id: "my-article" }
   }, [currentRoute]);
@@ -439,7 +438,7 @@ interface IRouteStack {
 
 ### <a name="useRouter"></a>useRouter
 
-Get current router instance.
+Get current router informations :
 
 ```jsx
 const router = useRouter();
@@ -447,7 +446,25 @@ const router = useRouter();
 
 **Returns:**
 
-Current router instance.
+`useRouter()` returns an object with these public properties:
+
+- **currentRoute** `TRoute` Current route object
+- **previousRoute** `TRoute` Previous route object
+- **routeIndex** `number` Current router index
+- **base** `string` Formated base URL, (add current language if LangService is set)
+
+```ts
+// previousRoute and currentRoute
+type TRoute = {
+  path: string;
+  component: React.ComponentType<any>;
+  props?: { [x: string]: any };
+  parser?: Path;
+  children?: TRoute[];
+  matchUrl?: string;
+  fullUrl?: string;
+};
+```
 
 ### <a name="useLocation"></a>useLocation
 
