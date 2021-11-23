@@ -73,9 +73,8 @@ export class CreateRouter {
     routes: TRoute[];
     middlewares?: any[];
     id?: number | string;
-
     history?: BrowserHistory | HashHistory | MemoryHistory;
-    setNewCurrentRoute: any;
+    setNewCurrentRoute?: (newRoute) => void;
   }) {
     this.base = base;
     this.id = id;
@@ -181,7 +180,7 @@ export class CreateRouter {
     this.currentRoute = matchingRoute || notFoundRoute;
 
     // dispatch current Route
-    this.setNewCurrentRoute(matchingRoute || notFoundRoute);
+    this.setNewCurrentRoute?.(matchingRoute || notFoundRoute);
 
     // only for test
     return {
