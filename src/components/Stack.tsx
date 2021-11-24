@@ -1,6 +1,7 @@
 import React, { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { IRouteStack, useRouter } from "..";
 import { IRouterContext } from "./Router";
+import debug from "@wbe/debug";
 
 export type TManageTransitions = {
   previousPage: IRouteStack;
@@ -14,7 +15,7 @@ interface IProps {
 }
 
 const componentName = "Stack";
-const debug = require("debug")(`router:${componentName}`);
+const log = debug(`router:${componentName}`);
 
 /**
  * @name Stack
@@ -67,7 +68,7 @@ function Stack(props: IProps) {
   // need to be "layoutEffect" to play transitions before render, to avoid screen "clip"
   useLayoutEffect(() => {
     if (!currentRoute) {
-      debug("local current route doesn't exist, return.");
+      log("local current route doesn't exist, return.");
       return;
     }
     selectedTransition({

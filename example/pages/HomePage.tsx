@@ -1,8 +1,10 @@
 import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react";
 import { useHistory, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
+import debug from "@wbe/debug";
+
 const componentName: string = "HomePage";
-const debug = require("debug")(`router:${componentName}`);
+const log = debug(`router:${componentName}`);
 
 interface IProps {
   params: {
@@ -15,11 +17,11 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
 
   const history = useHistory();
   useEffect(() => {
-    debug("history form home", history);
+    log("history form home", history);
   }, [history]);
 
   useEffect(() => {
-    debug("props.params.lang", props.params.lang);
+    log("props.params.lang", props.params.lang);
   }, [props.params.lang]);
 
   useStack({

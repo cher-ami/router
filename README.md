@@ -334,7 +334,7 @@ const App = (props, handleRef) => {
 
 ## <a name="Debug"></a>Debug
 
-[debug](https://github.com/visionmedia/debug) is used on this project. It allows
+[@wbe/debug](https://github.com/willybrauner/debug) is used on this project. It allows
 to easily get logs informations on development and production modes.
 
 To use it, add this line in your browser console:

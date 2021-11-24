@@ -8,7 +8,6 @@ import {
 } from "../api/helpers";
 import { ROUTERS } from "../api/routers";
 import { LangService } from "..";
-const debug = require("debug")(`router:useLocation`);
 
 /**
  * prepare set location new URL

@@ -1,7 +1,9 @@
 import { ROUTERS } from "../api/routers";
 import { buildUrl, joinPaths, removeLastCharFromString } from "../api/helpers";
 import { prepareSetLocationFullUrl } from "../hooks/useLocation";
-const debug = require("debug")(`router:LangService`);
+import debug from "@wbe/debug";
+
+const log = debug(`router:LangService`);
 
 export type TLanguage = {
   key: string;
@@ -79,11 +81,11 @@ class LangService {
       return;
     }
     if (toLang.key === this.currentLang.key) {
-      debug("setLang: This is the same language, exit.");
+      log("setLang: This is the same language, exit.");
       return;
     }
     if (!this.langIsAvailable(toLang)) {
-      debug(`setLang: lang ${toLang.key} is not available in languages list, exit.`);
+      log(`setLang: lang ${toLang.key} is not available in languages list, exit.`);
       return;
     }
 
@@ -125,7 +127,7 @@ class LangService {
     }
 
     if (!newUrl) {
-      debug("newUrl is no set, do not reload or refresh, return.", newUrl);
+      log("newUrl is no set, do not reload or refresh, return.", newUrl);
       return;
     }
     // register current langage (not usefull if we reload the app.)
@@ -146,11 +148,11 @@ class LangService {
       return;
     }
     if (!this.showDefaultLangInUrl) {
-      debug("redirect: URLs have a lang param or language is valid, don't redirect.");
+      log("redirect: URLs have a lang param or language is valid, don't redirect.");
       return;
     }
     if (this.langIsAvailable(this.getLangFromUrl())) {
-      debug("redirect: lang from URL is valid, don't redirect");
+      log("redirect: lang from URL is valid, don't redirect");
       return;
     }
 
@@ -164,7 +166,7 @@ class LangService {
       // build new URL
       let newUrl = buildUrl(path, { lang: this.defaultLang.key });
 
-      debug("redirect: to >", { newUrl });
+      log("redirect: to >", { newUrl });
       // reload or refresh all application
       this.reloadOrRefresh(newUrl, forcePageReload);
     }

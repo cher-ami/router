@@ -2,6 +2,7 @@ import { Path } from "path-parser";
 import React from "react";
 import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
+import debug from "@wbe/debug";
 import {
   BrowserHistory,
   createBrowserHistory,
@@ -9,7 +10,8 @@ import {
   MemoryHistory,
 } from "history";
 
-const debug = require("debug")("router:CreateRouter");
+const componentName: string = "CreateRouter";
+const log = debug(`router:${componentName}`);
 
 export type TParams = {
   [x: string]: any;
@@ -94,14 +96,14 @@ export class CreateRouter {
 
     // add missing "/" route to routes list if doesn't exist
     this.preMiddlewareRoutes = this.patchMissingRootRoute(routes);
-    debug(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
+    log(this.id, "this.preMiddlewareRoutes", this.preMiddlewareRoutes);
 
     this.routes =
       this.middlewares?.reduce(
         (routes, middleware) => middleware(routes),
         this.preMiddlewareRoutes
       ) || this.preMiddlewareRoutes;
-    debug(this.id, "this.routes", this.routes);
+    log(this.id, "this.routes", this.routes);
 
     this.updateRoute();
     this.initEvents();
@@ -155,9 +157,10 @@ export class CreateRouter {
    * - get route object matching with current URL
    * - emit selected route object on route-change event (listen by Stack)
    */
-  protected updateRoute(
-    url: string = ROUTERS.history.location.pathname
-  ): { currentRoute: TRoute; previousRoute: TRoute } {
+  protected updateRoute(url: string = ROUTERS.history.location.pathname): {
+    currentRoute: TRoute;
+    previousRoute: TRoute;
+  } {
     // get matching route depending of current URL
     const matchingRoute: TRoute = this.getRouteFromUrl({ pUrl: url });
 
@@ -167,12 +170,12 @@ export class CreateRouter {
     );
 
     if (!matchingRoute && !notFoundRoute) {
-      debug(this.id, "updateRoute: NO MATCHING ROUTE & NO NOTFOUND ROUTE. RETURN.");
+      log(this.id, "updateRoute: NO MATCHING ROUTE & NO NOTFOUND ROUTE. RETURN.");
       return;
     }
 
     if (this.currentRoute?.url != null && this.currentRoute?.url === matchingRoute?.url) {
-      debug(this.id, "updateRoute: THIS IS THE SAME URL, RETURN.");
+      log(this.id, "updateRoute: THIS IS THE SAME URL, RETURN.");
       return;
     }
 
@@ -218,7 +221,7 @@ export class CreateRouter {
       // prepare parser
       const pathParser: Path = new Path(currentRoutePath);
       // prettier-ignore
-      debug(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!pathParser.test(pUrl));
+      log(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!pathParser.test(pUrl));
       // set new matcher
       match = pathParser.test(pUrl);
       // if current route path match with the param url
@@ -243,7 +246,7 @@ export class CreateRouter {
           },
         };
 
-        debug(this.id, "getRouteFromUrl: MATCH routeObj", routeObj);
+        log(this.id, "getRouteFromUrl: MATCH routeObj", routeObj);
         return routeObj;
       }
 
@@ -259,7 +262,7 @@ export class CreateRouter {
           pMatch: match,
         });
 
-        debug(this.id, "matchingChildren", matchingChildren);
+        log(this.id, "matchingChildren", matchingChildren);
 
         // only if matching, return this match, else continue to next iteration
         if (matchingChildren) return matchingChildren;

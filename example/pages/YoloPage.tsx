@@ -2,7 +2,6 @@ import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "YoloPage";
-const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {}
 

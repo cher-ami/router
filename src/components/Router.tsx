@@ -15,7 +15,6 @@ import { getLangPathByPath } from "../lang/langHelpers";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 const componentName = "Router";
-const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {
   base: string;

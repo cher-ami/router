@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime";
 import React from "react";
 import { Link, Router, TRoute } from "../src";
 import { render, fireEvent } from "@testing-library/react";
