@@ -35,7 +35,6 @@
     }
   ],
   "dependencies": {
-    "@babel/preset-env": "^7.16.4",
     "@wbe/debug": "^1.0.0",
     "history": "^5.1.0",
     "path-parser": "^6.1.0"
@@ -45,23 +44,29 @@
     "react-dom": "^17.0.2"
   },
   "devDependencies": {
+    "@babel/core": "*",
+    "@babel/preset-env": "^7.16.4",
+    "@babel/preset-react": "*",
+    "@babel/preset-typescript": "*",
     "@testing-library/react": "^12.1.2",
     "@testing-library/react-hooks": "^7.0.2",
     "@types/jest": "^27.0.3",
     "@types/node": "^16.11.10",
     "@types/react": "^17.0.36",
     "@types/react-dom": "^17.0.11",
+    "@vitejs/plugin-react-refresh": "^1.3.1",
+    "babel-jest": "*",
     "gsap": "^3.8.0",
     "jest": "^27.3.1",
     "prettier": "^2.4.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-test-renderer": "^17.0.2",
+    "regenerator-runtime": "^0.13.9",
     "size-limit": "^7.0.3",
     "ts-jest": "^27.0.7",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2",
-    "@vitejs/plugin-react-refresh": "^1.3.1",
     "vite": "^2.4.0"
   },
   "husky": {
