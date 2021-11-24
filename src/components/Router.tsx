@@ -26,12 +26,12 @@ interface IProps {
   history?: BrowserHistory | HashHistory | MemoryHistory;
 }
 
-export interface IStackContext {
-  unmountPreviousPage: () => void;
-  previousPageIsMount: boolean;
+export interface IRouterStackStates {
+  unmountPreviousPage?: () => void;
+  previousPageIsMount?: boolean;
 }
 
-export interface IRouterContext {
+export interface IRouterContext extends IRouterStackStates {
   currentRoute: TRoute;
   previousRoute: TRoute;
   routeIndex: number;
@@ -53,16 +53,16 @@ const defaultRouterContext = {
 export const RouterContext = createContext<IRouterContext>(defaultRouterContext);
 RouterContext.displayName = componentName;
 
-/**
- * Stack Context
- * Dispatch informations for used on Stack
- */
-const defaultStackContext = {
-  unmountPreviousPage: () => {},
-  previousPageIsMount: false,
-};
-export const StackContext = createContext<IStackContext>(defaultStackContext);
-StackContext.displayName = "Stack";
+// /**
+//  * Stack Context
+//  * Dispatch informations for used on Stack
+//  */
+// const defaultStackContext = {
+//   unmountPreviousPage: () => {},
+//   previousPageIsMount: false,
+// };
+// export const StackContext = createContext<IStackContext>(defaultStackContext);
+// StackContext.displayName = "Stack";
 
 /**
  * Routes Reducer
@@ -173,8 +173,14 @@ export const Router = memo((props: IProps) => {
   }, [routerState]);
 
   return (
-    <StackContext.Provider
+    <RouterContext.Provider
+      children={props.children}
       value={{
+        ...defaultRouterContext,
+        base,
+        currentRoute: reducerState.currentRoute,
+        previousRoute: reducerState.previousRoute,
+        routeIndex: reducerState.index,
         previousPageIsMount: reducerState.previousPageIsMount,
         unmountPreviousPage: () =>
           dispatch({
@@ -182,18 +188,7 @@ export const Router = memo((props: IProps) => {
             value: true,
           }),
       }}
-    >
-      <RouterContext.Provider
-        children={props.children}
-        value={{
-          ...defaultRouterContext,
-          base,
-          currentRoute: reducerState.currentRoute,
-          previousRoute: reducerState.previousRoute,
-          routeIndex: reducerState.index,
-        }}
-      />
-    </StackContext.Provider>
+    />
   );
 });
 

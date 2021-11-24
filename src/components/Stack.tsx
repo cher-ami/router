@@ -1,6 +1,6 @@
-import React, { useCallback, useContext, useLayoutEffect, useMemo, useRef } from "react";
+import React, { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 import { IRouteStack, useRouter } from "..";
-import { StackContext } from "./Router";
+import { IRouterContext } from "./Router";
 
 export type TManageTransitions = {
   previousPage: IRouteStack;
@@ -21,8 +21,13 @@ const debug = require("debug")(`router:${componentName}`);
  */
 function Stack(props: IProps) {
   // 1 get routes
-  const { currentRoute, previousRoute, routeIndex } = useRouter();
-  const { unmountPreviousPage, previousPageIsMount } = useContext(StackContext);
+  const {
+    currentRoute,
+    previousRoute,
+    routeIndex,
+    unmountPreviousPage,
+    previousPageIsMount,
+  } = useRouter() as IRouterContext;
 
   // handle components with refs
   const prevRef = useRef(null);
