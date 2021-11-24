@@ -451,7 +451,7 @@ const router = useRouter();
 - **currentRoute** `TRoute` Current route object
 - **previousRoute** `TRoute` Previous route object
 - **routeIndex** `number` Current router index
-- **base** `string` Formated base URL, (add current language if LangService is set)
+- **base** `string` Formated base URL
 
 ```ts
 // previousRoute and currentRoute
