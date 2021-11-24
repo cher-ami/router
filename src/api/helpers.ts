@@ -1,8 +1,8 @@
-import { Path } from "path-parser";
 import { TRoute } from "./CreateRouter";
 import { LangService } from "..";
 import { useRootRouter } from "../hooks/useRouter";
 import debug from "@wbe/debug";
+import { compile } from "path-to-regexp";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -54,8 +54,7 @@ export function removeLastCharFromString(
  * Build an URL with path and params via PathParser
  */
 export function buildUrl(path: string, params?: TParams): string {
-  const newPath = new Path(path);
-  return newPath.build(params);
+  return compile(path)(params);
 }
 
 /**
@@ -116,10 +115,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
         route?.name === params.name || route.component?.displayName === params.name;
       if (match) {
         if (!route?.path) {
-          log(
-            "getUrlByRouteName > There is no route with this name, exit",
-            params.name
-          );
+          log("getUrlByRouteName > There is no route with this name, exit", params.name);
           return;
         }
         // get full URL

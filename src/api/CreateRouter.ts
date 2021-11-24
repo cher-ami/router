@@ -3,6 +3,8 @@ import React from "react";
 import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
 import debug from "@wbe/debug";
+import { pathToRegexp, match, parse, compile } from "path-to-regexp";
+
 import {
   BrowserHistory,
   createBrowserHistory,
@@ -201,34 +203,30 @@ export class CreateRouter {
     pRoutes = this.routes,
     pBase = this.base,
     pCurrentRoute = null,
-    pPathParser = null,
-    pMatch = null,
+    pMatcher = null,
   }: {
     pUrl: string;
     pRoutes?: TRoute[];
     pBase?: string;
     pCurrentRoute?: TRoute;
-    pPathParser?: any;
-    pMatch?: any;
+    pMatcher?: any;
   }): TRoute {
     if (!pRoutes || pRoutes?.length === 0) return;
-    let match;
+    let matcher;
 
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
       const currentRoutePath = joinPaths([pBase, currentRoute.path as string]);
       // prepare parser
-      const pathParser: Path = new Path(currentRoutePath);
+      matcher = match(currentRoutePath)(pUrl);
       // prettier-ignore
-      log(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!pathParser.test(pUrl));
-      // set new matcher
-      match = pathParser.test(pUrl);
+      log(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
       // if current route path match with the param url
-      if (match) {
+      if (matcher) {
         // prepare route obj
         const route = pCurrentRoute || currentRoute;
-        const params = pMatch || match;
+        const params = pMatcher?.params || matcher?.params;
         const routeObj = {
           fullPath: currentRoutePath,
           path: route?.path,
@@ -237,7 +235,7 @@ export class CreateRouter {
           base: pBase,
           component: route?.component,
           children: route?.children,
-          parser: pPathParser || pathParser,
+          parser: pMatcher || matcher,
           langPath: route.langPath,
           name: route?.name || route?.component?.displayName,
           props: {
@@ -258,8 +256,7 @@ export class CreateRouter {
           pRoutes: currentRoute?.children,
           pBase: currentRoutePath, // parent base
           pCurrentRoute: currentRoute,
-          pPathParser: pathParser,
-          pMatch: match,
+          pMatcher: matcher,
         });
 
         log(this.id, "matchingChildren", matchingChildren);

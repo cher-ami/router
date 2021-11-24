@@ -21,12 +21,12 @@ export const langMiddleware = (
    * @param pShowLang
    */
   const patchLangParam = (pPath: string, pShowLang): string =>
-    joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : "/"]);
+    joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : ""]);
 
   /**
    * Patch routes
    *  - Add "/:lang" param on each 1st level route
-   *  - format path recurcively (on chidren if exist)
+   *  - format path recurcively (on children if exist)
    * ex:
    *     {
    *      path: { en: "/home", fr: "/accueil" }

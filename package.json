@@ -37,7 +37,8 @@
   "dependencies": {
     "@wbe/debug": "^1.0.0",
     "history": "^5.1.0",
-    "path-parser": "^6.1.0"
+    "path-parser": "^6.1.0",
+    "path-to-regexp": "^6.2.0"
   },
   "peerDependencies": {
     "react": "^17.0.2",

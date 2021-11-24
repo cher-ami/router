@@ -18,12 +18,12 @@ import "./index.css";
 export const routesList: TRoute[] = [
   {
     path: "/",
-    //path: { en: "/", fr: "/", de: "/" },
+    // path: { en: "/", fr: "/", de: "/" },
     component: HomePage,
   },
   {
-    path: "/blog/:id",
-    //path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
+    // path: "/blog/:id",
+    path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
     component: ArticlePage,
     props: {
       color: "red",
