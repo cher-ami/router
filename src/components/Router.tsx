@@ -26,12 +26,12 @@ interface IProps {
   history?: BrowserHistory | HashHistory | MemoryHistory;
 }
 
-export interface IRouterStackStates {
+export interface IRouterContextStackStates {
   unmountPreviousPage?: () => void;
   previousPageIsMount?: boolean;
 }
 
-export interface IRouterContext extends IRouterStackStates {
+export interface IRouterContext extends IRouterContextStackStates {
   currentRoute: TRoute;
   previousRoute: TRoute;
   routeIndex: number;

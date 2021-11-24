@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { IRouterContext, IRouterStackStates, RouterContext } from "../components/Router";
+import { IRouterContext, IRouterContextStackStates, RouterContext } from "../components/Router";
 import { CreateRouter } from "..";
 import { ROUTERS } from "../api/routers";
 
@@ -8,7 +8,7 @@ import { ROUTERS } from "../api/routers";
  * Instance depend of inside witch provider this function is called
  */
 export const useRouter = () =>
-  useContext<Omit<IRouterContext, keyof IRouterStackStates>>(RouterContext);
+  useContext<Omit<IRouterContext, keyof IRouterContextStackStates>>(RouterContext);
 
 /**
  * Returns root router instance
