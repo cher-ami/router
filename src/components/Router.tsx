@@ -22,18 +22,16 @@ interface IProps {
   children: ReactElement;
   // routes array is required for 1st instance only
   routes?: TRoute[];
-  // middleware list (like LangMiddleware)
   middlewares?: any[];
-  // default is BrowserHistory in "CreateRouter"
   history?: BrowserHistory | HashHistory | MemoryHistory;
 }
 
-export interface IRouterContextAdditional {
-  history: BrowserHistory | HashHistory | MemoryHistory;
+export interface IStackContext {
   unmountPreviousPage: () => void;
   previousPageIsMount: boolean;
 }
-export interface IRouterContext extends IRouterContextAdditional {
+
+export interface IRouterContext {
   currentRoute: TRoute;
   previousRoute: TRoute;
   routeIndex: number;
@@ -41,27 +39,34 @@ export interface IRouterContext extends IRouterContextAdditional {
 }
 
 /**
- * Context
- *
- *
+ * Router Context
+ * Router instance will be keep on this context
+ * Big thing is you can access this context from the closest provider in the tree.
+ * This allow to manage easily nested stack instances.
  */
 const defaultRouterContext = {
-  history: null,
   currentRoute: null,
   previousRoute: null,
   routeIndex: 0,
-  unmountPreviousPage: () => {},
-  previousPageIsMount: false,
   base: "/",
 };
-
 export const RouterContext = createContext<IRouterContext>(defaultRouterContext);
 RouterContext.displayName = componentName;
 
 /**
+ * Stack Context
+ * Dispatch informations for used on Stack
+ */
+const defaultStackContext = {
+  unmountPreviousPage: () => {},
+  previousPageIsMount: false,
+};
+export const StackContext = createContext<IStackContext>(defaultStackContext);
+StackContext.displayName = "Stack";
+
+/**
  * Routes Reducer
- *
- *
+ * Allows to dispatch routes states to components three
  */
 export type TRouteReducerState = {
   currentRoute: TRoute;
@@ -168,14 +173,8 @@ export const Router = memo((props: IProps) => {
   }, [routerState]);
 
   return (
-    <RouterContext.Provider
-      children={props.children}
+    <StackContext.Provider
       value={{
-        ...defaultRouterContext,
-        currentRoute: reducerState.currentRoute,
-        previousRoute: reducerState.previousRoute,
-        routeIndex: reducerState.index,
-        base: base,
         previousPageIsMount: reducerState.previousPageIsMount,
         unmountPreviousPage: () =>
           dispatch({
@@ -183,7 +182,18 @@ export const Router = memo((props: IProps) => {
             value: true,
           }),
       }}
-    />
+    >
+      <RouterContext.Provider
+        children={props.children}
+        value={{
+          ...defaultRouterContext,
+          base,
+          currentRoute: reducerState.currentRoute,
+          previousRoute: reducerState.previousRoute,
+          routeIndex: reducerState.index,
+        }}
+      />
+    </StackContext.Provider>
   );
 });
 

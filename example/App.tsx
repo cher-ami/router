@@ -9,8 +9,7 @@ const debug = require("debug")(`router:${componentName}`);
  * @name App
  */
 export default function App() {
-
-  const {currentRoute} = useRouter()
+  const { currentRoute } = useRouter();
 
   useEffect(() => {
     LangService.redirect();
