@@ -1,8 +1,8 @@
 import { LangService, TRoute } from "..";
 import { ROUTERS } from "../api/routers";
 import { removeBaseToUrl, joinPaths } from "../api/helpers";
-
-const debug = require("debug")("router:langHelpers");
+import debug from "@wbe/debug";
+const logg = debug(`router:langHelpers`);
 
 /**
  * Get current lang path by Lang
@@ -73,7 +73,7 @@ export function getLangPathByPath({
   log = false,
 }: TGetLangPathByPath): string {
   if (!routes) {
-    log && debug("No routes is set, return", { routes });
+    log && logg("No routes is set, return", { routes });
     return;
   }
   // store path
@@ -86,7 +86,7 @@ export function getLangPathByPath({
   const pathWithoutBase = removeBaseToUrl(initialPath, base);
 
   for (let route of routes) {
-    log && debug("> route", route);
+    log && logg("> route", route);
     // get current routePath
     const routePath = route.path?.[lang] || route.path;
 
@@ -96,31 +96,31 @@ export function getLangPathByPath({
       Object.keys(route.path).some((l) => route.path?.[l] === pathWithoutBase);
 
     // prettier-ignore
-    log && debug({ "route.path": route.path, base, storePaths, routePath, pathWithoutBaseMatchWithOnePathLang, pathWithoutBase });
+    log && logg({ "route.path": route.path, base, storePaths, routePath, pathWithoutBaseMatchWithOnePathLang, pathWithoutBase });
 
     if (routePath === pathWithoutBase || pathWithoutBaseMatchWithOnePathLang) {
       // pousser dans la tableau
       storePaths.push(routePath);
-      log && debug("> FINAL return: ", joinPaths(storePaths));
+      log && logg("> FINAL return: ", joinPaths(storePaths));
       // retourner le path final
       return joinPaths(storePaths);
     }
     // si ca match pas mais qu'il y a des children
     else if (route.children?.length > 0) {
-      log && debug("children > has children");
+      log && logg("children > has children");
 
       // translate current base
       // prettier-ignore
       const translateBase = base ? getLangPathByPath({ path: base, lang, routes, log:false }) : base;
-      log && debug("translateBase", translateBase);
+      log && logg("translateBase", translateBase);
 
       // prettier-ignore
       const match = getLangPathByPath({ path, base, lang, basePath: translateBase, routes: route.children });
-      log && debug("match >", match);
+      log && logg("match >", match);
 
       if (match) {
         // keep path in local array
-        log && debug("children match, return it");
+        log && logg("children match, return it");
         // prettier-ignore
         return match
       }

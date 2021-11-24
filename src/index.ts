@@ -1,13 +1,18 @@
-export { CreateRouter, TRoute} from "./api/CreateRouter";
+export { CreateRouter } from "./api/CreateRouter";
+export type { TRoute } from "./api/CreateRouter";
 export { Router } from "./components/Router";
 export { Link } from "./components/Link";
-export { Stack, TManageTransitions } from "./components/Stack";
+
+export { Stack } from "./components/Stack";
+export type { TManageTransitions } from "./components/Stack";
 
 export { useRootRouter, useRouter } from "./hooks/useRouter";
 export { useLocation, prepareSetLocationUrl } from "./hooks/useLocation";
 export { useHistory } from "./hooks/useHistory";
 export { useRouteCounter } from "./hooks/useRouteCounter";
-export { useStack, IRouteStack } from "./hooks/useStack";
+export { useStack } from "./hooks/useStack";
+export type { IRouteStack } from "./hooks/useStack";
 
 export { langMiddleware } from "./lang/LangMiddleware";
-export { default as LangService, TLanguage } from "./lang/LangService";
+export { default as LangService } from "./lang/LangService";
+export type { TLanguage } from "./lang/LangService";

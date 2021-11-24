@@ -1,10 +1,11 @@
 import { gsap } from "gsap";
-const debug = require("debug")(`router:transitionsHelper`);
+import debug from "@wbe/debug"
+const log = debug(`router:transitionsHelper`);
 
 export const transitionsHelper = (el, show: boolean): Promise<any> => {
   return new Promise((resolve) => {
     if (!el) {
-      debug("el doesnt exist", el);
+      log("el doesnt exist", el);
     }
 
     gsap.fromTo(

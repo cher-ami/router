@@ -2,7 +2,10 @@ import { Path } from "path-parser";
 import { TRoute } from "./CreateRouter";
 import { LangService } from "..";
 import { useRootRouter } from "../hooks/useRouter";
-const debug = require("debug")("router:helpers");
+import debug from "@wbe/debug";
+
+const componentName: string = "helpers";
+const log = debug(`router:${componentName}`);
 
 export type TParams = { [x: string]: any };
 
@@ -113,7 +116,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
         route?.name === params.name || route.component?.displayName === params.name;
       if (match) {
         if (!route?.path) {
-          debug(
+          log(
             "getUrlByRouteName > There is no route with this name, exit",
             params.name
           );

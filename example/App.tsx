@@ -3,7 +3,6 @@ import { Link, Stack, useRouter } from "../src";
 import { LangService } from "../src";
 
 const componentName = "App";
-const debug = require("debug")(`router:${componentName}`);
 
 /**
  * @name App

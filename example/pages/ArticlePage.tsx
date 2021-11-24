@@ -6,6 +6,7 @@ import React, {
 import { useLocation } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
+import debug from "@wbe/debug";
 
 interface IProps {
   params?: {
@@ -14,14 +15,14 @@ interface IProps {
 }
 
 const componentName = "ArticlePage";
-const debug = require("debug")(`router:${componentName}`);
+const log = debug(`router:${componentName}`);
 
 /**
  * @name ArticlePage
  */
 export const ArticlePage = forwardRef(
   (props: IProps, handleRef: ForwardedRef<any>) => {
-    debug("params", props);
+    log("params", props);
     const rootRef = useRef(null);
     const [location, setLocation] = useLocation();
 

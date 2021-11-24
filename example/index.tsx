@@ -12,8 +12,6 @@ import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
 
-const debug = require("debug")(`router:index`);
-
 /**
  * Define routes list
  */
@@ -61,7 +59,6 @@ LangService.init(locales, true, baseUrl);
  * Init Application
  */
 ReactDOM.render(
-
   <Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
     <App />
   </Router>,
