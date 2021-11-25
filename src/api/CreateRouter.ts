@@ -1,9 +1,8 @@
-import { Path } from "path-parser";
 import React from "react";
 import { buildUrl, joinPaths } from "./helpers";
 import { ROUTERS } from "./routers";
 import debug from "@wbe/debug";
-import { pathToRegexp, match, parse, compile } from "path-to-regexp";
+import { Match, match } from "path-to-regexp";
 
 import {
   BrowserHistory,
@@ -31,7 +30,7 @@ export type TRoute = {
   component?: React.ComponentType<any>;
   base?: string;
   name?: string;
-  parser?: Path;
+  parser?: Match;
   props?: TProps;
   children?: TRoute[];
   url?: string;
@@ -195,8 +194,8 @@ export class CreateRouter {
   }
 
   /**
-   * Get current route from URL using path-parser
-   * @doc https://www.npmjs.com/package/path-parser
+   * Get current route from URL using path-to-regex
+   * @doc https://github.com/pillarjs/path-to-regexp
    */
   protected getRouteFromUrl({
     pUrl,
