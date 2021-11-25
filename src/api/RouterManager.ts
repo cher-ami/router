@@ -1,6 +1,6 @@
 import React from "react";
-import { compileUrl, joinPaths } from "./helpers";
-import { Routers } from "./routers";
+import { compileUrl, joinPaths, removeLastCharFromString } from "./helpers";
+import { Routers } from "./Routers";
 import debug from "@wbe/debug";
 import { Match, match } from "path-to-regexp";
 
@@ -216,7 +216,10 @@ export class RouterManager {
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
-      const currentRoutePath = joinPaths([pBase, currentRoute.path as string]);
+      const currentRoutePath = removeLastCharFromString(
+        joinPaths([pBase, currentRoute.path as string]),
+        "/"
+      );
       // prepare parser
       matcher = match(currentRoutePath)(pUrl);
       // prettier-ignore

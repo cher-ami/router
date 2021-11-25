@@ -2,7 +2,6 @@ import { RouterManager, TRoute } from "./RouterManager";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { buildUrl, TOpenRouteParams } from "./helpers";
 
-
 /**
  * TODO transformer cet objet en class pour avoir des propriété getter / setter protégées
  */
@@ -41,7 +40,7 @@ export type TRoutersConfig = {
 };
 
 /**
- * ROUTERS object allows to keep safe globales values between routers instances
+ * ROUTERS object allows to keep safe globales values between Routers instances
  * This object values do not depend of one single router
  */
 export const Routers: TRoutersConfig = {

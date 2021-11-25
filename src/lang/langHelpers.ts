@@ -1,5 +1,5 @@
 import { LangService, TRoute } from "..";
-import { Routers } from "../api/routers";
+import { Routers } from "../api/Routers";
 import { removeBaseToUrl, joinPaths } from "../api/helpers";
 import debug from "@wbe/debug";
 const logg = debug(`router:langHelpers`);

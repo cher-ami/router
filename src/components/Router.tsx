@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 import { joinPaths } from "../api/helpers";
-import { Routers } from "../api/routers";
+import { Routers } from "../api/Routers";
 import { LangService } from "..";
 import { getLangPathByPath } from "../lang/langHelpers";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";

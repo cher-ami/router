@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useHistory } from "..";
 import { buildUrl, TOpenRouteParams } from "../api/helpers";
-import { Routers } from "../api/routers";
+import { Routers } from "../api/Routers";
 import debug from "@wbe/debug";
 
 const log = debug("router:useLocation");

@@ -5,7 +5,7 @@ import {
   RouterContext,
 } from "../components/Router";
 import { RouterManager } from "..";
-import { Routers } from "../api/routers";
+import { Routers } from "../api/Routers";
 
 /**
  * Returns current router instance context

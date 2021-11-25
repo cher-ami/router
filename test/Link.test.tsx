@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 import React from "react";
 import { Link, Router, TRoute } from "../src";
 import { render, fireEvent } from "@testing-library/react";
-import { Routers } from "../src/api/routers";
+import { Routers } from "../src/api/Routers";
 import { LangService } from "../src";
 import { TOpenRouteParams } from "../src/api/helpers";
 import { createBrowserHistory } from "history";

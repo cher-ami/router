@@ -1,4 +1,4 @@
-import { Routers } from "../api/routers";
+import { Routers } from "../api/Routers";
 import {
   compileUrl,
   joinPaths,

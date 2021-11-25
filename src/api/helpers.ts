@@ -2,7 +2,7 @@ import { RouterManager, TRoute } from "./RouterManager";
 import { LangService, Routers } from "..";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
-import { rootRouterInstance } from "./routers";
+import { rootRouterInstance } from "./Routers";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -147,7 +147,7 @@ export function buildUrl(
 
 /**
  * Prepare set location **FULL** URL
- * Result URL of each routers
+ * Result URL of each Routers
  *
  * ex:
  *   "/base/en/foo-en-path/sub-en-path"
