@@ -2,8 +2,7 @@ import { CreateRouter, TRoute } from "./CreateRouter";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 
 export type TRoutersConfig = {
-
-  preMiddelwareRoutes: TRoute[]
+  preMiddelwareRoutes: TRoute[];
   /**
    * Global routes list
    */
@@ -29,6 +28,9 @@ export type TRoutersConfig = {
    * Is first route is true if routerCounter === 1
    */
   isFirstRoute: boolean;
+
+
+  //generateUrl: () => string;
 };
 
 /**
@@ -43,4 +45,10 @@ export const ROUTERS: TRoutersConfig = {
   locationsHistory: [],
   routeCounter: 1,
   isFirstRoute: true,
+//  generateUrl,
 };
+
+/**
+ * Returns root router instance
+ */
+export const rootRouterInstance = (): CreateRouter => ROUTERS.instances?.[0];

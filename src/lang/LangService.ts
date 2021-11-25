@@ -1,6 +1,10 @@
 import { ROUTERS } from "../api/routers";
-import { buildUrl, joinPaths, removeLastCharFromString } from "../api/helpers";
-import { prepareSetLocationFullUrl } from "../hooks/useLocation";
+import {
+  buildUrl,
+  joinPaths,
+  prepareSetLocationFullUrl,
+  removeLastCharFromString,
+} from "../api/helpers";
 import debug from "@wbe/debug";
 
 const log = debug(`router:LangService`);

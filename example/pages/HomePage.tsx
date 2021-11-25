@@ -1,5 +1,5 @@
 import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react";
-import { useHistory, useStack } from "../../src";
+import { ROUTERS, useHistory, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import debug from "@wbe/debug";
 
@@ -23,6 +23,12 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   useEffect(() => {
     log("props.params.lang", props.params.lang);
   }, [props.params.lang]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      ROUTERS.history.push("/base/de/about/foo");
+    }, 2000);
+  }, []);
 
   useStack({
     componentName,

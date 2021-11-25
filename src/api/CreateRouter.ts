@@ -220,7 +220,7 @@ export class CreateRouter {
       // prepare parser
       matcher = match(currentRoutePath)(pUrl);
       // prettier-ignore
-      log(this.id, `getRouteFromUrl: currentUrl "${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
+      log(this.id, `"${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
       // if current route path match with the param url
       if (matcher) {
         // prepare route obj
