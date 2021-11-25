@@ -22,7 +22,7 @@ const routesList = (addLangPath = false): TRoute[] => [
 
 const patchRoutesList: TRoute[] = [
   {
-    path: "/:lang/",
+    path: "/:lang",
     langPath: null,
   },
   {

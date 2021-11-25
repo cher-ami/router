@@ -52,17 +52,6 @@ const defaultRouterContext = {
 export const RouterContext = createContext<IRouterContext>(defaultRouterContext);
 RouterContext.displayName = componentName;
 
-// /**
-//  * Stack Context
-//  * Dispatch informations for used on Stack
-//  */
-// const defaultStackContext = {
-//   unmountPreviousPage: () => {},
-//   previousPageIsMount: false,
-// };
-// export const StackContext = createContext<IStackContext>(defaultStackContext);
-// StackContext.displayName = "Stack";
-
 /**
  * Routes Reducer
  * Allows to dispatch routes states to components three

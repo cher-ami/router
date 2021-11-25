@@ -23,8 +23,8 @@ is designed to allow flexible transitions. It provides Stack component who
 render previous and current page component when route change.
 
 This router loads [history](https://github.com/ReactTraining/history)
-, [path-parser](https://github.com/troch/path-parser)
-and [debug](https://github.com/visionmedia/debug) as dependencies.
+, [path-to-regexp](https://github.com/pillarjs/path-to-regexp)
+and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 
 ## Summary
 
@@ -141,9 +141,9 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## <a name="DynamicRoutes"></a>Dynamic routes
 
-cher-ami router use [path-parser](https://github.com/troch/path-parser) which
+cher-ami router use [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which
 accept path parameters. (check
-this [documentation](https://github.com/troch/path-parser#defining-parameters)).
+this [documentation](https://github.com/pillarjs/path-to-regexp)).
 For example, URL `/blog/my-article` will match with this route object:
 
 ```js
@@ -375,8 +375,7 @@ Router component creates a new router instance.
 
 - **routes** `TRoute[]` Routes list
 - **base** `string` Base URL - default: `"/"`
-- **history** `BrowserHistory | HashHistory | MemoryHistory` _(optional)_ create and set an history () -
-  default : `BrowserHistory`
+- **history** `BrowserHistory | HashHistory | MemoryHistory` _(optional)_ create and set an history - default : `BrowserHistory`
   History mode can
   be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory)
   ,

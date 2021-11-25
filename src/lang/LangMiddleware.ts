@@ -1,5 +1,5 @@
 import { LangService, TRoute } from "..";
-import { joinPaths } from "../api/helpers";
+import { joinPaths, removeLastCharFromString } from "../api/helpers";
 import { getLangPathByLang } from "./langHelpers";
 
 /**
@@ -21,12 +21,15 @@ export const langMiddleware = (
    * @param pShowLang
    */
   const patchLangParam = (pPath: string, pShowLang): string =>
-    joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : "/"]);
+    removeLastCharFromString(
+      joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : "/"]),
+      "/"
+    );
 
   /**
    * Patch routes
    *  - Add "/:lang" param on each 1st level route
-   *  - format path recurcively (on chidren if exist)
+   *  - format path recurcively (on children if exist)
    * ex:
    *     {
    *      path: { en: "/home", fr: "/accueil" }
