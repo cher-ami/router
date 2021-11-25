@@ -1,5 +1,5 @@
 import { CreateRouter, TRoute } from "./CreateRouter";
-import { LangService, ROUTERS } from "..";
+import { LangService, Routers } from "..";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { rootRouterInstance } from "./routers";
@@ -14,13 +14,14 @@ export type TOpenRouteParams = {
   params?: TParams;
 };
 
-
 // ----------------------------------------------------------------------------- URLS
 
 /**
- * Build an URL with path and params via PathParser
+ * Compile an URL with path and params via path-to-regex
+ * ex:
+ *  compile("foo/:id")({id: example}) // "foo/example"
  */
-export function buildUrl(path: string, params?: TParams): string {
+export function compileUrl(path: string, params?: TParams): string {
   return compile(path)(params);
 }
 
@@ -88,7 +89,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
         // get full URL
         const urlByPath = getUrlByPathPart(pRoutes, route.path, pParams?.params?.lang);
         // build URL with param and return
-        return buildUrl(urlByPath, params.params);
+        return compileUrl(urlByPath, params.params);
       }
 
       // if route has children
@@ -105,13 +106,13 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
 }
 
 /**
- * Generate URL for setlocation
+ * BuildUrl URL for setlocation
  * (Get URL to push in history)
  *
  * @param args can be string or TOpenRouteParams object
  * @param availablesRoutes
  */
-export function generateUrl(
+export function buildUrl(
   args: string | TOpenRouteParams,
   availablesRoutes = rootRouterInstance().routes
 ): string {
@@ -156,24 +157,25 @@ export function generateUrl(
  */
 export function prepareSetLocationFullUrl(
   toLang,
-  instances: CreateRouter[] = ROUTERS.instances
+  instances: CreateRouter[] = Routers.instances
 ): string {
   let pathToGenerate = [];
 
   for (let instance of instances) {
-    const newUrl = generateUrl({
-      name: instance.currentRoute.name,
-      params: {
-        ...(instance.currentRoute.props?.params || {}),
-        lang: toLang.key,
-      },
-    });
-    pathToGenerate.push(newUrl);
+    if (instance?.currentRoute) {
+      const newUrl = buildUrl({
+        name: instance.currentRoute.name,
+        params: {
+          ...(instance.currentRoute.props?.params || {}),
+          lang: toLang.key,
+        },
+      });
+      pathToGenerate.push(newUrl);
+    }
   }
   // get last item of array
   return pathToGenerate.filter((v) => v).slice(-1)[0];
 }
-
 
 // ----------------------------------------------------------------------------- UTILS
 
@@ -271,4 +273,3 @@ export function removeBaseToUrl(path: string, base: string): string {
   let baseStartIndex = path.indexOf(base);
   return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
 }
-

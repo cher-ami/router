@@ -1,5 +1,5 @@
 import { CreateRouter, TRoute } from "../src";
-import { ROUTERS } from "../src/api/routers";
+import { Routers } from "../src/api/routers";
 import { preventSlashes } from "../src/api/helpers";
 
 /**
@@ -8,7 +8,7 @@ import { preventSlashes } from "../src/api/helpers";
  */
 export class CreateRouterTest extends CreateRouter {
   public updateRoute(
-    url: string = ROUTERS.history.location.pathname
+    url: string = Routers.history.location.pathname
   ): { currentRoute: TRoute; previousRoute: TRoute } {
     return super.updateRoute(url);
   }

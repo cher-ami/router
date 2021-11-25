@@ -1,5 +1,5 @@
 import {
-  buildUrl,
+  compileUrl,
   getUrlByPathPart,
   getUrlByRouteName,
   joinPaths,
@@ -37,9 +37,9 @@ describe("joinPaths", () => {
   });
 });
 
-describe("buildUrl", () => {
+describe("compileUrl", () => {
   it("should build url", () => {
-    const parh = buildUrl("/foo/:id/bar", { id: "2" });
+    const parh = compileUrl("/foo/:id/bar", { id: "2" });
     expect(parh).toBe("/foo/2/bar");
   });
 });
@@ -48,13 +48,6 @@ describe("preventSlashes", () => {
   it("should remove multi slashs", () => {
     expect(preventSlashes("///foo/")).toBe("/foo/");
     expect(preventSlashes("///foo/bar/////zoo")).toBe("/foo/bar/zoo");
-  });
-});
-
-describe("buildUrl", () => {
-  it("should build url", () => {
-    const parh = buildUrl("/foo/:id/bar", { id: "2" });
-    expect(parh).toBe("/foo/2/bar");
   });
 });
 

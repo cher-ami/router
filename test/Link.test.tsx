@@ -2,7 +2,7 @@ import "regenerator-runtime/runtime";
 import React from "react";
 import { Link, Router, TRoute } from "../src";
 import { render, fireEvent } from "@testing-library/react";
-import { ROUTERS } from "../src/api/routers";
+import { Routers } from "../src/api/routers";
 import { LangService } from "../src";
 import { TOpenRouteParams } from "../src/api/helpers";
 import { createBrowserHistory } from "history";
@@ -72,7 +72,7 @@ describe("Link", () => {
   it("should return the right href URL", () => {
     const { container } = render(<App base={"/"} to={{ name: "FooPage" }} />);
     fireEvent.click(container.firstChild);
-    expect(ROUTERS.history.location.pathname).toBe("/foo");
+    expect(Routers.history.location.pathname).toBe("/foo");
   });
 
   it("should return the right href URL with param", () => {
@@ -80,13 +80,13 @@ describe("Link", () => {
       <App base={"/"} to={{ name: "BarPage", params: { id: "test" } }} />
     );
     fireEvent.click(container.firstChild);
-    expect(ROUTERS.history.location.pathname).toBe("/bar/test");
+    expect(Routers.history.location.pathname).toBe("/bar/test");
   });
 
   it("should push in history on click", () => {
     const { container } = render(<App base={"/"} to={"/bar"} />);
     fireEvent.click(container.firstChild);
-    expect(ROUTERS.history.location.pathname).toBe("/bar");
-    expect(ROUTERS.history.action).toBe("PUSH");
+    expect(Routers.history.location.pathname).toBe("/bar");
+    expect(Routers.history.action).toBe("PUSH");
   });
 });

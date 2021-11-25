@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, Stack, useRouter } from "../src";
+import { Link, Stack } from "../src";
 import { LangService } from "../src";
 
 const componentName = "App";
@@ -8,42 +8,22 @@ const componentName = "App";
  * @name App
  */
 export default function App() {
-  const { currentRoute } = useRouter();
-
   useEffect(() => {
     LangService.redirect();
   }, []);
 
   return (
     <div className={componentName}>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "en" });
-        }}
-      >
-        EN
-      </button>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "fr" });
-        }}
-      >
-        FR
-      </button>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "de" });
-        }}
-      >
-        DE
-      </button>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "nl" });
-        }}
-      >
-        NL
-      </button>
+      {["en", "fr", "de", "nl"].map((el, i) => (
+        <button
+          key={i}
+          children={el}
+          onClick={() => {
+            LangService.setLang({ key: el });
+          }}
+        />
+      ))}
+
       <nav>
         <ul>
           <li>

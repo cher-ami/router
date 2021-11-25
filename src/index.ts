@@ -1,4 +1,4 @@
-export { ROUTERS } from "./api/routers";
+export { Routers } from "./api/routers";
 export { CreateRouter } from "./api/CreateRouter";
 export type { TRoute } from "./api/CreateRouter";
 export { Router } from "./components/Router";

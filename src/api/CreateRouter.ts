@@ -1,6 +1,6 @@
 import React from "react";
-import { buildUrl, joinPaths } from "./helpers";
-import { ROUTERS } from "./routers";
+import { compileUrl, joinPaths } from "./helpers";
+import { Routers } from "./routers";
 import debug from "@wbe/debug";
 import { Match, match } from "path-to-regexp";
 
@@ -89,10 +89,10 @@ export class CreateRouter {
       throw new Error(`Router id ${id} > no routes array is set.`);
     }
 
-    if (!ROUTERS.history) {
-      ROUTERS.history = this.history;
+    if (!Routers.history) {
+      Routers.history = this.history;
       // push first location history object in global locationsHistory
-      ROUTERS.locationsHistory.push(ROUTERS.history.location);
+      Routers.locationsHistory.push(Routers.history.location);
     }
 
     // add missing "/" route to routes list if doesn't exist
@@ -132,7 +132,7 @@ export class CreateRouter {
    * Initialise event
    */
   public initEvents() {
-    this.unlistenHistory = ROUTERS.history.listen(({ location, action }) => {
+    this.unlistenHistory = Routers.history.listen(({ location, action }) => {
       this.handleHistory(location.pathname);
     });
   }
@@ -158,7 +158,7 @@ export class CreateRouter {
    * - get route object matching with current URL
    * - emit selected route object on route-change event (listen by Stack)
    */
-  protected updateRoute(url: string = ROUTERS.history.location.pathname): {
+  protected updateRoute(url: string = Routers.history.location.pathname): {
     currentRoute: TRoute;
     previousRoute: TRoute;
   } {
@@ -230,7 +230,7 @@ export class CreateRouter {
           fullPath: currentRoutePath,
           path: route?.path,
           fullUrl: pUrl,
-          url: buildUrl(route.path as string, params),
+          url: compileUrl(route.path as string, params),
           base: pBase,
           component: route?.component,
           children: route?.children,

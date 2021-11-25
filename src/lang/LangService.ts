@@ -1,6 +1,6 @@
-import { ROUTERS } from "../api/routers";
+import { Routers } from "../api/routers";
 import {
-  buildUrl,
+  compileUrl,
   joinPaths,
   prepareSetLocationFullUrl,
   removeLastCharFromString,
@@ -168,7 +168,7 @@ class LangService {
       const path = joinPaths([this.base, "/:lang"]);
 
       // build new URL
-      let newUrl = buildUrl(path, { lang: this.defaultLang.key });
+      let newUrl = compileUrl(path, { lang: this.defaultLang.key });
 
       log("redirect: to >", { newUrl });
       // reload or refresh all application
@@ -236,7 +236,7 @@ class LangService {
    * @protected
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
-    forcePageReload ? window.open(newUrl, "_self") : ROUTERS.history.push(newUrl);
+    forcePageReload ? window.open(newUrl, "_self") : Routers.history.push(newUrl);
   }
 }
 
