@@ -1,6 +1,6 @@
 import { TRoute } from "../src";
 import { getLangPathByPath } from "../src/lang/langHelpers";
-import { TPathLangObject } from "../src/api/CreateRouter";
+import { TPathLangObject } from "../src/api/RouterManager";
 
 export const routesList: TRoute[] = [
   {

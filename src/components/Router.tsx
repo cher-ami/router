@@ -1,4 +1,4 @@
-import { CreateRouter, TRoute, useRouter, langMiddleware } from "..";
+import { RouterManager, TRoute, useRouter, langMiddleware } from "..";
 import React, {
   createContext,
   memo,
@@ -132,8 +132,8 @@ export const Router = memo((props: IProps) => {
   }, [props.base]);
 
   // keep router instance in state
-  const [routerState] = useState<CreateRouter>(() => {
-    const newRouter = new CreateRouter({
+  const [routerState] = useState<RouterManager>(() => {
+    const newRouter = new RouterManager({
       base,
       routes,
       id,

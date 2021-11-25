@@ -1,6 +1,6 @@
 export { Routers } from "./api/routers";
-export { CreateRouter } from "./api/CreateRouter";
-export type { TRoute } from "./api/CreateRouter";
+export { RouterManager } from "./api/RouterManager";
+export type { TRoute } from "./api/RouterManager";
 export { Router } from "./components/Router";
 export { Link } from "./components/Link";
 

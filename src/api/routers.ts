@@ -1,4 +1,4 @@
-import { CreateRouter, TRoute } from "./CreateRouter";
+import { RouterManager, TRoute } from "./RouterManager";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { buildUrl, TOpenRouteParams } from "./helpers";
 
@@ -16,7 +16,7 @@ export type TRoutersConfig = {
   /**
    * Routers instances list
    */
-  instances: CreateRouter[];
+  instances: RouterManager[];
   /**
    * Global browser history
    */
@@ -58,4 +58,4 @@ export const Routers: TRoutersConfig = {
 /**
  * Returns root router instance
  */
-export const rootRouterInstance = (): CreateRouter => Routers.instances?.[0];
+export const rootRouterInstance = (): RouterManager => Routers.instances?.[0];

@@ -1,4 +1,4 @@
-import { CreateRouter, TRoute } from "./CreateRouter";
+import { RouterManager, TRoute } from "./RouterManager";
 import { LangService, Routers } from "..";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
@@ -157,7 +157,7 @@ export function buildUrl(
  */
 export function prepareSetLocationFullUrl(
   toLang,
-  instances: CreateRouter[] = Routers.instances
+  instances: RouterManager[] = Routers.instances
 ): string {
   let pathToGenerate = [];
 

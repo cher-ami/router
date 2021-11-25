@@ -1,15 +1,15 @@
-import { CreateRouter, TRoute } from "../src";
-import { Routers } from "../src/api/routers";
+import { Routers, RouterManager, TRoute } from "../src";
 import { preventSlashes } from "../src/api/helpers";
 
 /**
  * Create Router Test
- * Allow to access protected methods of CreateRouter class
+ * Allow to access protected methods of RouterManager class
  */
-export class CreateRouterTest extends CreateRouter {
-  public updateRoute(
-    url: string = Routers.history.location.pathname
-  ): { currentRoute: TRoute; previousRoute: TRoute } {
+export class RouterManagerTest extends RouterManager {
+  public updateRoute(url: string = Routers.history.location.pathname): {
+    currentRoute: TRoute;
+    previousRoute: TRoute;
+  } {
     return super.updateRoute(url);
   }
 
@@ -28,7 +28,7 @@ const routesList: TRoute[] = [
   { path: "/:rest", component: null, name: "NotFoundPage" },
 ];
 const base = "/custom/base";
-const router = new CreateRouterTest({
+const router = new RouterManagerTest({
   base: base,
   routes: routesList,
 });
@@ -36,7 +36,7 @@ const router = new CreateRouterTest({
 /**
  * Tests
  */
-describe("CreateRouter", () => {
+describe("RouterManager", () => {
   it("should get right route from URL", () => {
     const getRoute = router.getRouteFromUrl({ pUrl: preventSlashes(`${base}/bar/foo`) });
     expect(getRoute.fullUrl).toBe(`${base}/bar/foo`);

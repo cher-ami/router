@@ -11,7 +11,7 @@ import {
   MemoryHistory,
 } from "history";
 
-const componentName: string = "CreateRouter";
+const componentName: string = "RouterManager";
 const log = debug(`router:${componentName}`);
 
 export type TParams = {
@@ -42,7 +42,7 @@ export type TRoute = {
 /**
  * RouterInstance
  */
-export class CreateRouter {
+export class RouterManager {
   // base URL
   public base: string;
   // before execute middleware routes list
