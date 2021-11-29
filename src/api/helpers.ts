@@ -106,13 +106,13 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
 }
 
 /**
- * BuildUrl URL for setlocation
+ * createUrl URL for setlocation
  * (Get URL to push in history)
  *
  * @param args can be string or TOpenRouteParams object
  * @param availablesRoutes
  */
-export function buildUrl(
+export function createUrl(
   args: string | TOpenRouteParams,
   availablesRoutes = rootRouterInstance().routes
 ): string {
@@ -163,7 +163,7 @@ export function prepareSetLocationFullUrl(
 
   for (let instance of instances) {
     if (instance?.currentRoute) {
-      const newUrl = buildUrl({
+      const newUrl = createUrl({
         name: instance.currentRoute.name,
         params: {
           ...(instance.currentRoute.props?.params || {}),

@@ -64,6 +64,10 @@ Services:
 - [`LangService`](#LangService) Manage `:lang` params
 - [`Translate Path`](#TranslatePath)
 
+Global:
+
+-[`Routers`](#Routers) Global Routers object
+
 ## <a name="Installation"></a>Installation
 
 ```shell

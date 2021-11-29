@@ -26,11 +26,11 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
 
   useEffect(() => {
     log(
-      "generated",
-      Routers.buildUrl({ name: "ArticlePage", params: { id: "article-1" } })
+      "createUrl",
+      Routers.createUrl({ name: "ArticlePage", params: { id: "article-1" } })
     );
 
-    log("generated", Routers.buildUrl("/about"));
+    log("generated", Routers.createUrl("/about"));
   }, []);
 
   useStack({

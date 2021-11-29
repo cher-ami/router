@@ -1,7 +1,7 @@
 import React, { ReactNode, useMemo } from "react";
 import { useLocation } from "..";
 import {
-  buildUrl,
+  createUrl,
   joinPaths,
   removeLastCharFromString,
   TOpenRouteParams,
@@ -20,7 +20,7 @@ interface IProps {
 function Link(props: IProps) {
   const [location, setLocation] = useLocation();
 
-  const url = useMemo(() => buildUrl(props.to), [props.to]);
+  const url = useMemo(() => createUrl(props.to), [props.to]);
 
   const isActive = useMemo(
     () => location === url || location === removeLastCharFromString(url, "/", true),

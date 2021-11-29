@@ -1,6 +1,6 @@
 import { RouterManager, TRoute } from "./RouterManager";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
-import { buildUrl, TOpenRouteParams } from "./helpers";
+import { createUrl, TOpenRouteParams } from "./helpers";
 
 /**
  * TODO transformer cet objet en class pour avoir des propriété getter / setter protégées
@@ -36,7 +36,7 @@ export type TRoutersConfig = {
   /**
    * build URL method
    */
-  buildUrl: (args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string;
+  createUrl: (args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string;
 };
 
 /**
@@ -51,7 +51,7 @@ export const Routers: TRoutersConfig = {
   locationsHistory: [],
   routeCounter: 1,
   isFirstRoute: true,
-  buildUrl,
+  createUrl,
 };
 
 /**

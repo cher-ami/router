@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useHistory } from "..";
-import { buildUrl, TOpenRouteParams } from "../api/helpers";
+import { createUrl, TOpenRouteParams } from "../api/helpers";
 import { Routers } from "../api/Routers";
 import debug from "@wbe/debug";
 
@@ -24,7 +24,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
    * @param args
    */
   function setLocation(args: string & TOpenRouteParams): void {
-    const urlToPush = buildUrl(args);
+    const urlToPush = createUrl(args);
     Routers.history.push(urlToPush);
   }
 
