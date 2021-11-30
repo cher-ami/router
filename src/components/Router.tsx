@@ -1,4 +1,4 @@
-import { CreateRouter, TRoute, useRouter, langMiddleware } from "..";
+import { RouterManager, TRoute, useRouter, langMiddleware } from "..";
 import React, {
   createContext,
   memo,
@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 import { joinPaths } from "../api/helpers";
-import { ROUTERS } from "../api/routers";
+import { Routers } from "../api/Routers";
 import { LangService } from "..";
 import { getLangPathByPath } from "../lang/langHelpers";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
@@ -97,16 +97,16 @@ export const Router = memo((props: IProps) => {
   // get parent router instance if exist, in case we are one sub router
   const parentRouter = useRouter();
   // deduce a router ID
-  const id = ROUTERS.instances?.length > 0 ? ROUTERS.instances.length + 1 : 1;
+  const id = Routers.instances?.length > 0 ? Routers.instances.length + 1 : 1;
   // get routes list by props first
   // if there is no props.routes, we deduce that we are on a subrouter
   const routes = useMemo(() => {
     let currentRoutesList: TRoute[];
     if (props.routes) {
-      ROUTERS.routes = props.routes;
+      Routers.routes = props.routes;
       currentRoutesList = props.routes;
     } else {
-      currentRoutesList = ROUTERS.routes?.find((el) => {
+      currentRoutesList = Routers.routes?.find((el) => {
         return (
           getLangPathByPath({ path: el.path }) === getLangPathByPath({ path: props.base })
         );
@@ -132,8 +132,8 @@ export const Router = memo((props: IProps) => {
   }, [props.base]);
 
   // keep router instance in state
-  const [routerState] = useState<CreateRouter>(() => {
-    const newRouter = new CreateRouter({
+  const [routerState] = useState<RouterManager>(() => {
+    const newRouter = new RouterManager({
       base,
       routes,
       id,
@@ -143,7 +143,7 @@ export const Router = memo((props: IProps) => {
         dispatch({ type: "update-current-route", value: newCurrentRoute }),
     });
     // keep new router in global constant
-    ROUTERS.instances.push(newRouter);
+    Routers.instances.push(newRouter);
     // return it as state
     return newRouter;
   });
@@ -152,8 +152,8 @@ export const Router = memo((props: IProps) => {
   // remove 1 element from specific index
   useEffect(() => {
     return () => {
-      ROUTERS.instances.splice(
-        ROUTERS.instances.findIndex((el) => el.id === routerState.id),
+      Routers.instances.splice(
+        Routers.instances.findIndex((el) => el.id === routerState.id),
         1
       );
       routerState.destroyEvents();

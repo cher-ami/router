@@ -1,5 +1,5 @@
 import { LangService, TRoute } from "..";
-import { ROUTERS } from "../api/routers";
+import { Routers } from "../api/Routers";
 import { removeBaseToUrl, joinPaths } from "../api/helpers";
 import debug from "@wbe/debug";
 const logg = debug(`router:langHelpers`);
@@ -68,7 +68,7 @@ export function getLangPathByPath({
   path,
   base = null,
   lang = LangService.currentLang?.key || undefined,
-  routes = ROUTERS?.routes,
+  routes = Routers?.routes,
   basePath = null,
   log = false,
 }: TGetLangPathByPath): string {

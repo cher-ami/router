@@ -1,8 +1,8 @@
-import { TRoute } from "./CreateRouter";
-import { LangService } from "..";
-import { useRootRouter } from "../hooks/useRouter";
+import { RouterManager, TRoute } from "./RouterManager";
+import { LangService, Routers } from "..";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
+import { rootRouterInstance } from "./Routers";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -14,53 +14,21 @@ export type TOpenRouteParams = {
   params?: TParams;
 };
 
-/**
- * Join string paths array
- * @param paths
- * @param join
- */
-export function joinPaths(paths: string[], join: string = ""): string {
-  const preparePath = paths?.filter((str) => str).join(join);
-  return preventSlashes(preparePath);
-}
+// ----------------------------------------------------------------------------- URLS
 
 /**
- * Prevent Multi Slashes
+ * Compile an URL with path and params via path-to-regex
  * ex:
- *  - '///foo/' will return '/foo/'
- * @param str
+ *  compile("foo/:id")({id: example}) // "foo/example"
  */
-export function preventSlashes(str: string): string {
-  return str.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
-}
-
-/**
- * Remove last caracter from string
- * @param str
- * @param lastChar
- * @param exeptIfStringIsLastChar if str is "/" and lastChar to remove is "/" do nothing
- */
-export function removeLastCharFromString(
-  str: string,
-  lastChar: string,
-  exeptIfStringIsLastChar = true
-): string {
-  if (exeptIfStringIsLastChar && str === lastChar) return str;
-  if (str.endsWith(lastChar)) str = str.slice(0, -1);
-  return str;
-}
-
-/**
- * Build an URL with path and params via PathParser
- */
-export function buildUrl(path: string, params?: TParams): string {
+export function compileUrl(path: string, params?: TParams): string {
   return compile(path)(params);
 }
 
 /**
  * Get URL by path part
  *  if path "/foo" is a children of path "/bar", his full url is "/bar/foo"
- *  With "/foo" this function will return "/bar/foo"
+ *  With the second URL part "/foo", this function will returns "/bar/foo"
  * @returns string
  */
 export function getUrlByPathPart(
@@ -121,7 +89,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
         // get full URL
         const urlByPath = getUrlByPathPart(pRoutes, route.path, pParams?.params?.lang);
         // build URL with param and return
-        return buildUrl(urlByPath, params.params);
+        return compileUrl(urlByPath, params.params);
       }
 
       // if route has children
@@ -135,6 +103,129 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
   };
 
   return recursiveFn(pRoutes, pParams);
+}
+
+/**
+ * createUrl URL for setlocation
+ * (Get URL to push in history)
+ *
+ * @param args can be string or TOpenRouteParams object
+ * @param availablesRoutes
+ */
+export function createUrl(
+  args: string | TOpenRouteParams,
+  availablesRoutes = rootRouterInstance().routes
+): string {
+  let urlToPush: string;
+
+  // in case we recieve a string
+  if (typeof args === "string") {
+    urlToPush = args as string;
+    urlToPush = addLangToUrl(urlToPush);
+
+    // in case we recieve an object
+  } else if (typeof args === "object" && args?.name) {
+    if (LangService.isInit && !args.params?.lang) {
+      args.params = {
+        ...args.params,
+        ...{ lang: LangService.currentLang.key },
+      };
+    }
+    // Get URL by the route name
+    urlToPush = getUrlByRouteName(availablesRoutes, args);
+
+    // in other case return.
+  } else {
+    console.warn("setLocation param isn't valid. return.", args);
+    return;
+  }
+
+  // in each case, add base URL
+  urlToPush = addBaseToUrl(urlToPush);
+  return urlToPush;
+}
+
+/**
+ * openRoute push a route in history
+ *  the Stack component will render the new route
+ * @param args can be string or TOpenRouteParams object
+ * @param availablesRoutes
+ */
+export function openRoute(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) {
+  const url = typeof args === "string" ? args : createUrl(args, availablesRoutes);
+  if (Routers.history) {
+    Routers.history.push(url);
+  }
+}
+
+/**
+ * Prepare set location **FULL** URL
+ * Result URL of each Routers
+ *
+ * ex:
+ *   "/base/en/foo-en-path/sub-en-path"
+ * should become:
+ *   "/base/fr/foo-fr-path/sub-fr-path"
+ *
+ */
+export function prepareSetLocationFullUrl(
+  toLang,
+  instances: RouterManager[] = Routers.instances
+): string {
+  let pathToGenerate = [];
+
+  for (let instance of instances) {
+    if (instance?.currentRoute) {
+      const newUrl = createUrl({
+        name: instance.currentRoute.name,
+        params: {
+          ...(instance.currentRoute.props?.params || {}),
+          lang: toLang.key,
+        },
+      });
+      pathToGenerate.push(newUrl);
+    }
+  }
+  // get last item of array
+  return pathToGenerate.filter((v) => v).slice(-1)[0];
+}
+
+// ----------------------------------------------------------------------------- UTILS
+
+/**
+ * Join string paths array
+ * @param paths
+ * @param join
+ */
+export function joinPaths(paths: string[], join: string = ""): string {
+  const preparePath = paths?.filter((str) => str).join(join);
+  return preventSlashes(preparePath);
+}
+
+/**
+ * Prevent Multi Slashes
+ * ex:
+ *  - '///foo/' will return '/foo/'
+ * @param str
+ */
+export function preventSlashes(str: string): string {
+  return str.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
+}
+
+/**
+ * Remove last caracter from string
+ * @param str
+ * @param lastChar
+ * @param exeptIfStringIsLastChar if str is "/" and lastChar to remove is "/" do nothing
+ */
+export function removeLastCharFromString(
+  str: string,
+  lastChar: string,
+  exeptIfStringIsLastChar = true
+): string {
+  if (exeptIfStringIsLastChar && str === lastChar) return str;
+  if (str.endsWith(lastChar)) str = str.slice(0, -1);
+  return str;
 }
 
 /**
@@ -177,13 +268,13 @@ export function addLangToUrl(
  * @param url
  * @param base
  */
-export function addBaseToUrl(url: string, base = useRootRouter()?.base): string {
+export function addBaseToUrl(url: string, base = rootRouterInstance()?.base): string {
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
 }
 
 /**
- * Return path without his URL
+ * get URL without his base
  *
  * before: "/custom-base/foo"
  * after:  "/foo"

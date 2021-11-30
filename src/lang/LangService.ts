@@ -1,6 +1,10 @@
-import { ROUTERS } from "../api/routers";
-import { buildUrl, joinPaths, removeLastCharFromString } from "../api/helpers";
-import { prepareSetLocationFullUrl } from "../hooks/useLocation";
+import { Routers } from "../api/Routers";
+import {
+  compileUrl,
+  joinPaths,
+  prepareSetLocationFullUrl,
+  removeLastCharFromString,
+} from "../api/helpers";
 import debug from "@wbe/debug";
 
 const log = debug(`router:LangService`);
@@ -164,7 +168,7 @@ class LangService {
       const path = joinPaths([this.base, "/:lang"]);
 
       // build new URL
-      let newUrl = buildUrl(path, { lang: this.defaultLang.key });
+      let newUrl = compileUrl(path, { lang: this.defaultLang.key });
 
       log("redirect: to >", { newUrl });
       // reload or refresh all application
@@ -232,7 +236,7 @@ class LangService {
    * @protected
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
-    forcePageReload ? window.open(newUrl, "_self") : ROUTERS.history.push(newUrl);
+    forcePageReload ? window.open(newUrl, "_self") : Routers.history.push(newUrl);
   }
 }
 
