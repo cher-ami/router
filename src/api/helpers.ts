@@ -146,6 +146,19 @@ export function createUrl(
 }
 
 /**
+ * openRoute push a route in history
+ * This will trigger the Stack component to render the new route
+ * @param args can be string or TOpenRouteParams object
+ * @param availablesRoutes
+ */
+export function openRoute(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) {
+  const url = typeof args === "string" ? args : createUrl(args, availablesRoutes);
+  if (Routers.history) {
+    Routers.history.push(url);
+  }
+}
+
+/**
  * Prepare set location **FULL** URL
  * Result URL of each Routers
  *

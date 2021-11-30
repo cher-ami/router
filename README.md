@@ -66,7 +66,7 @@ Services:
 
 Global:
 
--[`Routers`](#Routers) Global Routers object
+-[`Routers`](#Routers) Global Routers object keeps all routers properties (history, instances...)
 
 ## <a name="Installation"></a>Installation
 
@@ -770,6 +770,53 @@ Paths can be translated by lang in route path property:
     path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
     component: FooPage,
   }
+```
+
+## <a name="Routes"></a>
+
+Global routers informations are available from `Routers` object
+
+```ts
+type TRoutersConfig = {
+  /**
+   * 
+   */ 
+  preMiddelwareRoutes: TRoute[];
+  /**
+   * Global routes list
+   */
+  routes: TRoute[];
+  /**
+   * Routers instances list
+   */
+  instances: RouterManager[];
+  /**
+   * Global browser history
+   */
+  history: HashHistory | MemoryHistory | BrowserHistory;
+  /**
+   * GLobal navigation history list
+   */
+  locationsHistory: any[];
+  /**
+   * Global route counter increment on each history push
+   */
+  routeCounter: number;
+  /**
+   * Global is first route state
+   * Is first route is true if routerCounter === 1
+   */
+  isFirstRoute: boolean;
+  /**
+   * build URL method
+   */
+  createUrl: (args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string;
+
+  /**
+   * Open route method
+   */
+  
+};
 ```
 
 ## Credits
