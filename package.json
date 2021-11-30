@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "private": false,
-  "source": "src/index.ts",   
+  "source": "src/index.ts",
   "keywords": [
     "router",
     "react",
@@ -22,7 +22,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "compile": "microbundle --jsx React.createElement",
+    "clean": "rm -rf dist",
+    "compile": "npm run clean && microbundle --jsx React.createElement",
     "size": "npm run compile && size-limit",
     "size-why": "npm run size -- --why",
     "test": "jest && npm run size",
