@@ -1,5 +1,5 @@
 import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react";
-import { Routers, useHistory, useStack } from "../../src";
+import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import debug from "@wbe/debug";
 
@@ -14,24 +14,6 @@ interface IProps {
 
 const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
-
-  const history = useHistory();
-  useEffect(() => {
-    log("history form home", history);
-  }, [history]);
-
-  useEffect(() => {
-    log("props.params.lang", props.params.lang);
-  }, [props.params.lang]);
-
-  useEffect(() => {
-    log(
-      "createUrl",
-      Routers.createUrl({ name: "ArticlePage", params: { id: "article-1" } })
-    );
-
-    log("generated", Routers.createUrl("/about"));
-  }, []);
 
   useStack({
     componentName,
