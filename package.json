@@ -1,11 +1,12 @@
 {
   "name": "@cher-ami/router",
-  "version": "2.0.0-beta-4",
+  "version": "2.0.0-beta-5",
   "description": "A fresh react router designed for flexible route transitions",
   "author": "Willy Brauner",
   "license": "MIT",
   "main": "dist/index.js",
   "private": false,
+  "source": "src/index.ts",
   "keywords": [
     "router",
     "react",
@@ -21,9 +22,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "compile": "tsc -p tsconfig.json",
-    "size": "npm run compile && size-limit",
-    "size-why": "npm run size -- --why",
+    "clean": "rm -rf dist",
+    "compile": "npm run clean && microbundle --jsx React.createElement",
+    "size": "size-limit",
+    "size-why": "size-limit -- --why",
     "test": "jest && npm run size",
     "test:watch": "jest --watch",
     "pre-publish": "npm run compile && npm run test"
@@ -59,6 +61,7 @@
     "babel-jest": "*",
     "gsap": "^3.8.0",
     "jest": "^27.3.1",
+    "microbundle": "^0.14.2",
     "prettier": "^2.4.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
