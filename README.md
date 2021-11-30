@@ -777,39 +777,39 @@ Paths can be translated by lang in route path property:
 Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack,
 we need a global object to store shared informations between router instances. It contains also some importants helpers.
 
-### createUrl `(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string`
+#### createUrl `(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string`
 
 Create a formated URL by string, or `TOpenRouteParams`
 
-### openRoute `(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => void`
+#### openRoute `(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => void`
 
 Push new route in current history. Stack(s) component(s) will return appriopriated route.
 
-### Routers.preMiddlewareRoutes `TRoute[]`
+#### Routers.preMiddlewareRoutes `TRoute[]`
 
 Routes givent to the router before Middleware process.
 
-### Routers.routes `TRoute[]`
+#### Routers.routes `TRoute[]`
 
 Final routes array used by the router be
 
-### instances `RouterManager[]`
+#### instances `RouterManager[]`
 
 Contains all router instances. This array is updated each time a router is added or removed from DOM.
 
-### history `HashHistory | MemoryHistory | BrowserHistory;`
+#### history `HashHistory | MemoryHistory | BrowserHistory;`
 
 Selected history mode. all history API is avaible from this one.
 
-### locationsHistory `Location[]`
+#### locationsHistory `Location[]`
 
 Array of history navigation locations from the start of the session. This information is provided by`history`.
 
-### routeCounter `number`
+#### routeCounter `number`
 
 How many route are resolved from the start of the session. This property is also available from `useRouteCounter`.
 
-### isFirstRoute `boolean`
+#### isFirstRoute `boolean`
 
 Is it the first route of the session. This property is also available from `useRouteCounter`.
 
