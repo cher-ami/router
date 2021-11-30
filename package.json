@@ -24,8 +24,8 @@
     "build": "vite build",
     "clean": "rm -rf dist",
     "compile": "npm run clean && microbundle --jsx React.createElement",
-    "size": "npm run compile && size-limit",
-    "size-why": "npm run size -- --why",
+    "size": "size-limit",
+    "size-why": "size-limit -- --why",
     "test": "jest && npm run size",
     "test:watch": "jest --watch",
     "pre-publish": "npm run compile && npm run test"
