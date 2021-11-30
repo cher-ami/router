@@ -147,7 +147,7 @@ export function createUrl(
 
 /**
  * openRoute push a route in history
- * This will trigger the Stack component to render the new route
+ *  the Stack component will render the new route
  * @param args can be string or TOpenRouteParams object
  * @param availablesRoutes
  */

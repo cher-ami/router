@@ -3,6 +3,8 @@ export { RouterManager } from "./api/RouterManager";
 export type { TRoute } from "./api/RouterManager";
 export { Router } from "./components/Router";
 export { Link } from "./components/Link";
+export { createUrl, openRoute } from "./api/helpers";
+export type { TOpenRouteParams } from "./api/helpers";
 
 export { Stack } from "./components/Stack";
 export type { TManageTransitions } from "./components/Stack";

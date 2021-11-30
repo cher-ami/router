@@ -1,16 +1,12 @@
 import { RouterManager, TRoute } from "./RouterManager";
-import { BrowserHistory, HashHistory, MemoryHistory } from "history";
+import { Location, BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { createUrl, openRoute, TOpenRouteParams } from "./helpers";
-
-/**
- * TODO transformer cet objet en class pour avoir des propriété getter / setter protégées
- */
 
 export type TRoutersConfig = {
   /**
    * Routes givent to the router
    */
-  preMiddelwareRoutes: TRoute[];
+  preMiddlewareRoutes: TRoute[];
   /**
    * Global routes list
    */
@@ -26,7 +22,7 @@ export type TRoutersConfig = {
   /**
    * GLobal navigation history list
    */
-  locationsHistory: any[];
+  locationsHistory: Location[];
   /**
    * Global route counter increment on each history push
    */
@@ -44,17 +40,14 @@ export type TRoutersConfig = {
    * Open route method
    */
   openRoute: (args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => void;
-
 };
-
-
 
 /**
  * ROUTERS object allows to keep safe globales values between Routers instances
  * This object values do not depend of one single router
  */
 export const Routers: TRoutersConfig = {
-  preMiddelwareRoutes: null,
+  preMiddlewareRoutes: null,
   routes: null,
   instances: [],
   history: null,
