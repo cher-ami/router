@@ -1,4 +1,4 @@
-import React, { ReactNode, useMemo } from "react";
+import React, { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useMemo } from "react";
 import { useLocation } from "..";
 import {
   createUrl,
@@ -7,17 +7,19 @@ import {
   TOpenRouteParams,
 } from "../api/helpers";
 
-interface IProps {
+// exclude href because it collides with "to"
+type AnchorWithoutHref = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">
+
+export interface ILinkProps extends PropsWithChildren<AnchorWithoutHref> {
   to: string | TOpenRouteParams;
   onClick?: () => void;
   className?: string;
-  children: ReactNode;
 }
 
 /**
  * @name Link
  */
-function Link(props: IProps) {
+function Link(props: ILinkProps) {
   const [location, setLocation] = useLocation();
 
   const url = useMemo(() => createUrl(props.to), [props.to]);
@@ -35,6 +37,7 @@ function Link(props: IProps) {
 
   return (
     <a
+      {...props}
       className={joinPaths(["Link", props.className, isActive && "active"], " ")}
       onClick={handleClick}
       children={props.children}
