@@ -37,7 +37,7 @@ function Link(props: ILinkProps) {
 
   return (
     <a
-      {...props}
+      {...{...props, to: undefined}}
       className={joinPaths(["Link", props.className, isActive && "active"], " ")}
       onClick={handleClick}
       children={props.children}
