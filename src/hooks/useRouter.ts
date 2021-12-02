@@ -4,8 +4,6 @@ import {
   IRouterContextStackStates,
   RouterContext,
 } from "../components/Router";
-import { RouterManager } from "..";
-import { Routers } from "../api/Routers";
 
 /**
  * Returns current router instance context
@@ -13,5 +11,3 @@ import { Routers } from "../api/Routers";
  */
 export const useRouter = () =>
   useContext<Omit<IRouterContext, keyof IRouterContextStackStates>>(RouterContext);
-
-

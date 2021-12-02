@@ -114,8 +114,10 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  */
 export function createUrl(
   args: string | TOpenRouteParams,
-  availablesRoutes = rootRouterInstance().routes
+  availablesRoutes = Routers?.routes,
+  base: string = Routers?.base
 ): string {
+  if (!availablesRoutes) return;
   let urlToPush: string;
 
   // in case we recieve a string
@@ -141,7 +143,7 @@ export function createUrl(
   }
 
   // in each case, add base URL
-  urlToPush = addBaseToUrl(urlToPush);
+  urlToPush = addBaseToUrl(urlToPush, base);
   return urlToPush;
 }
 
@@ -223,6 +225,9 @@ export function removeLastCharFromString(
   lastChar: string,
   exeptIfStringIsLastChar = true
 ): string {
+  if (!str || str === "") {
+    log("str ", str);
+  }
   if (exeptIfStringIsLastChar && str === lastChar) return str;
   if (str.endsWith(lastChar)) str = str.slice(0, -1);
   return str;
@@ -268,7 +273,8 @@ export function addLangToUrl(
  * @param url
  * @param base
  */
-export function addBaseToUrl(url: string, base = rootRouterInstance()?.base): string {
+export function addBaseToUrl(url: string, base = Routers?.base): string {
+  log("base", base);
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
 }

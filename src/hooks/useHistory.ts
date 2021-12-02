@@ -1,34 +1,36 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Routers } from "../api/Routers";
+import { useRouter } from "./useRouter";
 
 /**
  * Handle router history
  */
 export const useHistory = (
   callback?: (e: { location: any; action: any }) => void,
-  deps = []
+  deps = [],
+  pHistory?
 ) => {
-  const UNLISTEN_HISTORY = useRef(null);
+  const { history: contextHistory } = useRouter();
   const [history, setHistory] = useState<any[]>(Routers.locationsHistory);
 
   useEffect(() => {
     // handle history change and keep reference
-    UNLISTEN_HISTORY.current = Routers.history.listen(
+    // @ts-ignore
+    if (!contextHistory && !pHistory) {
+      console.warn("no contextHistory, return ", contextHistory, pHistory);
+      return;
+    }
+    return (contextHistory || pHistory).listen(
       (event: { action: any; location: any }) => {
-        // prepare new history
-        const newHistory = [...history, event.location];
-        // set it in external singleton
+        // prepare new history & set it in external singleton
         // (because, we need to start history in new useHistory() with the current locationsHistory)
-        Routers.locationsHistory = newHistory;
+        Routers.locationsHistory = [...history, event.location];
         // set in local start returned
-        setHistory(newHistory);
+        setHistory(Routers.locationsHistory);
         // execute callback if exist
         callback?.(event);
       }
     );
-
-    // destroy
-    return () => UNLISTEN_HISTORY.current();
   }, [history, ...(deps || [])]);
 
   // return history array

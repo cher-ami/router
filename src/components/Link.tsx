@@ -1,5 +1,10 @@
-import React, { AnchorHTMLAttributes, PropsWithChildren, useMemo } from "react";
-import { useLocation } from "..";
+import React, {
+  AnchorHTMLAttributes,
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+} from "react";
+import { useLocation, useRouter } from "..";
 import {
   createUrl,
   joinPaths,
@@ -20,9 +25,13 @@ export interface ILinkProps extends PropsWithChildren<TAnchorWithoutHref> {
  * @name Link
  */
 function Link(props: ILinkProps) {
+  const { routes, base } = useRouter();
   const [location, setLocation] = useLocation();
 
-  const url = useMemo(() => createUrl(props.to), [props.to]);
+  const url = useMemo(() => createUrl(props.to, routes, base), [props.to, routes, base]);
+  useEffect(() => {
+    console.log("url", url, base);
+  }, [url]);
 
   const isActive = useMemo(
     () => location === url || location === removeLastCharFromString(url, "/", true),

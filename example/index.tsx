@@ -22,8 +22,8 @@ export const routesList: TRoute[] = [
     component: HomePage,
   },
   {
-    // path: "/blog/:id",
-    path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
+    path: "/blog/:id",
+    //path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
     component: ArticlePage,
     props: {
       color: "red",
@@ -52,13 +52,13 @@ export const routesList: TRoute[] = [
 ];
 
 const baseUrl = "/base/";
-LangService.init([{ key: "en" }, { key: "fr" }, { key: "de" }], true, baseUrl);
+// LangService.init([{ key: "en" }, { key: "fr" }, { key: "de" }], true, baseUrl);
 
 /**
  * Init Application
  */
 ReactDOM.render(
-  <Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
+  <Router routes={routesList} base={baseUrl}>
     <App />
   </Router>,
   document.getElementById("root")

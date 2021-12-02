@@ -4,6 +4,10 @@ import { createUrl, openRoute, TOpenRouteParams } from "./helpers";
 
 export type TRoutersConfig = {
   /**
+   * Base URL
+   */
+  base: string;
+  /**
    * Routes givent to the router
    */
   preMiddlewareRoutes: TRoute[];
@@ -54,6 +58,7 @@ export const Routers: TRoutersConfig = {
   locationsHistory: [],
   routeCounter: 1,
   isFirstRoute: true,
+  base: "/",
   createUrl,
   openRoute,
 };

@@ -14,7 +14,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
   /**
    * Get dynamic current location
    */
-  const [location, setLoc] = useState(Routers.history.location.pathname);
+  const [location, setLoc] = useState(Routers.history?.location.pathname);
   useHistory((event) => {
     setLoc(event.location.pathname);
   }, []);
