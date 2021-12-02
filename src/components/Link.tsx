@@ -8,9 +8,9 @@ import {
 } from "../api/helpers";
 
 // exclude href because it collides with "to"
-type AnchorWithoutHref = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">
+type TAnchorWithoutHref = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">;
 
-export interface ILinkProps extends PropsWithChildren<AnchorWithoutHref> {
+export interface ILinkProps extends PropsWithChildren<TAnchorWithoutHref> {
   to: string | TOpenRouteParams;
   onClick?: () => void;
   className?: string;
@@ -37,7 +37,7 @@ function Link(props: ILinkProps) {
 
   return (
     <a
-      {...{...props, to: undefined}}
+      {...{ ...props, to: undefined }}
       className={joinPaths(["Link", props.className, isActive && "active"], " ")}
       onClick={handleClick}
       children={props.children}
