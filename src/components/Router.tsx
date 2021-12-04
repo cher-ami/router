@@ -150,7 +150,7 @@ function Router({
   return (
     <RouterContext.Provider
       value={{
-        base: Routers.base,
+        base,
         routes,
         history: Routers.history,
         currentRoute: reducerState.currentRoute,
