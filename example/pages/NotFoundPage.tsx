@@ -1,18 +1,11 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
-import debug from "@wbe/debug";
+const componentName: string = "NotFoundPage";
 
-const componentName: string = "HomePage";
-const log = debug(`router:${componentName}`);
+interface IProps {}
 
-interface IProps {
-  params: {
-    lang: string;
-  };
-}
-
-const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
+const NotFoundPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
   useStack({
@@ -30,5 +23,5 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   );
 });
 
-HomePage.displayName = componentName;
-export default HomePage;
+NotFoundPage.displayName = componentName;
+export default NotFoundPage;

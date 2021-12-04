@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useHistory, useRouter } from "..";
+import { useHistory } from "../hooks/useHistory";
 import { createUrl, TOpenRouteParams } from "../api/helpers";
 import debug from "@wbe/debug";
 

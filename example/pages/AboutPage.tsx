@@ -1,14 +1,13 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { Router } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
+import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
+import { routesList } from "../routes";
 const componentName: string = "AboutPage";
 
-interface IProps {}
-
-const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
+const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
   useStack({
@@ -19,10 +18,13 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
+  const routes = routesList.find((route) => route.path === "/about").children;
+
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      {/* <Router base={"/about"}>
+
+      {/* <Router base={"/about"} routes={routes}>
         <div className={componentName}>
           <nav>
             <ul>
