@@ -1,8 +1,7 @@
-import { RouterManager, TRoute } from "./RouterManager";
 import { LangService, Routers } from "..";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
-import { rootRouterInstance } from "./Routers";
+import { TRoute } from "../components/Router";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -153,10 +152,14 @@ export function createUrl(
  * @param args can be string or TOpenRouteParams object
  * @param availablesRoutes
  */
-export function openRoute(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) {
+export function openRoute(
+  args: string | TOpenRouteParams,
+  availablesRoutes?: TRoute[],
+  history = Routers?.history
+) {
   const url = typeof args === "string" ? args : createUrl(args, availablesRoutes);
-  if (Routers.history) {
-    Routers.history.push(url);
+  if (history) {
+    history.push(url);
   }
 }
 
@@ -170,10 +173,7 @@ export function openRoute(args: string | TOpenRouteParams, availablesRoutes?: TR
  *   "/base/fr/foo-fr-path/sub-fr-path"
  *
  */
-export function prepareSetLocationFullUrl(
-  toLang,
-  instances: RouterManager[] = Routers.instances
-): string {
+export function prepareSetLocationFullUrl(toLang, instances = Routers.instances): string {
   let pathToGenerate = [];
 
   for (let instance of instances) {
@@ -274,7 +274,6 @@ export function addLangToUrl(
  * @param base
  */
 export function addBaseToUrl(url: string, base = Routers?.base): string {
-  log("base", base);
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
 }

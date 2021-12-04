@@ -22,7 +22,7 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <Router base={"/about"}>
+      {/* <Router base={"/about"}>
         <div className={componentName}>
           <nav>
             <ul>
@@ -36,7 +36,7 @@ const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
           </nav>
           <Stack key={"about-stack"} />
         </div>
-      </Router>
+      </Router> */}
     </div>
   );
 });

@@ -1,5 +1,5 @@
-import { RouterManager, TRoute } from "./RouterManager";
 import { Location, BrowserHistory, HashHistory, MemoryHistory } from "history";
+import { TRoute } from "../components/Router";
 import { createUrl, openRoute, TOpenRouteParams } from "./helpers";
 
 export type TRoutersConfig = {
@@ -18,15 +18,11 @@ export type TRoutersConfig = {
   /**
    * Routers instances list
    */
-  instances: RouterManager[];
+  instances: any[];
   /**
    * Global browser history
    */
   history: HashHistory | MemoryHistory | BrowserHistory;
-  /**
-   * GLobal navigation history list
-   */
-  locationsHistory: Location[];
   /**
    * Global route counter increment on each history push
    */
@@ -51,19 +47,13 @@ export type TRoutersConfig = {
  * This object values do not depend of one single router
  */
 export const Routers: TRoutersConfig = {
-  preMiddlewareRoutes: null,
-  routes: null,
+  preMiddlewareRoutes: undefined,
+  routes: undefined,
   instances: [],
-  history: null,
-  locationsHistory: [],
+  history: undefined,
   routeCounter: 1,
   isFirstRoute: true,
-  base: "/",
+  base: undefined,
   createUrl,
   openRoute,
 };
-
-/**
- * Returns root router instance
- */
-export const rootRouterInstance = (): RouterManager => Routers.instances?.[0];

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Link, Stack } from "../src";
 import { LangService } from "../src";
 
@@ -8,10 +8,6 @@ const componentName = "App";
  * @name App
  */
 export default function App() {
-  useEffect(() => {
-    LangService.redirect();
-  }, []);
-
   return (
     <div className={componentName}>
       {["en", "fr", "de", "nl"].map((el, i) => (

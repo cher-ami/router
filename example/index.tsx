@@ -1,7 +1,7 @@
 import ReactDOM from "react-dom";
 import * as React from "react";
 import { forwardRef } from "react";
-import { Router, TRoute } from "../src";
+import { Router } from "../src";
 import { LangService, langMiddleware } from "../src";
 
 import App from "./App";
@@ -11,6 +11,8 @@ import ArticlePage from "./pages/ArticlePage";
 import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import "./index.css";
+import { createBrowserHistory } from "history";
+import { TRoute } from "../src/components/Router";
 
 /**
  * Define routes list
@@ -33,17 +35,17 @@ export const routesList: TRoute[] = [
     path: "/about",
     //path: { en: "/about", fr: "/a-propos", de: "/uber" },
     component: AboutPage,
-    children: [
-      {
-        path: "/foo",
-        // path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
-        component: FooPage,
-      },
-      {
-        path: "/bar",
-        component: BarPage,
-      },
-    ],
+    // children: [
+    //   {
+    //     path: "/foo",
+    //     // path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
+    //     component: FooPage,
+    //   },
+    //   {
+    //     path: "/bar",
+    //     component: BarPage,
+    //   },
+    // ],
   },
   {
     path: "/:rest",
@@ -57,6 +59,7 @@ const baseUrl = "/base/";
 /**
  * Init Application
  */
+
 ReactDOM.render(
   <Router routes={routesList} base={baseUrl}>
     <App />

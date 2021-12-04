@@ -1,6 +1,5 @@
 import { TRoute } from "../src";
 import { getLangPathByPath } from "../src/lang/langHelpers";
-import { TPathLangObject } from "../src/api/RouterManager";
 
 export const routesList: TRoute[] = [
   {
@@ -89,12 +88,12 @@ describe("langHelpers", () => {
         lang: "de",
         routes: routesList,
       })
-    ).toBe((testRoute?.path as TPathLangObject)?.de);
+    ).toBe((testRoute?.path as { [x: string]: string })?.de);
   });
 
   it("getLangPathByPath: get path object as param, should return path properly", () => {
     const testRoute = routesList.find((el) => el.name === "home");
-    const path = testRoute?.path as TPathLangObject;
+    const path = testRoute?.path as { [x: string]: string };
     expect(
       getLangPathByPath({
         path: path,
