@@ -1,10 +1,4 @@
-import React, {
-  AnchorHTMLAttributes,
-  PropsWithChildren,
-  useCallback,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { AnchorHTMLAttributes, PropsWithChildren, useMemo } from "react";
 import { useLocation, useRouter } from "..";
 import {
   createUrl,
@@ -31,25 +25,21 @@ const log = debug("router:Link");
 function Link(props: ILinkProps) {
   const { routes, base } = useRouter();
   const [location, setLocation] = useLocation();
-  const url = useMemo(() => {
-    const createNewUrl = createUrl(props.to, routes, base);
-    log("createNewUrl",createNewUrl)
-    return createNewUrl;
-  }, [props.to, routes, base]);
 
+  // Compute URL
+  const url = useMemo(() => createUrl(props.to, routes, base), [props.to, routes, base]);
+
+  // Link is active if its URL is the current URL
   const isActive = useMemo(
     () => location === url || location === removeLastCharFromString(url, "/", true),
     [location, url]
   );
 
-  const handleClick = useCallback(
-    (e) => {
-      e.preventDefault();
-      props.onClick?.();
-      setLocation(url);
-    },
-    [url, props.onClick]
-  );
+  const handleClick = (event): void => {
+    event.preventDefault();
+    props.onClick?.();
+    setLocation(props.to);
+  };
 
   return (
     <a

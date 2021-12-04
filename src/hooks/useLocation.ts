@@ -9,7 +9,7 @@ const log = debug("router:useLocation");
  * useLocation
  */
 export const useLocation = (): [string, (param: string | TOpenRouteParams) => void] => {
-  const { history } = useRouter();
+  const history = useHistory();
   /**
    * Get dynamic current location
    */
@@ -25,8 +25,8 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
    * Prepare setLocation function, who push in history
    */
   function setLocation(args: string & TOpenRouteParams): void {
-    const url = createUrl(args)
-    log('url',url)
+    const url = createUrl(args);
+    log("url", url);
     history.push(url);
   }
 
