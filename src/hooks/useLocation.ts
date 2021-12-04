@@ -9,21 +9,16 @@ const log = debug("router:useLocation");
  * useLocation
  */
 export const useLocation = (): [string, (param: string | TOpenRouteParams) => void] => {
-  const history = useHistory();
-  /**
-   * Get dynamic current location
-   */
-  const [pathname, setPathname] = useState(window.location.pathname);
-
-  useHistory((event) => {
+  const history = useHistory((event) => {
     setPathname(event.location.pathname);
   }, []);
 
-  /**
-   * Prepare setLocation function, who push in history
-   */
+  // Get dynamic current location
+  const [pathname, setPathname] = useState(window.location.pathname);
+
+  // Prepare setLocation function, who push in history
   function setLocation(args: string & TOpenRouteParams): void {
-    history.push(createUrl(args));
+    history?.push(createUrl(args));
   }
 
   return [pathname, setLocation];

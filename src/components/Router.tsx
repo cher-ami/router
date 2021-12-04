@@ -8,7 +8,7 @@ import {
 import debug from "@wbe/debug";
 import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Match } from "path-to-regexp";
-import { Routers } from "..";
+import { Routers } from "../api/Routers";
 
 export type TRoute = {
   path: string;
@@ -16,7 +16,10 @@ export type TRoute = {
   base?: string;
   name?: string;
   parser?: Match;
-  props?: { [x: string]: any };
+  props?: {
+    params?: { [x: string]: any };
+    [x: string]: any;
+  };
   children?: TRoute[];
   url?: string;
   fullUrl?: string; // full URL who not depend of current instance
