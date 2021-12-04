@@ -25,12 +25,14 @@ export const getRouteFromUrl = ({
   pBase,
   pCurrentRoute = null,
   pMatcher = null,
+  id,
 }: {
   pUrl: string;
   pRoutes?: TRoute[];
   pBase?: string;
   pCurrentRoute?: TRoute;
   pMatcher?: any;
+  id?: number;
 }): TRoute => {
   if (!pRoutes || pRoutes?.length === 0) return;
 
@@ -42,7 +44,7 @@ export const getRouteFromUrl = ({
       "/"
     );
     const matcher = match(currentRoutePath)(pUrl);
-    log(`"${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
+    log(id, `"${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
 
     // if current route path match with the param url
     if (matcher) {
@@ -66,7 +68,7 @@ export const getRouteFromUrl = ({
         },
       };
 
-      log("getRouteFromUrl: MATCH routeObj", routeObj);
+      log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
       return routeObj;
     }
 
@@ -74,14 +76,15 @@ export const getRouteFromUrl = ({
     else if (currentRoute?.children) {
       // else, call recursively this same method with new params
       const matchingChildren = getRouteFromUrl({
-        pUrl: pUrl,
+        pUrl,
+        id,
         pRoutes: currentRoute?.children,
         pBase: currentRoutePath, // parent base
         pCurrentRoute: currentRoute,
         pMatcher: matcher,
       });
 
-      log("matchingChildren", matchingChildren);
+      log(id, "matchingChildren", matchingChildren);
 
       // only if matching, return this match, else continue to next iteration
       if (matchingChildren) return matchingChildren;

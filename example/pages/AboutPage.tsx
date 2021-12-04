@@ -18,13 +18,15 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
-  const routes = routesList.find((route) => route.path === "/about").children;
-
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
-      {/* <Router base={"/about"} routes={routes}>
+      <Router
+        id={2}
+        base={"/base/about"}
+        routes={routesList.find((route) => route.path === "/about").children}
+      >
         <div className={componentName}>
           <nav>
             <ul>
@@ -38,7 +40,7 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
           </nav>
           <Stack key={"about-stack"} />
         </div>
-      </Router> */}
+      </Router>
     </div>
   );
 });

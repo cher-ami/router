@@ -13,6 +13,54 @@ export type TOpenRouteParams = {
   params?: TParams;
 };
 
+// ----------------------------------------------------------------------------- ROUTES
+
+/**
+ * Add missing route with "/" on children routes if doesn't exist.
+ *
+ * children: [
+ *     { path: "/foo", component: FooPage },
+ *     { path: "/bar", component: BarPage },
+ * ]
+ * become:
+ *  children: [
+ *     { path: "/", component: null },
+ *     { path: "/foo", component: FooPage },
+ *     { path: "/bar", component: BarPage },
+ * ]
+ * @param routes
+ */
+export function patchMissingRootRoute(routes: TRoute[]): TRoute[] {
+  const rootPathExist = routes.some(
+    (route) =>
+      (typeof route.path === "object" &&
+        Object.keys(route.path).some((el) => route.path[el] === "/")) ||
+      route.path === "/"
+  );
+  if (!rootPathExist) {
+    routes.unshift({ path: "/", component: null });
+  }
+  return routes;
+}
+
+/**
+ * Apply middlewares to routes.
+ * @param preMiddlewareRoutes
+ * @param middlewares
+ * @returns
+ */
+export function applyMiddlewares(
+  preMiddlewareRoutes: TRoute[],
+  middlewares: ((routes: TRoute[]) => TRoute[])[]
+): TRoute[] {
+  return (
+    middlewares?.reduce(
+      (routes, middleware) => middleware(routes),
+      preMiddlewareRoutes
+    ) || preMiddlewareRoutes
+  );
+}
+
 // ----------------------------------------------------------------------------- URLS
 
 /**

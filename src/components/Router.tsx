@@ -1,14 +1,17 @@
-import React from "react";
+import debug from "@wbe/debug";
 import {
   BrowserHistory,
   createBrowserHistory,
   HashHistory,
   MemoryHistory,
 } from "history";
-import debug from "@wbe/debug";
-import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Match } from "path-to-regexp";
+import React from "react";
+import { applyMiddlewares, joinPaths, patchMissingRootRoute } from "../api/helpers";
+import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Routers } from "../api/Routers";
+import { useRouter } from "../hooks/useRouter";
+import LangService from "../lang/LangService";
 
 export type TRoute = {
   path: string;
@@ -91,20 +94,46 @@ const reducer = (
 /**
  * Router start
  */
-function Router({
-  children,
-  routes,
-  base = "/",
-  history = createBrowserHistory(),
-}: {
+
+Router.defaultProps = {
+  base: "/",
+  history: createBrowserHistory(),
+  id: 1,
+};
+
+function Router(props: {
   children: React.ReactNode;
   routes: TRoute[];
   base: string;
   history?: BrowserHistory | HashHistory | MemoryHistory;
+  middlewares?: ((routes: TRoute[]) => TRoute[])[];
+  id?: number;
 }): JSX.Element {
-  if (!Routers.routes) Routers.routes = routes;
-  if (!Routers.base) Routers.base = base;
-  if (!Routers.history) Routers.history = history;
+  const [routes] = React.useState(() => {
+    Routers.preMiddlewareRoutes = patchMissingRootRoute(props.routes);
+    Routers.routes = applyMiddlewares(Routers.preMiddlewareRoutes, props.middlewares);
+    log(props.id, "finalRoutes", Routers.routes);
+    return Routers.routes;
+  });
+
+  // get parent router instance if exist, in case we are one sub router
+  const parentRouter = useRouter();
+  // join each parent router base
+  // TODO continue
+  const base = React.useMemo(() => {
+    const showLang = LangService.showLangInUrl();
+    const parentBase: string = parentRouter?.base;
+    const addLang: boolean = props.id !== 1 && showLang;
+    const base: string = addLang ? getLangPathByPath({ path: props.base }) : props.base;
+    return joinPaths([
+      parentBase, // ex: /master-base
+      addLang && "/:lang",
+      base, // ex: "/about
+    ]);
+  }, [props.base]);
+
+  if (!Routers.base) Routers.base = props.base;
+  if (!Routers.history) Routers.history = props.history;
 
   const [reducerState, dispatch] = React.useReducer(reducer, {
     currentRoute: undefined,
@@ -122,16 +151,24 @@ function Router({
 
   const handleHistory = (url: string = window.location.pathname): void => {
     if (prevUrlRef.current === url) {
-      console.warn("It's the same URL, return.");
+      console.warn(props.id, "It's the same URL, return.");
       return;
     }
     // register URL if is not the same than the previous one and continue.
     prevUrlRef.current = url;
 
-    const matchingRoute = getRouteFromUrl({ pUrl: url, pRoutes: routes, pBase: base });
-    const notFoundRoute = getNotFoundRoute(routes);
+    const matchingRoute = getRouteFromUrl({
+      pUrl: url,
+      pRoutes: props.routes,
+      pBase: props.base,
+      id: props.id,
+    });
+    const notFoundRoute = getNotFoundRoute(props.routes);
     if (!matchingRoute && !notFoundRoute) {
-      console.warn("matchingRoute not found & 'notFoundRoute' not found, return.");
+      console.warn(
+        props.id,
+        "matchingRoute not found & 'notFoundRoute' not found, return."
+      );
       return;
     }
     const newRoute: TRoute = matchingRoute || notFoundRoute;
@@ -150,8 +187,8 @@ function Router({
   return (
     <RouterContext.Provider
       value={{
-        base,
         routes,
+        base: props.base,
         history: Routers.history,
         currentRoute: reducerState.currentRoute,
         previousRoute: reducerState.previousRoute,
@@ -159,7 +196,7 @@ function Router({
         previousPageIsMount: reducerState.previousPageIsMount,
         unmountPreviousPage: () => dispatch({ type: "unmount-previous-page" }),
       }}
-      children={children}
+      children={props.children}
     />
   );
 }
@@ -167,3 +204,6 @@ function Router({
 Router.displayName = componentName;
 const MemoizedRouter = React.memo(Router);
 export { MemoizedRouter as Router };
+function getLangPathByPath(arg0: { path: string }): string {
+  throw new Error("Function not implemented.");
+}
