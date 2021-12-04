@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import {
   BrowserHistory,
   createBrowserHistory,
@@ -119,7 +119,7 @@ function Router({
 
   const handleHistory = (url: string = window.location.pathname): void => {
     if (prevUrlRef.current === url) {
-      console.warn("It's the same URL, return.", prevUrlRef.current, url);
+      console.warn("It's the same URL, return.");
       return;
     }
     // register URL if is not the same than the previous one and continue.

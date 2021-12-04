@@ -1,4 +1,4 @@
-import React, { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import React from "react";
 import { IRouteStack, useRouter } from "..";
 import { IRouterContext } from "./Router";
 import debug from "@wbe/debug";
@@ -20,10 +20,7 @@ const log = debug(`router:${componentName}`);
 /**
  * @name Stack
  */
-function Stack(props: {
-  className?: string;
-  manageTransitions?: (T: TManageTransitions) => Promise<void>;
-}): JSX.Element {
+function Stack(props: IProps): JSX.Element {
   const {
     routeIndex,
     currentRoute,

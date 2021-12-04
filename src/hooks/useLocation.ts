@@ -13,9 +13,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
   /**
    * Get dynamic current location
    */
-  const [pathname, setPathname] = useState(
-    history.location?.pathname || window.location.pathname
-  );
+  const [pathname, setPathname] = useState(window.location.pathname);
 
   useHistory((event) => {
     setPathname(event.location.pathname);
@@ -25,9 +23,7 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
    * Prepare setLocation function, who push in history
    */
   function setLocation(args: string & TOpenRouteParams): void {
-    const url = createUrl(args);
-    log("url", url);
-    history.push(url);
+    history.push(createUrl(args));
   }
 
   return [pathname, setLocation];

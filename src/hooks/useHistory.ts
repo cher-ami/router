@@ -15,7 +15,7 @@ export function useHistory(
   const { history } = useRouter();
 
   React.useEffect(() => {
-    return history.listen((e) => {
+    return history?.listen((e) => {
       callback?.(e);
     });
   }, [history, ...deps]);
