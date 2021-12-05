@@ -5,6 +5,7 @@ import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
 import { routesList } from "../routes";
+import { createMemoryHistory } from "history";
 const componentName: string = "AboutPage";
 
 const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
@@ -25,6 +26,7 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
       <Router
         id={2}
         base={"/base/about"}
+        //history={createMemoryHistory()}
         routes={routesList.find((route) => route.path === "/about").children}
       >
         <div className={componentName}>

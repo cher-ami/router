@@ -26,15 +26,12 @@ export default function App() {
             <Link to={{ name: "HomePage" }}>Home</Link>
           </li>
           <li>
-            <Link to={{ name: "AboutPage" }}>About</Link>
-          </li>
-          <li>
             <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>
               Blog id:article-1
             </Link>
           </li>
           <li>
-            <Link to={"/not/found/"}>Not found route</Link>
+            <Link to={{ name: "AboutPage" }}>About (sub router)</Link>
           </li>
         </ul>
       </nav>

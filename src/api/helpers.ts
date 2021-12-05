@@ -61,6 +61,8 @@ export function applyMiddlewares(
   );
 }
 
+export function prepareRoutes() {}
+
 // ----------------------------------------------------------------------------- URLS
 
 /**
@@ -162,8 +164,9 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
 export function createUrl(
   args: string | TOpenRouteParams,
   availablesRoutes = Routers?.routes,
-  base: string = Routers?.base
+  base: string = Routers.base
 ): string {
+  log("Routers.base", Routers.base);
   if (!availablesRoutes) return;
   let urlToPush: string;
 
@@ -321,7 +324,7 @@ export function addLangToUrl(
  * @param url
  * @param base
  */
-export function addBaseToUrl(url: string, base = Routers?.base): string {
+export function addBaseToUrl(url: string, base = Routers.base): string {
   url = joinPaths([base === "/" ? "" : base, url]);
   return url;
 }

@@ -1,7 +1,8 @@
-import { LangService, TRoute } from "..";
+import LangService from "../lang/LangService";
 import { Routers } from "../api/Routers";
 import { removeBaseToUrl, joinPaths } from "../api/helpers";
 import debug from "@wbe/debug";
+import { TRoute } from "../components/Router";
 const logg = debug(`router:langHelpers`);
 
 /**
@@ -36,7 +37,7 @@ export function getLangPathByLang(
 /**
  * Get lang path by another lang path
  * ex:
- *     path: { en: "/about", fr: "/a-propos", de: "uber" },
+ *     path: { en: "/about", fr: "/a-propos", de: "/uber" },
  *
  * with "/about", we need "fr" path  "/a-propos"
  * selectLangPathByPath("/about", "fr", routes) // will return "/a-propos"

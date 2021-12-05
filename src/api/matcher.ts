@@ -84,8 +84,6 @@ export const getRouteFromUrl = ({
         pMatcher: matcher,
       });
 
-      log(id, "matchingChildren", matchingChildren);
-
       // only if matching, return this match, else continue to next iteration
       if (matchingChildren) return matchingChildren;
     }

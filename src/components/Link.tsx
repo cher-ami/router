@@ -1,4 +1,9 @@
-import React, { AnchorHTMLAttributes, PropsWithChildren, useMemo } from "react";
+import React, {
+  AnchorHTMLAttributes,
+  PropsWithChildren,
+  useEffect,
+  useMemo,
+} from "react";
 import { useLocation, useRouter } from "..";
 import {
   createUrl,
@@ -23,8 +28,8 @@ const log = debug("router:Link");
  * @name Link
  */
 function Link(props: ILinkProps) {
-  const { routes, base } = useRouter();
-  const [location, setLocation] = useLocation();
+  const { history, routes, base } = useRouter();
+  const [location] = useLocation();
 
   // Compute URL
   const url = useMemo(() => createUrl(props.to, routes, base), [props.to, routes, base]);
@@ -38,7 +43,7 @@ function Link(props: ILinkProps) {
   const handleClick = (event): void => {
     event.preventDefault();
     props.onClick?.();
-    setLocation(props.to);
+    history?.push(url);
   };
 
   return (
