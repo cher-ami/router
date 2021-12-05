@@ -1,5 +1,6 @@
-import { LangService, TRoute } from "..";
+import { LangService } from "..";
 import { joinPaths, removeLastCharFromString } from "../api/helpers";
+import { TRoute } from "../components/Router";
 import { getLangPathByLang } from "./langHelpers";
 
 /**
