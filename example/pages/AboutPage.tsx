@@ -26,7 +26,6 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
       <Router
         id={2}
         base={"/base/about"}
-        //history={createMemoryHistory()}
         routes={routesList.find((route) => route.path === "/about").children}
       >
         <div className={componentName}>

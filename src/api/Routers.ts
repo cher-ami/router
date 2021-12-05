@@ -1,4 +1,4 @@
-import { Location, BrowserHistory, HashHistory, MemoryHistory } from "history";
+import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { TRoute } from "../components/Router";
 import { createUrl, openRoute, TOpenRouteParams } from "./helpers";
 

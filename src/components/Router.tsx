@@ -152,9 +152,8 @@ function Router(props: {
    * Dispatch new routes via RouterContext
    */
 
+  const currentRouteRef = React.useRef<TRoute>();
   const handleHistory = (url: string = window.location.pathname): void => {
-    const { currentRoute } = reducerState;
-
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
@@ -168,7 +167,10 @@ function Router(props: {
       return;
     }
 
-    if (currentRoute?.url != null && currentRoute?.url === matchingRoute?.url) {
+    if (
+      currentRouteRef.current?.url != null &&
+      currentRouteRef.current?.url === matchingRoute.url
+    ) {
       log(props.id, "this is the same route 'url', return.");
       return;
     }
@@ -176,22 +178,23 @@ function Router(props: {
     const newRoute: TRoute = matchingRoute || notFoundRoute;
     if (newRoute) {
       dispatch({ type: "update-current-route", value: newRoute });
+      currentRouteRef.current = newRoute;
     }
   };
 
   React.useEffect(() => {
     handleHistory();
-    return props.history.listen(({ location }) => {
+    return Routers.history.listen(({ location }) => {
       handleHistory(location.pathname);
     });
-  }, [reducerState]);
+  }, []);
 
   return (
     <RouterContext.Provider
       value={{
         routes,
         base: props.base,
-        history: props.history,
+        history: Routers.history,
         currentRoute: reducerState.currentRoute,
         previousRoute: reducerState.previousRoute,
         routeIndex: reducerState.routeIndex,
