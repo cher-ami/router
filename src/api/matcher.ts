@@ -15,6 +15,15 @@ export const getNotFoundRoute = (routes: TRoute[]): TRoute =>
     (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage"
   );
 
+type TGetRouteFromUrl = {
+  pUrl: string;
+  pRoutes?: TRoute[];
+  pBase?: string;
+  pCurrentRoute?: TRoute;
+  pMatcher?: any;
+  id?: number;
+};
+
 /**
  * Get current route from URL, using path-to-regex
  * @doc https://github.com/pillarjs/path-to-regexp
@@ -23,69 +32,72 @@ export const getRouteFromUrl = ({
   pUrl,
   pRoutes,
   pBase,
-  pCurrentRoute = null,
-  pMatcher = null,
+  pMatcher,
   id,
-}: {
-  pUrl: string;
-  pRoutes?: TRoute[];
-  pBase?: string;
-  pCurrentRoute?: TRoute;
-  pMatcher?: any;
-  id?: number;
-}): TRoute => {
+}: TGetRouteFromUrl): TRoute => {
   if (!pRoutes || pRoutes?.length === 0) return;
 
-  // test each routes
-  for (let currentRoute of pRoutes) {
-    // create parser & matcher
-    const currentRoutePath = removeLastCharFromString(
-      joinPaths([pBase, currentRoute.path as string]),
-      "/"
-    );
-    const matcher = match(currentRoutePath)(pUrl);
-    log(id, `"${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
+  // keep first level current route.
+  // this route object is obj to return even if URL match
+  let firstLevelCurrentRoute = undefined;
 
-    // if current route path match with the param url
-    if (matcher) {
-      // prepare route obj
-      const route = pCurrentRoute || currentRoute;
-      const params = pMatcher?.params || matcher?.params;
-      const routeObj = {
-        fullPath: currentRoutePath,
-        path: route?.path,
-        fullUrl: pUrl,
-        url: compile(route.path)(params),
-        base: pBase,
-        component: route?.component,
-        children: route?.children,
-        parser: pMatcher || matcher,
-        langPath: route?.langPath,
-        name: route?.name || route?.component?.displayName,
-        props: {
-          params,
-          ...(route?.props || {}),
-        },
-      };
+  function next({ pUrl, pRoutes, pBase, pMatcher, id }: TGetRouteFromUrl): TRoute {
+    // test each routes
+    for (let currentRoute of pRoutes) {
+      // create parser & matcher
+      const currentRoutePath = removeLastCharFromString(
+        joinPaths([pBase, currentRoute.path as string]),
+        "/"
+      );
+      const matcher = match(currentRoutePath)(pUrl);
+      log(id, `"${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
 
-      log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
-      return routeObj;
-    }
+      // if current route path match with the param url
+      if (matcher) {
+        const route = firstLevelCurrentRoute || currentRoute;
+        const params = pMatcher?.params || matcher?.params;
+        const routeObj = {
+          fullPath: currentRoutePath,
+          path: route?.path,
+          fullUrl: pUrl,
+          url: compile(route.path)(params),
+          base: pBase,
+          component: route?.component,
+          children: route?.children,
+          parser: pMatcher || matcher,
+          langPath: route?.langPath,
+          name: route?.name || route?.component?.displayName,
+          props: {
+            params,
+            ...(route?.props || {}),
+          },
+        };
 
-    // if not match
-    else if (currentRoute?.children) {
-      // else, call recursively this same method with new params
-      const matchingChildren = getRouteFromUrl({
-        pUrl,
-        id,
-        pRoutes: currentRoute?.children,
-        pBase: currentRoutePath, // parent base
-        pCurrentRoute: currentRoute,
-        pMatcher: matcher,
-      });
+        log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
+        return routeObj;
+      }
 
-      // only if matching, return this match, else continue to next iteration
-      if (matchingChildren) return matchingChildren;
+      // if not match
+      else if (currentRoute?.children) {
+        if (!firstLevelCurrentRoute) {
+          firstLevelCurrentRoute = currentRoute;
+        }
+
+        // else, call recursively this same method with new params
+        const matchingChildren = next({
+          pUrl,
+          id,
+          pRoutes: currentRoute?.children,
+          pBase: currentRoutePath, // parent base
+          pCurrentRoute: firstLevelCurrentRoute || currentRoute,
+          pMatcher: matcher,
+        });
+
+        // only if matching, return this match, else continue to next iteration
+        if (matchingChildren) return matchingChildren;
+      }
     }
   }
+
+  return next({ pUrl, pRoutes, pBase, pMatcher, id });
 };

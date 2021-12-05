@@ -166,7 +166,6 @@ export function createUrl(
   availablesRoutes = Routers?.routes,
   base: string = Routers.base
 ): string {
-  log("Routers.base", Routers.base);
   if (!availablesRoutes) return;
   let urlToPush: string;
 
@@ -276,9 +275,6 @@ export function removeLastCharFromString(
   lastChar: string,
   exeptIfStringIsLastChar = true
 ): string {
-  if (!str || str === "") {
-    log("str ", str);
-  }
   if (exeptIfStringIsLastChar && str === lastChar) return str;
   if (str.endsWith(lastChar)) str = str.slice(0, -1);
   return str;

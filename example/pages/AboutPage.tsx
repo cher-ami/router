@@ -5,7 +5,6 @@ import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
 import { routesList } from "../routes";
-import { createMemoryHistory } from "history";
 const componentName: string = "AboutPage";
 
 const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
@@ -35,7 +34,7 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
                 <Link to={{ name: "FooPage" }}>Foo</Link>
               </li>
               <li>
-                <Link to={{ name: "BarPage" }}>Bar</Link>{" "}
+                <Link to={{ name: "BarPage" }}>Bar (sub router)</Link>
               </li>
             </ul>
           </nav>

@@ -1,5 +1,5 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { Link, Router, Stack, useLocation } from "../../src";
+import { Link, Router, Stack } from "../../src";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { routesList } from "../routes";
