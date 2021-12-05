@@ -1,8 +1,8 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { Link, Router, Stack } from "../../src";
+import { Link, Router, Stack, useRouter } from "../../src";
 import { useStack } from "../../src";
+import { joinPaths } from "../../src/api/helpers";
 import { transitionsHelper } from "../helper/transitionsHelper";
-import { routesList } from "../routes";
 
 const componentName: string = "HelloPage";
 
@@ -19,19 +19,15 @@ export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
+  const router = useRouter();
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
       <Router
         id={4}
-        base={"/base/about/bar/hello"}
-        routes={
-          routesList
-            .find((route) => route.path === "/about")
-            .children.find((route) => route.path === "/bar")
-            .children.find((route) => route.path === "/hello").children
-        }
+        base={joinPaths([router.base, "/hello"])}
+        routes={router.routes.find((route) => route.path === "/hello").children}
       >
         <div className={componentName}>
           <nav>

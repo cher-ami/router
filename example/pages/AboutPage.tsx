@@ -1,10 +1,11 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { useStack } from "../../src";
+import { useRouter, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
 import { routesList } from "../routes";
+import { joinPaths } from "../../src/api/helpers";
 const componentName: string = "AboutPage";
 
 const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
@@ -18,13 +19,15 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
+
+  const router = useRouter()
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
       <Router
         id={2}
-        base={"/base/about"}
+        base={joinPaths([router.base, '/about'])}
         routes={routesList.find((route) => route.path === "/about").children}
       >
         <div className={componentName}>
