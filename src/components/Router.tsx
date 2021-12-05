@@ -73,6 +73,7 @@ export const RouterContext = React.createContext({
   previousPageIsMount: true,
   unmountPreviousPage: () => {},
 });
+RouterContext.displayName = "RouterContext";
 
 Router.defaultProps = {
   base: "/",
@@ -94,10 +95,13 @@ function Router(props: {
   id?: number;
 }): JSX.Element {
   /**
-   * routes
+   * 1. routes
    * Format and return routes list
    * If is the first Router instance, register routes in 'Routers' store
    * In other case, return current props.routes
+   *
+   *  const { routes } = useRouter();
+   *  return current Router instance routes list, not all routes given to the first instance.
    */
   const routes = React.useMemo(() => {
     if (!Routers.routes) {
@@ -110,18 +114,28 @@ function Router(props: {
   }, [props.routes]);
 
   /**
-   * base
+   * 2. base
    * Format and return base URL
    * Register base in 'Routers' obj if is the first Router instance
+   * In all case, return current props.base
    */
   const base = React.useMemo(() => {
     if (!Routers.base) Routers.base = props.base;
     return props.base;
   }, [props.base]);
 
-  // 3. history
+  /**
+   * 3. history
+   * If is the first Router instance, register history in 'Routers' store
+   * 'history' object need to be the same between each Router instance
+   */
   if (!Routers.history) Routers.history = props.history;
 
+  // -------------------------------------------------------------------------------- ROUTE CHANGE
+
+  /**
+   * States list muted when history change
+   */
   const [reducerState, dispatch] = React.useReducer(
     (
       state,
@@ -148,13 +162,14 @@ function Router(props: {
     }
   );
 
+  // keep as reference
+  const currentRouteRef = React.useRef<TRoute>();
+
   /**
    * Handle history
    * Update routes when history change
    * Dispatch new routes via RouterContext
    */
-
-  const currentRouteRef = React.useRef<TRoute>();
   const handleHistory = (url: string = window.location.pathname): void => {
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
@@ -169,10 +184,8 @@ function Router(props: {
       return;
     }
 
-    if (
-      currentRouteRef.current?.url != null &&
-      currentRouteRef.current?.url === matchingRoute?.url
-    ) {
+    const currentRouteUrl = currentRouteRef.current?.url;
+    if (currentRouteUrl != null && currentRouteUrl === matchingRoute?.url) {
       log(props.id, "this is the same route 'url', return.");
       return;
     }
@@ -184,6 +197,13 @@ function Router(props: {
     }
   };
 
+  /**
+   * Here we go!
+   * Listen history change.
+   * If it's change:
+   * - Get matching route with current URL
+   * - Dispatch new route from context
+   */
   React.useEffect(() => {
     handleHistory();
     return Routers.history.listen(({ location }) => {
@@ -191,17 +211,21 @@ function Router(props: {
     });
   }, []);
 
+  // -------------------------------------------------------------------------------- RENDER
+
+  const { currentRoute, previousRoute, routeIndex, previousPageIsMount } = reducerState;
+
   return (
     <RouterContext.Provider
       value={{
         routes,
         base,
-        history: Routers.history,
-        currentRoute: reducerState.currentRoute,
-        previousRoute: reducerState.previousRoute,
-        routeIndex: reducerState.routeIndex,
-        previousPageIsMount: reducerState.previousPageIsMount,
+        currentRoute,
+        previousRoute,
+        routeIndex,
+        previousPageIsMount,
         unmountPreviousPage: () => dispatch({ type: "unmount-previous-page" }),
+        history: Routers.history,
       }}
       children={props.children}
     />
