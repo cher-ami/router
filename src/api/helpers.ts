@@ -159,14 +159,14 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  * (Get URL to push in history)
  *
  * @param args can be string or TOpenRouteParams object
- * @param availablesRoutes
+ * @param allRoutes
  */
 export function createUrl(
   args: string | TOpenRouteParams,
-  availablesRoutes = Routers?.routes,
-  base: string = Routers.base
+  base: string = Routers.base,
+  allRoutes: TRoute[] = Routers.routes
 ): string {
-  if (!availablesRoutes) return;
+  if (!allRoutes) return;
   let urlToPush: string;
 
   // in case we recieve a string
@@ -183,7 +183,7 @@ export function createUrl(
       };
     }
     // Get URL by the route name
-    urlToPush = getUrlByRouteName(availablesRoutes, args);
+    urlToPush = getUrlByRouteName(allRoutes, args);
 
     // in other case return.
   } else {
@@ -202,15 +202,9 @@ export function createUrl(
  * @param args can be string or TOpenRouteParams object
  * @param availablesRoutes
  */
-export function openRoute(
-  args: string | TOpenRouteParams,
-  availablesRoutes?: TRoute[],
-  history = Routers?.history
-) {
-  const url = typeof args === "string" ? args : createUrl(args, availablesRoutes);
-  if (history) {
-    history.push(url);
-  }
+export function openRoute(args: string | TOpenRouteParams, history = Routers?.history) {
+  const url = typeof args === "string" ? args : createUrl(args);
+  history?.push(url);
 }
 
 /**

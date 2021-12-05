@@ -16,10 +16,6 @@ export type TRoutersConfig = {
    */
   routes: TRoute[];
   /**
-   * Routers instances list
-   */
-  instances: any[];
-  /**
    * Global browser history
    */
   history: HashHistory | MemoryHistory | BrowserHistory;
@@ -35,11 +31,18 @@ export type TRoutersConfig = {
   /**
    * build URL method
    */
-  createUrl: (args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string;
+  createUrl: (
+    args: string | TOpenRouteParams,
+    base: string,
+    allRoutes: TRoute[]
+  ) => string;
   /**
    * Open route method
    */
-  openRoute: (args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => void;
+  openRoute: (
+    args: string | TOpenRouteParams,
+    history: HashHistory | MemoryHistory | BrowserHistory
+  ) => void;
 };
 
 /**
@@ -49,7 +52,6 @@ export type TRoutersConfig = {
 export const Routers: TRoutersConfig = {
   preMiddlewareRoutes: undefined,
   routes: undefined,
-  instances: [],
   history: undefined,
   routeCounter: 1,
   isFirstRoute: true,

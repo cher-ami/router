@@ -779,13 +779,13 @@ we need a global object to store shared informations between router instances. I
 
 #### Routers.createUrl()
 
-`(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string`
+`(args: string | TOpenRouteParams, base?:string, allRoutes?: TRoute[]) => string`
 
 Create a formated URL by string, or `TOpenRouteParams`
 
 #### Routers.openRoute()
 
-`(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => void`
+`(args: string | TOpenRouteParams, history?) => void`
 
 Push new route in current history. Stack(s) component(s) will return appriopriated route.
 
@@ -801,23 +801,11 @@ Routes givent to the router before Middleware process.
 
 Final routes array used by the router be
 
-#### Routers.instances
-
-`RouterManager[]`
-
-Contains all router instances. This array is updated each time a router is added or removed from DOM.
-
 #### Routers.history
 
 `HashHistory | MemoryHistory | BrowserHistory`
 
 Selected history mode. all history API is avaible from this one.
-
-#### Routers.locationsHistory
-
-`Location[]`
-
-Array of history navigation locations from the start of the session. This information is provided by `history`.
 
 #### Routers.routeCounter
 

@@ -32,7 +32,7 @@ function Link(props: ILinkProps) {
   const [location] = useLocation();
 
   // Compute URL
-  const url = useMemo(() => createUrl(props.to, routes, base), [props.to, routes, base]);
+  const url = useMemo(() => createUrl(props.to, base, routes), [props.to, routes, base]);
 
   // Link is active if its URL is the current URL
   const isActive = useMemo(

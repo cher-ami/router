@@ -74,34 +74,17 @@ export const RouterContext = React.createContext({
   unmountPreviousPage: () => {},
 });
 
-const reducer = (
-  state,
-  action: { type: "update-current-route" | "unmount-previous-page"; value?: any }
-) => {
-  switch (action.type) {
-    case "update-current-route":
-      return {
-        ...state,
-        previousRoute: state.currentRoute,
-        currentRoute: action.value,
-        routeIndex: state.routeIndex + 1,
-        previousPageIsMount: true,
-      };
-    case "unmount-previous-page":
-      return { ...state, previousPageIsMount: false };
-  }
-};
-
-/**
- * Router start
- */
-
 Router.defaultProps = {
   base: "/",
   history: createBrowserHistory(),
   id: 1,
 };
 
+/**
+ * Router
+ * @param props
+ * @returns JSX.Element
+ */
 function Router(props: {
   children: React.ReactNode;
   routes: TRoute[];
@@ -110,41 +93,60 @@ function Router(props: {
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   id?: number;
 }): JSX.Element {
-  // 1. routes
+  /**
+   * routes
+   * Format and return routes list
+   * If is the first Router instance, register routes in 'Routers' store
+   * In other case, return current props.routes
+   */
   const routes = React.useMemo(() => {
-    Routers.preMiddlewareRoutes = patchMissingRootRoute(props.routes);
-    Routers.routes = applyMiddlewares(Routers.preMiddlewareRoutes, props.middlewares);
-    log(props.id, "finalRoutes", Routers.routes);
-    return Routers.routes;
+    if (!Routers.routes) {
+      Routers.preMiddlewareRoutes = patchMissingRootRoute(props.routes);
+      Routers.routes = applyMiddlewares(Routers.preMiddlewareRoutes, props.middlewares);
+      return Routers.routes;
+    } else {
+      return props.routes;
+    }
   }, [props.routes]);
 
-  // 2. base
-  // const parentRouter = useRouter();
-  // const base = React.useMemo(() => {
-  //   const showLang = LangService.showLangInUrl();
-  //   const parentBase: string = parentRouter?.base;
-  //   const addLang: boolean = props.id !== 1 && showLang;
-  //   const selectedBase: string = addLang
-  //     ? getLangPathByPath({ path: props.base })
-  //     : props.base;
-  //   const final = joinPaths([
-  //     parentBase, // ex: /master-base
-  //     addLang && "/:lang",
-  //     selectedBase, // ex: "/about
-  //   ]);
-  //   return final;
-  // }, [props.base]);
+  /**
+   * base
+   * Format and return base URL
+   * Register base in 'Routers' obj if is the first Router instance
+   */
+  const base = React.useMemo(() => {
+    if (!Routers.base) Routers.base = props.base;
+    return props.base;
+  }, [props.base]);
 
-  // only for first instance
-  if (!Routers.base) Routers.base = props.base;
+  // 3. history
   if (!Routers.history) Routers.history = props.history;
 
-  const [reducerState, dispatch] = React.useReducer(reducer, {
-    currentRoute: undefined,
-    previousRoute: undefined,
-    previousPageIsMount: false,
-    routeIndex: 0,
-  });
+  const [reducerState, dispatch] = React.useReducer(
+    (
+      state,
+      action: { type: "update-current-route" | "unmount-previous-page"; value?: any }
+    ) => {
+      switch (action.type) {
+        case "update-current-route":
+          return {
+            ...state,
+            previousRoute: state.currentRoute,
+            currentRoute: action.value,
+            routeIndex: state.routeIndex + 1,
+            previousPageIsMount: true,
+          };
+        case "unmount-previous-page":
+          return { ...state, previousPageIsMount: false };
+      }
+    },
+    {
+      currentRoute: undefined,
+      previousRoute: undefined,
+      previousPageIsMount: false,
+      routeIndex: 0,
+    }
+  );
 
   /**
    * Handle history
@@ -169,7 +171,7 @@ function Router(props: {
 
     if (
       currentRouteRef.current?.url != null &&
-      currentRouteRef.current?.url === matchingRoute.url
+      currentRouteRef.current?.url === matchingRoute?.url
     ) {
       log(props.id, "this is the same route 'url', return.");
       return;
@@ -193,7 +195,7 @@ function Router(props: {
     <RouterContext.Provider
       value={{
         routes,
-        base: props.base,
+        base,
         history: Routers.history,
         currentRoute: reducerState.currentRoute,
         previousRoute: reducerState.previousRoute,

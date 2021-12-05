@@ -1,5 +1,5 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { useStack } from "../../src";
+import { openRoute, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "FooPage";
 
@@ -19,6 +19,11 @@ const FooPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
+      <br />
+      <button
+        children={`navigate to FooPage`}
+        onClick={() => openRoute({ name: "OurPage" })}
+      />
     </div>
   );
 });

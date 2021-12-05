@@ -40,7 +40,7 @@ export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>
                 <Link to={{ name: "LaPage" }}>La</Link>
               </li>
               <li>
-                <Link to={{ name: "OurPage" }}>OurR</Link>
+                <Link to={{ name: "OurPage" }}>Our</Link>
               </li>
             </ul>
           </nav>

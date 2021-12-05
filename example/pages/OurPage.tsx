@@ -1,5 +1,5 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { useStack } from "../../src";
+import { useLocation, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "OurPage";
 
@@ -7,6 +7,8 @@ interface IProps {}
 
 const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
+
+  const [location, setLocation] = useLocation();
 
   useStack({
     componentName,
@@ -19,6 +21,11 @@ const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
+      <br />
+      <button
+        children={`navigate to FooPage`}
+        onClick={() => setLocation({ name: "FooPage" })}
+      />
     </div>
   );
 });
