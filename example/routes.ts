@@ -5,6 +5,8 @@ import FooPage from "./pages/FooPage";
 import BarPage from "./pages/BarPage";
 import { TRoute } from "../src/components/Router";
 import NotFoundPage from "./pages/NotFoundPage";
+import YoloPage from "./pages/YoloPage";
+import HelloPage from "./pages/HelloPage";
 
 /**
  * Define routes list
@@ -36,6 +38,16 @@ export const routesList: TRoute[] = [
       {
         path: "/bar",
         component: BarPage,
+        children: [
+          {
+            path: "/yolo",
+            component: YoloPage,
+          },
+          {
+            path: "/hello",
+            component: HelloPage,
+          },
+        ],
       },
     ],
   },
