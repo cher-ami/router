@@ -101,12 +101,12 @@ function Router(props: {
    *  return current Router instance routes list, not all routes given to the first instance.
    */
   const routes = React.useMemo(() => {
+    const patchedRoutes = patchMissingRootRoute(props.routes);
     if (!Routers.routes) {
-      const patchedRoutes = patchMissingRootRoute(props.routes);
       Routers.routes = applyMiddlewares(patchedRoutes, props.middlewares);
       return Routers.routes;
     } else {
-      return props.routes;
+      return patchedRoutes;
     }
   }, [props.routes]);
 
@@ -168,6 +168,7 @@ function Router(props: {
    * Dispatch new routes via RouterContext
    */
   const handleHistory = (url: string = window.location.pathname): void => {
+    log('"routes', routes);
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
@@ -197,9 +198,9 @@ function Router(props: {
   /**
    * Here we go!
    * Listen history change.
-   * If it's change:
+   * If it change:
    * - Get matching route with current URL
-   * - Dispatch new route from context
+   * - Dispatch new routes states from RouterContext
    */
   React.useEffect(() => {
     handleHistory();
@@ -215,6 +216,7 @@ function Router(props: {
 
   return (
     <RouterContext.Provider
+      children={props.children}
       value={{
         routes,
         base,
@@ -225,7 +227,6 @@ function Router(props: {
         unmountPreviousPage,
         history: Routers.history,
       }}
-      children={props.children}
     />
   );
 }
