@@ -31,7 +31,7 @@ export default function App() {
             </Link>
           </li>
           <li>
-            <Link to={{ name: "AboutPage" }}>About (sub router)</Link>
+            <Link to={{ name: "AboutPage" }}>About (has sub router)</Link>
           </li>
         </ul>
       </nav>

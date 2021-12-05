@@ -38,10 +38,10 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
           <nav>
             <ul>
               <li>
-                <Link to={{ name: "HelloPage" }}>Hello</Link>
+                <Link to={{ name: "YoloPage" }}>Yolo</Link>
               </li>
               <li>
-                <Link to={{ name: "YoloPage" }}>Yolo</Link>
+                <Link to={{ name: "HelloPage" }}>Hello (has sub router)</Link>
               </li>
             </ul>
           </nav>

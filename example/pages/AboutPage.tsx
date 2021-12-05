@@ -34,7 +34,7 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
                 <Link to={{ name: "FooPage" }}>Foo</Link>
               </li>
               <li>
-                <Link to={{ name: "BarPage" }}>Bar (sub router)</Link>
+                <Link to={{ name: "BarPage" }}>Bar (has sub router)</Link>
               </li>
             </ul>
           </nav>

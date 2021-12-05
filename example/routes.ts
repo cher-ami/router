@@ -7,6 +7,8 @@ import { TRoute } from "../src/components/Router";
 import NotFoundPage from "./pages/NotFoundPage";
 import YoloPage from "./pages/YoloPage";
 import HelloPage from "./pages/HelloPage";
+import LaPage from "./pages/LaPage";
+import OurPage from "./pages/OurPage";
 
 /**
  * Define routes list
@@ -46,6 +48,16 @@ export const routesList: TRoute[] = [
           {
             path: "/hello",
             component: HelloPage,
+            children: [
+              {
+                path: "/la",
+                component: LaPage,
+              },
+              {
+                path: "/our",
+                component: OurPage,
+              },
+            ],
           },
         ],
       },
