@@ -789,12 +789,6 @@ Create a formated URL by string, or `TOpenRouteParams`
 
 Push new route in current history. Stack(s) component(s) will return appriopriated route.
 
-#### Routers.preMiddlewareRoutes
-
-`TRoute[]`
-
-Routes givent to the router before Middleware process.
-
 #### Routers.routes
 
 `TRoute[]`

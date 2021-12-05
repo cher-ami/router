@@ -2,15 +2,11 @@ import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { TRoute } from "../components/Router";
 import { createUrl, openRoute, TOpenRouteParams } from "./helpers";
 
-export type TRoutersConfig = {
+export type TRouters = {
   /**
    * Base URL
    */
   base: string;
-  /**
-   * Routes givent to the router
-   */
-  preMiddlewareRoutes: TRoute[];
   /**
    * Global routes list
    */
@@ -49,8 +45,7 @@ export type TRoutersConfig = {
  * ROUTERS object allows to keep safe globales values between Routers instances
  * This object values do not depend of one single router
  */
-export const Routers: TRoutersConfig = {
-  preMiddlewareRoutes: undefined,
+export const Routers: TRouters = {
   routes: undefined,
   history: undefined,
   routeCounter: 1,

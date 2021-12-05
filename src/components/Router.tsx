@@ -7,12 +7,9 @@ import {
 } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { applyMiddlewares, joinPaths, patchMissingRootRoute } from "../api/helpers";
+import { applyMiddlewares, patchMissingRootRoute } from "../api/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Routers } from "../api/Routers";
-import { useRouter } from "../hooks/useRouter";
-import { getLangPathByPath } from "../lang/langHelpers";
-import LangService from "../lang/LangService";
 
 export type TRoute = {
   path: string;
@@ -105,8 +102,8 @@ function Router(props: {
    */
   const routes = React.useMemo(() => {
     if (!Routers.routes) {
-      Routers.preMiddlewareRoutes = patchMissingRootRoute(props.routes);
-      Routers.routes = applyMiddlewares(Routers.preMiddlewareRoutes, props.middlewares);
+      const patchedRoutes = patchMissingRootRoute(props.routes);
+      Routers.routes = applyMiddlewares(patchedRoutes, props.middlewares);
       return Routers.routes;
     } else {
       return props.routes;
@@ -214,6 +211,7 @@ function Router(props: {
   // -------------------------------------------------------------------------------- RENDER
 
   const { currentRoute, previousRoute, routeIndex, previousPageIsMount } = reducerState;
+  const unmountPreviousPage = () => dispatch({ type: "unmount-previous-page" });
 
   return (
     <RouterContext.Provider
@@ -224,7 +222,7 @@ function Router(props: {
         previousRoute,
         routeIndex,
         previousPageIsMount,
-        unmountPreviousPage: () => dispatch({ type: "unmount-previous-page" }),
+        unmountPreviousPage,
         history: Routers.history,
       }}
       children={props.children}
