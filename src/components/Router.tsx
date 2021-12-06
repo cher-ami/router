@@ -7,10 +7,10 @@ import {
 } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { useRouter } from "..";
 import { applyMiddlewares, patchMissingRootRoute } from "../api/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Routers } from "../api/Routers";
+import { getLangPath } from "../lang/langHelpers";
 
 export type TRoute = {
   path: string | { [x: string]: string };
@@ -102,12 +102,18 @@ function Router(props: {
    *  return current Router instance routes list, not all routes given to the first instance.
    */
   const routes = React.useMemo(() => {
+    if (!props.routes) {
+      console.warn("props.routes is missing or empty, return.", props.routes);
+    }
+
     let routesList;
     routesList = patchMissingRootRoute(props.routes);
     if (!Routers.routes) {
       routesList = applyMiddlewares(routesList, props.middlewares);
       Routers.routes = routesList;
     }
+
+    log(props.id, "routesList", routesList);
     return routesList;
   }, [props.routes]);
 
@@ -162,7 +168,6 @@ function Router(props: {
 
   // keep as reference
   const currentRouteRef = React.useRef<TRoute>();
-
   /**
    * Handle history
    * Update routes when history change
@@ -193,8 +198,8 @@ function Router(props: {
       dispatch({ type: "update-current-route", value: newRoute });
       currentRouteRef.current = newRoute;
 
-      // Routers.currentRoutes[props.id - 1] = newRoute;
-      // log(props.id, "-------------newRoute fullPath", newRoute.fullPath);
+      Routers.currentRoutes[props.id - 1] = newRoute;
+      log(props.id, "-------------Routers.currentRoutes", Routers.currentRoutes);
     }
   };
 
@@ -212,12 +217,13 @@ function Router(props: {
     });
   }, []);
 
-  // React.useEffect(() => {
-  //   return () => {
-  //     Routers.currentRoutes[props.id - 1] = null;
-  //     log(props.id, "Routers.currentRoutes after slice", Routers.currentRoutes);
-  //   };
-  // }, []);
+  // remove Router.currentRoutes entry of this current router
+  React.useEffect(() => {
+    return () => {
+      Routers.currentRoutes[props.id - 1] = null;
+      Routers.currentRoutes.filter((e) => e);
+    };
+  }, []);
 
   // -------------------------------------------------------------------------------- RENDER
 

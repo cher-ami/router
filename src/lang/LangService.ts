@@ -2,7 +2,7 @@ import { Routers } from "../api/Routers";
 import {
   compileUrl,
   joinPaths,
-  prepareSetLocationFullUrl,
+  prepareFullUrl,
   removeLastCharFromString,
 } from "../api/helpers";
 import debug from "@wbe/debug";
@@ -93,8 +93,8 @@ class LangService {
       return;
     }
 
-    // get fullUrl property from the last router instance ex: /base/lang/first-level/second-level
-    const preparedNewUrl = prepareSetLocationFullUrl(toLang);
+    // get fullUrl property from the last router url ex: /base/lang/first-level/second-level
+    const preparedNewUrl = prepareFullUrl(toLang);
     // create newUrl variable to set in each condition
     let newUrl: string;
     // choose force page reload in condition below

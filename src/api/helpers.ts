@@ -215,8 +215,9 @@ export function openRoute(args: string | TOpenRouteParams, history = Routers?.hi
 }
 
 /**
- * Prepare set location **FULL** URL
- * Parse each router full URL with new lang param, then keep the last router instance
+ * Prepare **FULL** URL
+ * Parse each router full URL with new lang param,
+ *  then keep the last router full URL
  *
  *  -> /base/en/foo-en
  *  -> /base/en/foo-en/bar-en -> keep this one
@@ -226,21 +227,21 @@ export function openRoute(args: string | TOpenRouteParams, history = Routers?.hi
  * should become:
  *   "/base/fr/foo-fr-path/sub-fr-path"
  *
- *
  */
-export function prepareSetLocationFullUrl(toLang, instances = Routers.instances): string {
+export function prepareFullUrl(toLang, currentRoutes = Routers.currentRoutes): string {
   let pathToGenerate = [];
 
-  for (let instance of instances) {
-    if (instance?.currentRoute) {
+  for (let current of currentRoutes) {
+    if (current) {
       const newUrl = createUrl({
-        name: instance.currentRoute.name,
+        name: current.name,
         params: {
-          ...(instance.currentRoute.props?.params || {}),
+          ...(current.props?.params || {}),
           lang: toLang.key,
         },
       });
       pathToGenerate.push(newUrl);
+      log("pathToGenerate", pathToGenerate);
     }
   }
   // get last item of array
