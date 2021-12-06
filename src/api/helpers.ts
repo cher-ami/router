@@ -172,7 +172,10 @@ export function createUrl(
   // in case we recieve a string
   if (typeof args === "string") {
     urlToPush = args as string;
-    urlToPush = addLangToUrl(urlToPush);
+
+    if (LangService.isInit) {
+      urlToPush = addLangToUrl(urlToPush);
+    }
 
     // in case we recieve an object
   } else if (typeof args === "object" && args?.name) {
@@ -192,7 +195,11 @@ export function createUrl(
   }
 
   // in each case, add base URL
-  urlToPush = addBaseToUrl(urlToPush, base);
+  urlToPush = addBaseToUrl(
+    urlToPush,
+    // compile base if contains lang params
+    compileUrl(base, { lang: LangService.currentLang?.key })
+  );
   return urlToPush;
 }
 
@@ -209,12 +216,16 @@ export function openRoute(args: string | TOpenRouteParams, history = Routers?.hi
 
 /**
  * Prepare set location **FULL** URL
- * Result URL of each Routers
+ * Parse each router full URL with new lang param, then keep the last router instance
+ *
+ *  -> /base/en/foo-en
+ *  -> /base/en/foo-en/bar-en -> keep this one
  *
  * ex:
  *   "/base/en/foo-en-path/sub-en-path"
  * should become:
  *   "/base/fr/foo-fr-path/sub-fr-path"
+ *
  *
  */
 export function prepareSetLocationFullUrl(toLang, instances = Routers.instances): string {

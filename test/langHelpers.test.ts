@@ -1,4 +1,4 @@
-import { TRoute } from "../src";
+import { TRoute } from "../src/components/Router";
 import { getLangPathByPath } from "../src/lang/langHelpers";
 
 export const routesList: TRoute[] = [

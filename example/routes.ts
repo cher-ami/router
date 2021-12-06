@@ -28,8 +28,8 @@ export const routesList: TRoute[] = [
     },
   },
   {
-    path: "/about",
-    //path: { en: "/about", fr: "/a-propos", de: "/uber" },
+    // path: "/about",
+    path: { en: "/about", fr: "/a-propos", de: "/uber" },
     component: AboutPage,
     children: [
       {
@@ -42,7 +42,7 @@ export const routesList: TRoute[] = [
         component: BarPage,
         children: [
           {
-            path: "/yolo",
+            path: "/yolo/:id?",
             component: YoloPage,
           },
           {

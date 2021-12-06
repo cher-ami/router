@@ -24,6 +24,9 @@ export type TRouters = {
    * Is first route is true if routerCounter === 1
    */
   isFirstRoute: boolean;
+
+
+  currentRoutes: TRoute[];
   /**
    * build URL method
    */
@@ -46,11 +49,12 @@ export type TRouters = {
  * This object values do not depend of one single router
  */
 export const Routers: TRouters = {
+  base: undefined,
   routes: undefined,
   history: undefined,
   routeCounter: 1,
   isFirstRoute: true,
-  base: undefined,
+  currentRoutes: [],
   createUrl,
   openRoute,
 };

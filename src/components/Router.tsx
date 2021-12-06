@@ -7,12 +7,13 @@ import {
 } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
+import { useRouter } from "..";
 import { applyMiddlewares, patchMissingRootRoute } from "../api/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Routers } from "../api/Routers";
 
 export type TRoute = {
-  path: string;
+  path: string | { [x: string]: string };
   component?: React.ComponentType<any>;
   base?: string;
   name?: string;
@@ -101,13 +102,13 @@ function Router(props: {
    *  return current Router instance routes list, not all routes given to the first instance.
    */
   const routes = React.useMemo(() => {
-    const patchedRoutes = patchMissingRootRoute(props.routes);
+    let routesList;
+    routesList = patchMissingRootRoute(props.routes);
     if (!Routers.routes) {
-      Routers.routes = applyMiddlewares(patchedRoutes, props.middlewares);
-      return Routers.routes;
-    } else {
-      return patchedRoutes;
+      routesList = applyMiddlewares(routesList, props.middlewares);
+      Routers.routes = routesList;
     }
+    return routesList;
   }, [props.routes]);
 
   /**
@@ -168,7 +169,6 @@ function Router(props: {
    * Dispatch new routes via RouterContext
    */
   const handleHistory = (url: string = window.location.pathname): void => {
-    log('"routes', routes);
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
@@ -192,6 +192,9 @@ function Router(props: {
     if (newRoute) {
       dispatch({ type: "update-current-route", value: newRoute });
       currentRouteRef.current = newRoute;
+
+      // Routers.currentRoutes[props.id - 1] = newRoute;
+      // log(props.id, "-------------newRoute fullPath", newRoute.fullPath);
     }
   };
 
@@ -208,6 +211,13 @@ function Router(props: {
       handleHistory(location.pathname);
     });
   }, []);
+
+  // React.useEffect(() => {
+  //   return () => {
+  //     Routers.currentRoutes[props.id - 1] = null;
+  //     log(props.id, "Routers.currentRoutes after slice", Routers.currentRoutes);
+  //   };
+  // }, []);
 
   // -------------------------------------------------------------------------------- RENDER
 

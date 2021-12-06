@@ -1,11 +1,12 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { useRouter, useStack } from "../../src";
+import { langMiddleware, LangService, Routers, useRouter, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
 import { routesList } from "../routes";
-import { joinPaths } from "../../src/api/helpers";
+import { compileUrl, joinPaths } from "../../src/api/helpers";
+import { getLangPathByPath } from "../../src/lang/langHelpers";
 const componentName: string = "AboutPage";
 
 const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
@@ -19,16 +20,22 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
+  const router = useRouter();
 
-  const router = useRouter()
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
       <Router
         id={2}
-        base={joinPaths([router.base, '/about'])}
-        routes={routesList.find((route) => route.path === "/about").children}
+        base={joinPaths([router.base, "/:lang", "/about"])}
+        routes={
+          router.routes.find(
+            (route) =>
+              getLangPathByPath({ path: route.path }) ===
+              getLangPathByPath({ path: "/:lang/about" })
+          )?.children
+        }
       >
         <div className={componentName}>
           <nav>
