@@ -2,6 +2,7 @@ import { LangService, Routers } from "..";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { TRoute } from "../components/Router";
+import { getLangPath } from "../lang/langHelpers";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -61,7 +62,35 @@ export function applyMiddlewares(
   );
 }
 
-export function prepareRoutes() {}
+/**
+ * Get sub router base URL
+ * @param path
+ * @param base
+ * @param showLangInUrl
+ * @returns
+ */
+export function getSubRouterBase(
+  path: string | { [x: string]: string },
+  base: string,
+  showLangInUrl: boolean = LangService.showLangInUrl()
+): string {
+  return joinPaths([base, showLangInUrl ? "/:lang" : "", getLangPath(path)]);
+}
+
+/**
+ * Get sub router routes
+ * @param path
+ * @param routes
+ * @returns
+ */
+export function getSubRouterRoutes(
+  path: string | { [x: string]: string },
+  routes: TRoute[]
+): TRoute[] {
+  return routes.find((route) => {
+    return getLangPath(route.path) === getLangPath(path);
+  })?.children;
+}
 
 // ----------------------------------------------------------------------------- URLS
 
