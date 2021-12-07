@@ -1,11 +1,12 @@
 import "regenerator-runtime/runtime";
 import React from "react";
-import { Link, Router } from "../src";
+import { Link } from "./Link";
+import { Router } from "./Router";
 import { render, fireEvent } from "@testing-library/react";
-import { Routers } from "../src/core/Routers";
-import { LangService } from "../src";
-import { TOpenRouteParams } from "../src/core/helpers";
-import { TRoute } from "../src/components/Router";
+import { Routers } from "../core/Routers";
+import LangService from "../core/LangService";
+import { TOpenRouteParams } from "../core/helpers";
+import { TRoute } from "./Router";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
@@ -19,6 +20,7 @@ const App = ({ base = "/", to }: { base: string; to: string | TOpenRouteParams }
   const langService = new LangService({
     languages: locales,
     base,
+    showDefaultLangInUrl: false,
   });
 
   return (
@@ -51,7 +53,7 @@ describe("Link", () => {
     //LangService.init(locales, true);
     const { container } = await render(<App base={"/"} to={"/foo"} />);
     const href = (container.firstChild as HTMLLinkElement).getAttribute("href");
-    expect(href).toBe("/en/foo");
+    expect(href).toBe("/foo");
   });
 
   // FIXME

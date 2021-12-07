@@ -6,19 +6,25 @@ import {
   joinPaths,
   preventSlashes,
   removeLastCharFromString,
-} from "../src/core/helpers";
-import { TRoute } from "../src/components/Router";
+} from "./helpers";
+import { TRoute } from "../components/Router";
 
 // ------------------------------------------------------------ ROUTES
 
-const routes:TRoute[] = [
+const routes: TRoute[] = [
   { path: "/", component: null, name: "Home" },
   {
     path: { en: "/about", fr: "/a-propos", de: "/uber" },
-    component: {displayName: "About"} as any,
+    component: { displayName: "About" } as any,
     children: [
       { path: "/foo" },
-      { path: "/bar", children: [{ path: "/yolo/:id?",name: "YOLO" }, { path: "/hello", name:"Hello" }] },
+      {
+        path: "/bar",
+        children: [
+          { path: "/yolo/:id?", name: "YOLO" },
+          { path: "/hello", name: "Hello" },
+        ],
+      },
     ],
   },
 ];
@@ -37,8 +43,8 @@ describe("getRoutePathByRouteName", () => {
   });
 });
 
-describe("getSubRouterBase", () => {})
-describe("getSubRouterRoutes", () => {})
+describe("getSubRouterBase", () => {});
+describe("getSubRouterRoutes", () => {});
 
 // ------------------------------------------------------------ UTILS
 
@@ -103,35 +109,6 @@ describe("getUrlByPath", () => {
     expect(getUrlByPathPart(routesList, "/foo")).toBe("/hello/foo");
     expect(getUrlByPathPart(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
   });
-
-  //     // FIXME besoin du LangService ici
-//   it("should return full URL ", () => {
-//     // LangService.init([{ key: "fr" }, { key: "en" }], true);
-//     const routesListLang = [
-//       {
-//         path: "/hello",
-//         langPath: { fr: "/salut", en: "/hello" },
-//         children: [
-//           {
-//             path: "/bar-en",
-//             langPath: { en: "/bar-en", fr: "/bar-fr" },
-//             children: [
-//               {
-//                 path: "/foo-en",
-//                 langPath: { en: "/foo-en", fr: "/foo-fr" },
-//               },
-//               {
-//                 path: "/zoo",
-//               },
-//             ],
-//           },
-//           { path: "/foo" },
-//         ],
-//       },
-//     ];
-
-//     expect(getUrlByPathPart(routesListLang, "/foo-fr")).toBe("/salut/bar-fr/foo-fr");
-//   });
 });
 
 describe("getUrlByRouteName", () => {

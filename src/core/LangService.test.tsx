@@ -1,7 +1,9 @@
-import { LangService, Link, Router, Routers, useRouter } from "../src";
-import { act, render } from "@testing-library/react";
 import React from "react";
-import { TRoute } from "../src/components/Router";
+import { Router } from "../components/Router";
+import LangService from "../core/LangService";
+import { Link } from "../components/Link";
+import { act, render } from "@testing-library/react";
+import { TRoute } from "../components/Router";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
@@ -35,21 +37,6 @@ beforeAll(() => {
 afterEach(() => {
   windowOpenMock.mockClear();
 });
-
-/**
- * setLang
- * TODO can't test because setLang use "prepareFullUrl()" which use Routers property not setted
- */
-
-// it("should set lang properly", () => {
-//   const langService = new LangService({ languages: locales, base: "/" });
-//   render(<App langService={langService} />);
-//   act(() => {
-//     console.log("Routers", Routers.currentRoutes);
-//     Routers.langService.setLang(locales[1]);
-//   });
-//   expect(window.open).toHaveBeenCalledWith(`/${locales[1].key}`, "_self");
-// });
 
 /**
  * redirect
@@ -86,6 +73,20 @@ it("should not redirect to default lang if showDefaultLangInUrl is set to false"
   });
   expect(window.open).toHaveBeenCalledTimes(0);
 });
+
+/**
+ * setLang
+ * FIXME can't test because setLang use "prepareFullUrl()" which use Routers property not setted
+ */
+// it("should set lang properly", () => {
+//   const langService = new LangService({ languages: locales, base: "/" });
+//   render(<App langService={langService} />);
+//   act(() => {
+//     console.log("Routers", Routers.currentRoutes);
+//     Routers.langService.setLang(locales[1]);
+//   });
+//   expect(window.open).toHaveBeenCalledWith(`/${locales[1].key}`, "_self");
+// });
 
 // -------------------------------------------------------------------------------------
 
