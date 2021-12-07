@@ -259,12 +259,17 @@ import {
 const FooPage = forwardRef((props, handleRef) => {
   // Get parent router context
   const { base, routes } = useRouter();
+
+  // Parsed routes list and get path by route name
+  const path = getRoutePathByRouteName(routesList, "FooPage"); // "/foo"
   // ...
   return (
     <div>
       <Router
-        base={getSubRoutersBase("/foo", base)}
-        routes={getSubRoutersRoutes("/foo", routes)}
+        // -> "/base/:lang/foo" (if last param is false, ':lang' will be not added)
+        base={getSubRoutersBase(path, base, true)}
+        // children routes array of FooPage
+        routes={getSubRoutersRoutes(path, routes)}
       >
         <Stack />
       </Router>
