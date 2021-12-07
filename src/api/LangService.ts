@@ -1,13 +1,13 @@
-import { Routers } from "./Routers";
+import { Routers } from "../api/Routers";
 import {
   compileUrl,
   joinPaths,
   prepareFullUrl,
   removeLastCharFromString,
-} from "./helpers";
+} from "../api/helpers";
 import debug from "@wbe/debug";
 import { TRoute } from "../components/Router";
-import { getLangPathByLang } from "./helpers";
+import { getLangPathByLang } from "../api/helpers";
 
 const log = debug(`router:LangService`);
 
@@ -90,10 +90,6 @@ class LangService<TLang = any> {
    * @param forcePageReload
    */
   public setLang(toLang: TLanguage<TLang>, forcePageReload = true): void {
-    if (!this.isInit) {
-      console.warn("setLang: LangService is not init, exit.");
-      return;
-    }
     if (toLang.key === this.currentLang.key) {
       log("setLang: This is the same language, exit.");
       return;

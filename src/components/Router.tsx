@@ -42,6 +42,7 @@ export interface IRouterContext extends IRouterContextStackStates {
   history: BrowserHistory | HashHistory | MemoryHistory;
   currentRoute: TRoute;
   previousRoute: TRoute;
+  langService: LangService;
   routeIndex: number;
   previousPageIsMount: boolean;
   unmountPreviousPage: () => void;
@@ -65,17 +66,7 @@ const log = debug(`router:${componentName}`);
  * Big thing is you can access this context from the closest provider in the tree.
  * This allow to manage easily nested stack instances.
  */
-export const RouterContext = React.createContext<{
-  base: string;
-  routes: TRoute[];
-  history: BrowserHistory | HashHistory | MemoryHistory;
-  langService: LangService;
-  currentRoute: TRoute;
-  previousRoute: TRoute;
-  routeIndex: number;
-  previousPageIsMount: boolean;
-  unmountPreviousPage: () => void;
-}>({
+export const RouterContext = React.createContext<IRouterContext>({
   base: "/",
   routes: undefined,
   history: undefined,
