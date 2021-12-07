@@ -1,5 +1,5 @@
 // import { Routers, RouterManager, TRoute } from "../src";
-// import { preventSlashes } from "../src/api/helpers";
+// import { preventSlashes } from "../src/core/helpers";
 
 // /**
 //  * Create Router Test

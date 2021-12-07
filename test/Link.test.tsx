@@ -2,9 +2,9 @@ import "regenerator-runtime/runtime";
 import React from "react";
 import { Link, Router } from "../src";
 import { render, fireEvent } from "@testing-library/react";
-import { Routers } from "../src/api/Routers";
+import { Routers } from "../src/core/Routers";
 import { LangService } from "../src";
-import { TOpenRouteParams } from "../src/api/helpers";
+import { TOpenRouteParams } from "../src/core/helpers";
 import { TRoute } from "../src/components/Router";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];

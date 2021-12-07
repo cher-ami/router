@@ -6,7 +6,7 @@ import {
   getSubRouterBase,
   getSubRouterRoutes,
   joinPaths,
-} from "../../src/api/helpers";
+} from "../../src/core/helpers";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { routesList } from "../routes";
 

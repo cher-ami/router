@@ -6,7 +6,7 @@ import {
   joinPaths,
   preventSlashes,
   removeLastCharFromString,
-} from "../src/api/helpers";
+} from "../src/core/helpers";
 import { TRoute } from "../src/components/Router";
 
 // ------------------------------------------------------------ ROUTES

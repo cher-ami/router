@@ -1,13 +1,13 @@
-import { Routers } from "../api/Routers";
+import { Routers } from "../core/Routers";
 import {
   compileUrl,
   joinPaths,
   prepareFullUrl,
   removeLastCharFromString,
-} from "../api/helpers";
+} from "../core/helpers";
 import debug from "@wbe/debug";
 import { TRoute } from "../components/Router";
-import { getLangPathByLang } from "../api/helpers";
+import { getLangPathByLang } from "../core/helpers";
 
 const log = debug(`router:LangService`);
 

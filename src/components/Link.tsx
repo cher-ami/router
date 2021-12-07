@@ -5,7 +5,7 @@ import {
   joinPaths,
   removeLastCharFromString,
   TOpenRouteParams,
-} from "../api/helpers";
+} from "../core/helpers";
 import debug from "@wbe/debug";
 
 // exclude href because it collides with "to"

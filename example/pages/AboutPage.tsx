@@ -8,7 +8,7 @@ import {
   getRoutePathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
-} from "../../src/api/helpers";
+} from "../../src/core/helpers";
 import { routesList } from "../routes";
 const componentName: string = "AboutPage";
 

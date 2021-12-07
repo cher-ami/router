@@ -1,4 +1,4 @@
-import LangService from "../api/LangService";
+import LangService from "../core/LangService";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { TRoute } from "../components/Router";
 import { createUrl, openRoute, TOpenRouteParams } from "./helpers";

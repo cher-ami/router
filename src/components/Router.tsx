@@ -7,10 +7,10 @@ import {
 } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { applyMiddlewares, patchMissingRootRoute } from "../api/helpers";
-import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
-import { Routers } from "../api/Routers";
-import LangService from "../api/LangService";
+import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
+import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
+import { Routers } from "../core/Routers";
+import LangService from "../core/LangService";
 
 // -------------------------------------------------------------------------------- TYPES
 
