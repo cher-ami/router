@@ -1,6 +1,5 @@
 import React from "react";
-import { Link, Stack } from "../src";
-import { LangService } from "../src";
+import { Link, Routers, Stack } from "../src";
 
 const componentName = "App";
 
@@ -15,7 +14,7 @@ export default function App() {
           key={i}
           children={el}
           onClick={() => {
-            LangService.setLang({ key: el });
+            Routers.langService?.setLang({ key: el }, false);
           }}
         />
       ))}

@@ -1,6 +1,7 @@
 import LangService from "../lang/LangService";
 import { TRoute } from "../components/Router";
 import debug from "@wbe/debug";
+import { Routers } from "../api/Routers";
 const log = debug(`router:langHelpers`);
 
 /**
@@ -19,7 +20,7 @@ const log = debug(`router:langHelpers`);
  */
 export function getLangPathByLang(
   route: TRoute,
-  lang = LangService.currentLang?.key
+  lang = Routers.langService?.currentLang.key
 ): string {
   let selectedPath: string;
   if (typeof route.path === "string") {
@@ -46,7 +47,7 @@ export function getLangPathByLang(
  */
 export const getLangPath = (
   langPath: string | { [p: string]: string },
-  lang: string = LangService.currentLang?.key
+  lang: string = Routers.langService?.currentLang.key
 ) => {
   let path;
   if (typeof langPath === "string") {

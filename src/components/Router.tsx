@@ -10,7 +10,9 @@ import React from "react";
 import { applyMiddlewares, patchMissingRootRoute } from "../api/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Routers } from "../api/Routers";
-import { getLangPath } from "../lang/langHelpers";
+import LangService from "../lang/LangService";
+
+// -------------------------------------------------------------------------------- TYPES
 
 export type TRoute = {
   path: string | { [x: string]: string };
@@ -52,6 +54,8 @@ export type TRouteReducerState = {
   index: number;
 };
 
+// -------------------------------------------------------------------------------- PREPARE / CONTEXT
+
 const componentName = "Router";
 const log = debug(`router:${componentName}`);
 
@@ -61,10 +65,21 @@ const log = debug(`router:${componentName}`);
  * Big thing is you can access this context from the closest provider in the tree.
  * This allow to manage easily nested stack instances.
  */
-export const RouterContext = React.createContext({
+export const RouterContext = React.createContext<{
+  base: string;
+  routes: TRoute[];
+  history: BrowserHistory | HashHistory | MemoryHistory;
+  langService: LangService;
+  currentRoute: TRoute;
+  previousRoute: TRoute;
+  routeIndex: number;
+  previousPageIsMount: boolean;
+  unmountPreviousPage: () => void;
+}>({
   base: "/",
   routes: undefined,
   history: undefined,
+  langService: undefined,
   currentRoute: undefined,
   previousRoute: undefined,
   routeIndex: 0,
@@ -79,6 +94,8 @@ Router.defaultProps = {
   id: 1,
 };
 
+// -------------------------------------------------------------------------------- COMPONENT
+
 /**
  * Router
  * @param props
@@ -90,8 +107,20 @@ function Router(props: {
   base: string;
   history?: BrowserHistory | HashHistory | MemoryHistory;
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
+  langService?: LangService;
   id?: number;
 }): JSX.Element {
+  /**
+   * 0. LangService
+   * Check if langService props exist.
+   * If props exist, store langService instance in Routers store.
+   */
+  const langService = React.useMemo(() => {
+    if (!Routers.langService) Routers.langService = props.langService;
+    log(props.id, "Routers.langService", Routers.langService);
+    return Routers.langService;
+  }, [props.langService]);
+
   /**
    * 1. routes
    * Format and return routes list
@@ -105,17 +134,20 @@ function Router(props: {
     if (!props.routes) {
       console.warn("props.routes is missing or empty, return.", props.routes);
     }
-
     let routesList;
+
+    // For each instances
     routesList = patchMissingRootRoute(props.routes);
+
+    // Only for first instance
     if (!Routers.routes) {
       routesList = applyMiddlewares(routesList, props.middlewares);
+      if (langService) routesList = langService.addLangParamToRoutes(routesList);
       Routers.routes = routesList;
     }
-
     log(props.id, "routesList", routesList);
     return routesList;
-  }, [props.routes]);
+  }, [props.routes, langService]);
 
   /**
    * 2. base
@@ -236,12 +268,13 @@ function Router(props: {
       value={{
         routes,
         base,
+        langService,
+        history: Routers.history,
         currentRoute,
         previousRoute,
         routeIndex,
         previousPageIsMount,
         unmountPreviousPage,
-        history: Routers.history,
       }}
     />
   );

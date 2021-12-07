@@ -20,6 +20,5 @@ export { useRouteCounter } from "./hooks/useRouteCounter";
 export { useStack } from "./hooks/useStack";
 export type { IRouteStack } from "./hooks/useStack";
 
-export { langMiddleware } from "./lang/LangMiddleware";
 export { default as LangService } from "./lang/LangService";
 export type { TLanguage } from "./lang/LangService";

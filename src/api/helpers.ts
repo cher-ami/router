@@ -1,4 +1,4 @@
-import { LangService, Routers } from "..";
+import { Routers } from "..";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { TRoute } from "../components/Router";
@@ -94,9 +94,13 @@ export function getSubRouterBase(
   path: string | { [x: string]: string },
   base: string,
   addLangToUrl: boolean = true,
-  showLangInUrl: boolean = LangService.showLangInUrl()
+  showLangInUrl: boolean = Routers.langService?.showLangInUrl()
 ): string {
-  return joinPaths([base, (showLangInUrl && addLangToUrl) ? "/:lang" : "", getLangPath(path)]);
+  return joinPaths([
+    base,
+    showLangInUrl && addLangToUrl ? "/:lang" : "",
+    getLangPath(path),
+  ]);
 }
 
 /**
@@ -134,7 +138,7 @@ export function compileUrl(path: string, params?: TParams): string {
 export function getUrlByPathPart(
   routes: TRoute[],
   path: string | { [x: string]: string },
-  lang: string = LangService.currentLang?.key || undefined,
+  lang: string = Routers.langService?.currentLang.key || undefined,
   basePath: string = null
 ): string {
   let localPath: string[] = [basePath];
@@ -224,16 +228,16 @@ export function createUrl(
   if (typeof args === "string") {
     urlToPush = args as string;
 
-    if (LangService.isInit) {
+    if (Routers.langService?.isInit) {
       urlToPush = addLangToUrl(urlToPush);
     }
 
     // in case we recieve an object
   } else if (typeof args === "object" && args?.name) {
-    if (LangService.isInit && !args.params?.lang) {
+    if (Routers.langService?.isInit && !args.params?.lang) {
       args.params = {
         ...args.params,
-        ...{ lang: LangService.currentLang.key },
+        ...{ lang: Routers.langService?.currentLang.key },
       };
     }
     // Get URL by the route name
@@ -249,7 +253,7 @@ export function createUrl(
   urlToPush = addBaseToUrl(
     urlToPush,
     // compile base if contains lang params
-    compileUrl(base, { lang: LangService.currentLang?.key })
+    compileUrl(base, { lang: Routers.langService?.currentLang.key })
   );
   return urlToPush;
 }
@@ -355,8 +359,8 @@ export function removeLastCharFromString(
  */
 export function addLangToUrl(
   url: string,
-  lang: string = LangService.currentLang?.key,
-  enable = LangService.showLangInUrl()
+  lang: string = Routers.langService?.currentLang.key,
+  enable = Routers.langService?.showLangInUrl()
 ): string {
   if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);

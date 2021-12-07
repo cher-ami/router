@@ -4,16 +4,22 @@ import "./index.css";
 import App from "./App";
 import { Router } from "../src/components/Router";
 import { routesList } from "./routes";
-import { LangService, langMiddleware } from "../src";
+import { LangService } from "../src";
 
-const baseUrl = "/base/";
-LangService.init([{ key: "en" }, { key: "fr" }, { key: "de" }], true, baseUrl);
+const base = "/base/";
+type TLang = "en" | "fr" | "de";
+
+const langService = new LangService<TLang>({
+  languages: [{ key: "en" }, { key: "fr" }, { key: "de" }],
+  showDefaultLangInUrl: true,
+  base,
+});
 
 /**
  * Init Application
  */
 ReactDOM.render(
-  <Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
+  <Router langService={langService} routes={routesList} base={base}>
     <App />
   </Router>,
   document.getElementById("root")
