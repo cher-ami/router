@@ -1,8 +1,6 @@
-import LangService from "../lang/LangService";
 import { TRoute } from "../components/Router";
 import debug from "@wbe/debug";
 import { Routers } from "../api/Routers";
-const log = debug(`router:langHelpers`);
 
 /**
  * Get current lang path by Lang
