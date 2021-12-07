@@ -31,7 +31,7 @@ and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 - [Installation](#Installation)
 - [Simple usage](#SimpleUsage)
 - [Dynamic routes](#DynamicRoutes)
-- [Nested routes](#NestedRoutes)
+- [Sub Routers](#SubRouters)
 - [Manage Transitions](#ManageTransitions)
   - [Default sequential transitions](#DefaultSequentialTransitions)
   - [Custom transitions](#CustomTransitions)
@@ -207,11 +207,12 @@ const routesList = [
 
 **[Demo codesandbox: not found route](https://codesandbox.io/s/not-found-route-eu4bi)**
 
-## <a name="NestedRoutes"></a>Nested Routes
+## <a name="SubRouters"></a>Sub-router
 
-cher-ami router supports nested routes 🙏🏽
+cher-ami router supports nested routes from sub routers instance 🙏🏽.
+It is possible to nest as many routers as you want.
 
-1. Define children routes in initial routes list with `children` key;
+1. Define children routes in initial routes list with `children` property;
 
 ```js
 const routesList = [
@@ -241,34 +242,36 @@ const routesList = [
 2. Children were defined within the route that render `FooPage` component, so
    you can then create a new router instance in this component.
 
-**Only if it's a nested router, you must not pass `routes` Router props again**.
-The previous routes array, passed to the root component, will be used
-by `Router`.
-
-`Router` props `base` need to be the same than the path who contains children
-routes. In this case, `/foo` will be the new nested router base. The stack will
-then be able to render `/foo/people` and `/foo/yolo`.
+3. The new subRouters needs his own base and routes.
+   `getSubRoutersBase` and `getSubRoutersRoutes` functions available to get them.
 
 ```jsx
 import React from "react";
-import { Router, useStack, Stack } from "@cher-ami/router";
+import {
+  Router,
+  useStack,
+  Stack,
+  useRouter,
+  getSubRoutersBase,
+  getSubRoutersRoutes,
+} from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
+  // Get parent router context
+  const { base, routes } = useRouter();
   // ...
   return (
-    <div
-      className="FooPage"
-      // ...
-    >
-      <Router base={"/foo"}>
+    <div>
+      <Router
+        base={getSubRoutersBase("/foo", base)}
+        routes={getSubRoutersRoutes("/foo", routes)}
+      >
         <Stack />
       </Router>
     </div>
   );
 });
 ```
-
-**[Demo codesandbox: nested router](https://codesandbox.io/s/nested-router-bvspe?file=/src/index.tsx)**
 
 ## <a name="ManageTransitions"></a>Manage transitions
 

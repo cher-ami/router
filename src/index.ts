@@ -1,7 +1,12 @@
 export { Routers } from "./api/Routers";
 export { Router } from "./components/Router";
 export { Link } from "./components/Link";
-export { createUrl, openRoute } from "./api/helpers";
+export {
+  createUrl,
+  openRoute,
+  getSubRouterBase,
+  getSubRouterRoutes,
+} from "./api/helpers";
 export type { TOpenRouteParams } from "./api/helpers";
 
 export { Stack } from "./components/Stack";
