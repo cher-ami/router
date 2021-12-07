@@ -63,6 +63,27 @@ export function applyMiddlewares(
 }
 
 /**
+ * Get route path by route name. (or component name)
+ * @param routes
+ * @param name
+ * @returns
+ */
+export function getRoutePathByRouteName(
+  routes: TRoute[],
+  name: string
+): string | { [x: string]: string } {
+  for (let route of routes) {
+    if (route.name === name || route.component?.displayName === name) {
+      return route.path;
+    } else {
+      if (route.children) {
+        return getRoutePathByRouteName(route.children, name);
+      }
+    }
+  }
+}
+
+/**
  * Get sub router base URL
  * @param path
  * @param base
@@ -72,9 +93,10 @@ export function applyMiddlewares(
 export function getSubRouterBase(
   path: string | { [x: string]: string },
   base: string,
+  addLangToUrl: boolean = true,
   showLangInUrl: boolean = LangService.showLangInUrl()
 ): string {
-  return joinPaths([base, showLangInUrl ? "/:lang" : "", getLangPath(path)]);
+  return joinPaths([base, (showLangInUrl && addLangToUrl) ? "/:lang" : "", getLangPath(path)]);
 }
 
 /**

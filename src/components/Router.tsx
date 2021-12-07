@@ -198,8 +198,8 @@ function Router(props: {
       dispatch({ type: "update-current-route", value: newRoute });
       currentRouteRef.current = newRoute;
 
+      // TODO insternal props ID
       Routers.currentRoutes[props.id - 1] = newRoute;
-      log(props.id, "-------------Routers.currentRoutes", Routers.currentRoutes);
     }
   };
 

@@ -1,8 +1,14 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { Link, Router, Stack, useRouter } from "../../src";
 import { useStack } from "../../src";
-import { joinPaths } from "../../src/api/helpers";
+import {
+  getRoutePathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+  joinPaths,
+} from "../../src/api/helpers";
 import { transitionsHelper } from "../helper/transitionsHelper";
+import { routesList } from "../routes";
 
 const componentName: string = "HelloPage";
 
@@ -20,14 +26,15 @@ export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>
   });
 
   const router = useRouter();
+  const path = getRoutePathByRouteName(routesList, "HelloPage");
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
       <Router
         id={4}
-        base={joinPaths([router.base, "/hello"])}
-        routes={router.routes.find((route) => route.path === "/hello").children}
+        base={getSubRouterBase(path, router.base, false)}
+        routes={getSubRouterRoutes(path, router.routes)}
       >
         <div className={componentName}>
           <nav>

@@ -1,5 +1,6 @@
 import {
   compileUrl,
+  getRoutePathByRouteName,
   getUrlByPathPart,
   getUrlByRouteName,
   joinPaths,
@@ -7,6 +8,40 @@ import {
   removeLastCharFromString,
 } from "../src/api/helpers";
 import { LangService } from "../src";
+import { TRoute } from "../src/components/Router";
+
+// ------------------------------------------------------------ ROUTES
+
+const routes:TRoute[] = [
+  { path: "/", component: null, name: "Home" },
+  {
+    path: { en: "/about", fr: "/a-propos", de: "/uber" },
+    component: {displayName: "About"} as any,
+    children: [
+      { path: "/foo" },
+      { path: "/bar", children: [{ path: "/yolo/:id?",name: "YOLO" }, { path: "/hello", name:"Hello" }] },
+    ],
+  },
+];
+
+describe("getRoutePathByRouteName", () => {
+  it("should return the right path with name", () => {
+    // prettier-ignore
+    expect(getRoutePathByRouteName(routes, "Home")).toEqual("/");
+    expect(getRoutePathByRouteName(routes, "About")).toEqual({
+      en: "/about",
+      fr: "/a-propos",
+      de: "/uber",
+    });
+    expect(getRoutePathByRouteName(routes, "YOLO")).toEqual("/yolo/:id?");
+    expect(getRoutePathByRouteName(routes, "Hello")).toEqual("/hello");
+  });
+});
+
+describe("getSubRouterBase", () => {})
+describe("getSubRouterRoutes", () => {})
+
+// ------------------------------------------------------------ UTILS
 
 describe("removeLastCharFromString", () => {
   it("should not remove last character if string === lastChar", () => {

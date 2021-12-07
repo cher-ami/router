@@ -4,7 +4,12 @@ import { transitionsHelper } from "../helper/transitionsHelper";
 import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
-import { getSubRouterBase, getSubRouterRoutes } from "../../src/api/helpers";
+import {
+  getRoutePathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+} from "../../src/api/helpers";
+import { routesList } from "../routes";
 const componentName: string = "AboutPage";
 
 const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
@@ -20,16 +25,17 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
 
   // prepare routes & base for subRouter
   const router = useRouter();
-  const routePath = { en: "/about", fr: "/a-propos", de: "/uber" };
-
-  const surRouterBase = getSubRouterBase(routePath, router.base);
-  const ubRouterRoutes = getSubRouterRoutes(routePath, router.routes);
+  const path = getRoutePathByRouteName(routesList, "AboutPage");
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
-      <Router id={2} base={getSubRouterBase(routePath, router.base)} routes={ getSubRouterRoutes(routePath, router.routes)}>
+      <Router
+        id={2}
+        base={getSubRouterBase(path, router.base)}
+        routes={getSubRouterRoutes(path, router.routes)}
+      >
         <div className={componentName}>
           <nav>
             <ul>
