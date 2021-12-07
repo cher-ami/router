@@ -1,9 +1,4 @@
-import React, {
-  AnchorHTMLAttributes,
-  PropsWithChildren,
-  useEffect,
-  useMemo,
-} from "react";
+import React, { AnchorHTMLAttributes, PropsWithChildren, useMemo } from "react";
 import { useLocation, useRouter } from "..";
 import {
   createUrl,

@@ -117,6 +117,17 @@ export function getSubRouterRoutes(
   })?.children;
 }
 
+/**
+ * openRoute push a route in history
+ *  the Stack component will render the new route
+ * @param args can be string or TOpenRouteParams object
+ * @param availablesRoutes
+ */
+export function openRoute(args: string | TOpenRouteParams, history = Routers?.history) {
+  const url = typeof args === "string" ? args : createUrl(args);
+  history?.push(url);
+}
+
 // ----------------------------------------------------------------------------- URLS
 
 /**
@@ -255,17 +266,6 @@ export function createUrl(
     compileUrl(base, { lang: Routers.langService?.currentLang.key })
   );
   return urlToPush;
-}
-
-/**
- * openRoute push a route in history
- *  the Stack component will render the new route
- * @param args can be string or TOpenRouteParams object
- * @param availablesRoutes
- */
-export function openRoute(args: string | TOpenRouteParams, history = Routers?.history) {
-  const url = typeof args === "string" ? args : createUrl(args);
-  history?.push(url);
 }
 
 /**

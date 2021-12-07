@@ -10,7 +10,7 @@ import React from "react";
 import { applyMiddlewares, patchMissingRootRoute } from "../api/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
 import { Routers } from "../api/Routers";
-import LangService from "../lang/LangService";
+import LangService from "../api/LangService";
 
 // -------------------------------------------------------------------------------- TYPES
 

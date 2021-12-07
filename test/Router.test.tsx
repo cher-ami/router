@@ -1,7 +1,8 @@
 import React from "react";
-import { Router, TRoute } from "../src";
+import { Router } from "../src";
 import { render } from "@testing-library/react";
 import { createBrowserHistory } from "history";
+import { TRoute } from "../src/components/Router";
 
 describe("Router", () => {
   const routesList: TRoute[] = [

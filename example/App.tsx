@@ -14,7 +14,7 @@ export default function App() {
           key={i}
           children={el}
           onClick={() => {
-            Routers.langService?.setLang({ key: el }, false);
+            Routers.langService?.setLang({ key: el });
           }}
         />
       ))}

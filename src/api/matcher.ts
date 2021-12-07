@@ -1,8 +1,7 @@
 import { compile, match } from "path-to-regexp";
-import debug from "@wbe/debug";
-
 import { joinPaths, removeLastCharFromString } from "./helpers";
 import { TRoute } from "../components/Router";
+import debug from "@wbe/debug";
 const log = debug(`router:matcher`);
 
 /**
