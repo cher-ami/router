@@ -252,6 +252,7 @@ import {
   useStack,
   Stack,
   useRouter,
+  getRoutePathByRouteName,
   getSubRoutersBase,
   getSubRoutersRoutes,
 } from "@cher-ami/router";
