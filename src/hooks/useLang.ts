@@ -2,7 +2,7 @@ import LangService, { TLanguage } from "../core/LangService";
 import debug from "@wbe/debug";
 import React from "react";
 import { Routers } from "../core/Routers";
-import { useHistory } from "..";
+import { useHistory } from "../hooks/useHistory";
 const log = debug("router:useLang");
 
 /**

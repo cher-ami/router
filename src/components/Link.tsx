@@ -1,11 +1,12 @@
 import React, { AnchorHTMLAttributes, PropsWithChildren, useMemo } from "react";
-import { useLocation, useRouter } from "..";
 import {
   createUrl,
   joinPaths,
   removeLastCharFromString,
   TOpenRouteParams,
 } from "../core/helpers";
+import { useRouter } from "../hooks/useRouter";
+import { useLocation } from "../hooks/useLocation";
 import debug from "@wbe/debug";
 
 // exclude href because it collides with "to"

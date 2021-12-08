@@ -63,7 +63,8 @@ Services:
 
 Global:
 
-[`Routers`](#Routers) Global Routers object contains all routers properties (history, instances...)
+[`Helpers`](#Helpers) Global Routers helpers
+[`Routers object`](#Routers) Global Routers object contains all routers properties (history, instances...)
 
 ## <a name="Installation"></a>Installation
 
@@ -811,24 +812,25 @@ Paths can be translated by lang in route path property. This option works only i
   }
 ```
 
-## <a name="Routers"></a>Routers
+## <a name="Helpers"></a>Helpers
 
-Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack,
-we need a global object to store shared informations between router instances. It contains also some importants helpers.
-
-#### Routers.createUrl()
+#### createUrl()
 
 `(args: string | TOpenRouteParams, base?:string, allRoutes?: TRoute[]) => string`
 
 Create a formated URL by string, or `TOpenRouteParams`
 
-#### Routers.openRoute()
+#### openRoute()
 
 `(args: string | TOpenRouteParams, history?) => void`
 
 Push new route in current history. Stack(s) component(s) will return appriopriated route.
 
 #### Routers.routes
+
+## <a name="Routers"></a>Routers
+
+Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack, we need a global object to store shared informations between router instances.
 
 `TRoute[]`
 
