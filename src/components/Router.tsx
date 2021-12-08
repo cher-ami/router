@@ -99,7 +99,7 @@ function Router(props: {
   history?: BrowserHistory | HashHistory | MemoryHistory;
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   langService?: LangService;
-  id?: number;
+  id?: number | string;
 }): JSX.Element {
   /**
    * 0. LangService

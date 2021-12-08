@@ -20,7 +20,7 @@ type TGetRouteFromUrl = {
   pBase?: string;
   pCurrentRoute?: TRoute;
   pMatcher?: any;
-  id?: number;
+  id?: number | string;
 };
 
 /**

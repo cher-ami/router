@@ -375,7 +375,7 @@ $ npm run dev
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={} history={} middlewares={}>
+<Router routes={} base={} history={} middlewares={} id={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -393,7 +393,8 @@ Router component creates a new router instance.
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
   the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
-- **middlewares** `[]` add routes middleware function to patch each routes (check [langMiddleware](src/lang/LangMiddleware.ts) example)
+- **middlewares** `[]` add routes middleware function to patch each routes)
+- **id** `?number | string`
 
 ### <a name="Link"></a>Link
 
