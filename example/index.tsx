@@ -19,7 +19,7 @@ const langService = new LangService<TLang>({
  * Init Application
  */
 ReactDOM.render(
-  <Router langService={langService} routes={routesList} base={base}>
+  <Router  routes={routesList} base={base}>
     <App />
   </Router>,
   document.getElementById("root")

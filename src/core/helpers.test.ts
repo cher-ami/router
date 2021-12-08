@@ -76,7 +76,7 @@ describe("getPathByRouteName", () => {
     });
 
     // FIXME: this is not working
-   // expect(getPathByRouteName(routesList, "zooPage")).toEqual("/hello/foo/zoo/:id?");
+    // expect(getPathByRouteName(routesList, "zooPage")).toEqual("/hello/foo/zoo/:id?");
   });
 });
 

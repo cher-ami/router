@@ -163,6 +163,7 @@ export function getFullPathByPath(
   for (let route of routes) {
     const langPath = route.langPath?.[lang];
     const routePath = route.path as string;
+
     const pathMatch =
       (langPath === path || routePath === path) && route.name === routeName;
 
@@ -229,7 +230,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           pParams?.params?.lang
         );
         // build URL
-        console.log("fullPath", fullPath, params);
+        // console.log("fullPath", fullPath, params);
         return compileUrl(fullPath, params.params);
       }
 
@@ -261,6 +262,12 @@ export function createUrl(
   if (!allRoutes) return;
   let urlToPush: string;
 
+  if (typeof args === "object" && !langService) {
+    log(
+      "route.path object is not supported without langService. Use should use route.path string instead."
+    );
+  }
+
   // in case we recieve a string
   if (typeof args === "string") {
     urlToPush = args as string;
@@ -268,9 +275,9 @@ export function createUrl(
     if (!!langService) {
       urlToPush = addLangToUrl(urlToPush);
     }
-
-    // in case we recieve an object
-  } else if (typeof args === "object" && args?.name) {
+  }
+  // in case we recieve an object
+  else if (typeof args === "object" && args?.name) {
     // add lang to params if no exist
     if (langService && !args.params?.lang) {
       args.params = {
