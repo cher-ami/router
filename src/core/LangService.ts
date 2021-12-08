@@ -1,4 +1,3 @@
-import { Router } from "..";
 import { Routers } from "../core/Routers";
 import {
   compileUrl,
@@ -247,21 +246,20 @@ class LangService<TLang = any> {
       );
 
     /**
-   * Patch routes
-   *  - Add "/:lang" param on each 1st level route
-   *  - format path recurcively (on children if exist)
-   * ex:
-   *     {
-   *      path: { en: "/home", fr: "/accueil" }
-   *     },
-   *  return:
-   *    {
-   *      path: "/:lang/home",
-   *      langPath: { en: "/:lang/home", fr: "/:lang/accueil" },
-   *    }
-
-   *
-   */
+     * Patch routes
+     *  - Add "/:lang" param on each 1st level route
+     *  - format path recurcively (on children if exist)
+     * ex:
+     *     {
+     *      path: { en: "/home", fr: "/accueil" }
+     *     },
+     *  return:
+     *    {
+     *      path: "/:lang/home",
+     *      langPath: { en: "/:lang/home", fr: "/:lang/accueil" },
+     *    }
+     *
+     */
     const patchRoutes = (pRoutes, children = false) => {
       return pRoutes.map((route: TRoute) => {
         const path = getLangPathByLang(route);

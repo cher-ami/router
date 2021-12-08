@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Routers, Stack } from "../src";
+import { Link, Routers, Stack, useLang } from "../src";
 
 const componentName = "App";
 
@@ -7,6 +7,7 @@ const componentName = "App";
  * @name App
  */
 export default function App() {
+  const [lang, setLang] = useLang();
   return (
     <div className={componentName}>
       {["en", "fr", "de", "nl"].map((el, i) => (
@@ -14,11 +15,10 @@ export default function App() {
           key={i}
           children={el}
           onClick={() => {
-            Routers.langService?.setLang({ key: el });
+            setLang(el, true);
           }}
         />
       ))}
-
       <nav>
         <ul>
           <li>

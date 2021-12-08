@@ -27,8 +27,8 @@ export const routesList: TRoute[] = [
     },
   },
   {
-    path: "/about",
-    //path: { en: "/about", fr: "/a-propos", de: "/uber" },
+    //path: "/about",
+    path: { en: "/about", fr: "/a-propos", de: "/uber" },
     component: AboutPage,
     children: [
       {
