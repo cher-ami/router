@@ -52,7 +52,7 @@ Hooks:
 - [`useLocation`](#useLocation) Get current location and set new location
 - [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
-- [`useHistory`](#useHistory) Get global router history and handle history
+- [`useHistory`](#useHistory) Execute callback each time history changes
   changes
 
 Services:
@@ -636,7 +636,7 @@ const history = useHistory((e) => {
 
 **Returns:**
 
-- **history** `location[]` : Location array of history API
+- **history** `location[]` : global history object. (`Routers.history`)
 
 ### <a name="LangService"></a>LangService
 
