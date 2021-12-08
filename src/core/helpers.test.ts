@@ -70,19 +70,22 @@ describe("getFullPathByPathPart", () => {
       { path: "/" },
       {
         path: "/hello",
+        name: "helloPage",
         children: [
-          { path: "/bar" },
+          { path: "/bar", name: "barPage" },
           {
             path: "/foo",
+            name: "fooPage",
             children: [
               { path: "/", name: "firstLevelRoute" },
-              { path: "/:zoo" },
+              { path: "/:zoo", name: "zooPage" },
               {
                 path: "/bla",
+                name: "blaPage",
                 children: [
                   { path: "/", name: "firstLevelRoute-2" },
-                  { path: "/:yes" },
-                  { path: "/no" },
+                  { path: "/yes", name: "yesPage" },
+                  { path: "/no", name: "noPage" },
                 ],
               },
             ],
@@ -90,16 +93,21 @@ describe("getFullPathByPathPart", () => {
         ],
       },
     ];
-    expect(getFullPathByPath(routesList, "/foo")).toBe("/hello/foo");
-    expect(getFullPathByPath(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
-    expect(getFullPathByPath(routesList, "/no")).toBe("/hello/foo/bla/no");
+    expect(getFullPathByPath(routesList, "/foo", "fooPage")).toBe("/hello/foo");
+    expect(getFullPathByPath(routesList, "/:zoo", "zooPage")).toBe("/hello/foo/:zoo");
+    expect(getFullPathByPath(routesList, "/", "firstLevelRoute-2")).toBe(
+      "/hello/foo/bla/"
+    );
+    expect(getFullPathByPath(routesList, "/no", "noPage")).toBe("/hello/foo/bla/no");
   });
 });
 
-// ------------------------------------------------------------ UTILS
+// ------------------------------------------------------------ ROUTES
 
 describe("getSubRouterBase", () => {});
 describe("getSubRouterRoutes", () => {});
+
+// ------------------------------------------------------------ UTILS
 
 describe("removeLastCharFromString", () => {
   it("should not remove last character if string === lastChar", () => {
@@ -143,3 +151,5 @@ describe("preventSlashes", () => {
     expect(preventSlashes("///foo/bar/////zoo")).toBe("/foo/bar/zoo");
   });
 });
+
+

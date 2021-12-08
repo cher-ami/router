@@ -152,6 +152,7 @@ export function compileUrl(path: string, params?: TParams): string {
 export function getFullPathByPath(
   routes: TRoute[],
   path: string | { [x: string]: string },
+  routeName: string,
   lang: string = Routers.langService?.currentLang.key || undefined,
   basePath: string = null
 ): string {
@@ -160,7 +161,8 @@ export function getFullPathByPath(
   for (let route of routes) {
     const langPath = route.langPath?.[lang];
     const routePath = route.path as string;
-    const pathMatch = langPath === path || routePath === path;
+    const pathMatch =
+      (langPath === path || routePath === path) && route.name === routeName;
 
     // if path match on first level, keep path in local array and return it, stop here.
     if (pathMatch) {
@@ -174,6 +176,7 @@ export function getFullPathByPath(
       const matchChildrenPath = getFullPathByPath(
         route.children,
         path,
+        routeName,
         lang,
         joinPaths(localPath)
       );
@@ -182,7 +185,13 @@ export function getFullPathByPath(
         // keep path in local array
         localPath.push(langPath || routePath);
         // Return the function after localPath push
-        return getFullPathByPath(route.children, path, lang, joinPaths(localPath));
+        return getFullPathByPath(
+          route.children,
+          path,
+          routeName,
+          lang,
+          joinPaths(localPath)
+        );
       }
     }
   }
@@ -195,7 +204,7 @@ export function getFullPathByPath(
 export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams): string {
   // need to wrap the function to be able to access the preserved "pRoutes" param
   // in local scope after recursion
-  const recursiveFn = (routes: TRoute[], params: TOpenRouteParams): string => {
+  const next = (routes: TRoute[], params: TOpenRouteParams): string => {
     for (let route of routes) {
       const match =
         route?.name === params.name || route.component?.displayName === params.name;
@@ -205,7 +214,12 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           return;
         }
         // get full path
-        const fullPath = getFullPathByPath(pRoutes, route.path, pParams?.params?.lang);
+        const fullPath = getFullPathByPath(
+          pRoutes,
+          route.path,
+          route.name,
+          pParams?.params?.lang
+        );
         // build URL
         return compileUrl(fullPath, params.params);
       }
@@ -213,14 +227,13 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
       // if route has children
       else if (route.children?.length > 0) {
         // getUrlByRouteName > no match, recall recursively on children
-        const match = recursiveFn(route.children, params);
+        const match = next(route.children, params);
         // return recursive Fn only if match, else, continue to next iteration
         if (match) return match;
       }
     }
   };
-
-  return recursiveFn(pRoutes, pParams);
+  return next(pRoutes, pParams);
 }
 
 /**
@@ -233,7 +246,8 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
 export function createUrl(
   args: string | TOpenRouteParams,
   base: string = Routers.base,
-  allRoutes: TRoute[] = Routers.routes
+  allRoutes: TRoute[] = Routers.routes,
+  langService = Routers.langService
 ): string {
   if (!allRoutes) return;
   let urlToPush: string;
@@ -242,18 +256,17 @@ export function createUrl(
   if (typeof args === "string") {
     urlToPush = args as string;
 
-    if (Routers.langService?.isInit) {
+    if (!!langService) {
       urlToPush = addLangToUrl(urlToPush);
     }
 
     // in case we recieve an object
   } else if (typeof args === "object" && args?.name) {
-
-    // add lang to params
-    if (Routers.langService && !args.params?.lang) {
+    // add lang to params if no exist
+    if (langService && !args.params?.lang) {
       args.params = {
         ...args.params,
-        ...{ lang: Routers.langService.currentLang.key },
+        ...{ lang: langService.currentLang.key },
       };
     }
     // Get URL by the route name

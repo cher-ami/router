@@ -41,13 +41,14 @@ export const routesList: TRoute[] = [
         path: "/bar",
         component: BarPage,
         children: [
-          {path: "/",component: null, name: "dlkdlkd"},
+          { path: "/", component: null, name: "dlkdlkd" },
           {
             path: "/yolo/:id?",
             component: YoloPage,
           },
           {
-            path: "/hello",
+            //path: "/hello",
+            path: { en: "/hello", fr: "/salut", de: "/gutten-tag" },
             component: HelloPage,
             children: [
               {
