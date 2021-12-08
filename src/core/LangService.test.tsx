@@ -96,17 +96,17 @@ it("should not redirect to default lang if showDefaultLangInUrl is set to false"
  * @param addLangPath
  */
 
-const routesListLang = (addLangPath = false): TRoute[] => [
+const routesListLang: TRoute[] = [
   {
     path: "/",
-    ...(addLangPath ? { langPath: null } : {}),
+    langPath: null,
   },
   {
     path: "/hello",
-    ...(addLangPath ? { langPath: null } : {}),
+    langPath: null,
     children: [
-      { path: "/zoo", ...(addLangPath ? { langPath: null } : {}) },
-      { path: "/:id", ...(addLangPath ? { langPath: null } : {}) },
+      { path: { en: "/zoo-en", fr: "/zoo-fr", de: "zoo-de" }, langPath: null },
+      { path: "/:id", langPath: null },
     ],
   },
 ];
@@ -114,14 +114,17 @@ const routesListLang = (addLangPath = false): TRoute[] => [
 const patchedRoutesListLang: TRoute[] = [
   {
     path: "/:lang",
-    langPath: null,
+    langPath: { en: "/:lang", fr: "/:lang", de: "/:lang" },
   },
   {
     path: "/:lang/hello",
-    langPath: null,
+    langPath: { en: "/:lang/hello", fr: "/:lang/hello", de: "/:lang/hello" },
     children: [
-      { path: "/zoo", langPath: null },
-      { path: "/:id", langPath: null },
+      {
+        path: "/zoo-en",
+        langPath: { en: "/zoo-en", fr: "/zoo-fr", de: "zoo-de" },
+      },
+      { path: "/:id", langPath: { en: "/:id", fr: "/:id", de: "/:id" } },
     ],
   },
 ];
@@ -129,13 +132,8 @@ const patchedRoutesListLang: TRoute[] = [
 describe("addLangParamToRoutes", () => {
   const langService = new LangService({ languages: locales, base: "/" });
   it("should patch all first level routes if LangService is init", () => {
-    expect(langService.addLangParamToRoutes(routesListLang(), true)).toEqual(
+    expect(langService.addLangParamToRoutes(routesListLang, true)).toEqual(
       patchedRoutesListLang
-    );
-  });
-  it("should not patch routes if LangService is not init", () => {
-    expect(langService.addLangParamToRoutes(routesListLang(), false)).toEqual(
-      routesListLang(true)
     );
   });
 });

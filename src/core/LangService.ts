@@ -106,7 +106,7 @@ class LangService<TLang = any> {
 
     // Translate currentRoute URL to new lang URL
     // ex: /base/fr/path-fr/ -> /base/en/path-en/
-     const preparedNewUrl = createUrl({
+    const preparedNewUrl = createUrl({
       name: currentRoute?.name,
       params: {
         ...(currentRoute.props?.params || {}),
@@ -269,10 +269,20 @@ class LangService<TLang = any> {
         const showLang = !children && showLangInUrl;
 
         let langPath = {};
-        typeof route.path === "object" &&
+        if (typeof route.path === "object") {
           Object.keys(route.path).forEach((lang) => {
             langPath[lang] = patchLangParam(route.path[lang], showLang);
           });
+        }
+
+        // even if route.path is not an object, add his value to route.langPath object property
+        else if (typeof route.path === "string") {
+          this.languages
+            .map((el) => el.key)
+            .forEach((key: string) => {
+              langPath[key] = patchLangParam(route.path as string, showLang);
+            });
+        }
 
         return {
           ...route,

@@ -213,10 +213,16 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           log("getUrlByRouteName > There is no route with this name, exit", params.name);
           return;
         }
+
+        let path =
+          typeof route.path === "object"
+            ? route.path[Object.keys(route.path)[0]]
+            : route.path;
+
         // get full path
         const fullPath = getFullPathByPath(
           pRoutes,
-          route.path,
+          path,
           route.name,
           pParams?.params?.lang
         );
