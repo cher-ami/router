@@ -30,7 +30,11 @@ export type TOpenRouteParams = {
  * ]
  * @param routes
  */
-export function patchMissingRootRoute(routes: TRoute[]): TRoute[] {
+export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute[] {
+  if (!routes) {
+    log("routes doesnt exist, return", routes);
+    return;
+  }
   const rootPathExist = routes.some(
     (route) =>
       (typeof route.path === "object" &&

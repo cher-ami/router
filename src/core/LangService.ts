@@ -1,4 +1,3 @@
-import { Router } from "..";
 import { Routers } from "../core/Routers";
 import {
   compileUrl,
@@ -259,7 +258,6 @@ class LangService<TLang = any> {
    *      path: "/:lang/home",
    *      langPath: { en: "/:lang/home", fr: "/:lang/accueil" },
    *    }
-
    *
    */
     const patchRoutes = (pRoutes, children = false) => {

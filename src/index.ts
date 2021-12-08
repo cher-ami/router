@@ -18,6 +18,7 @@ export { useLocation } from "./hooks/useLocation";
 export { useHistory } from "./hooks/useHistory";
 export { useRouteCounter } from "./hooks/useRouteCounter";
 export { useStack } from "./hooks/useStack";
+export { useLang } from "./hooks/useLang";
 export type { IRouteStack } from "./hooks/useStack";
 
 export { default as LangService } from "./core/LangService";
