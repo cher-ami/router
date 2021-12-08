@@ -71,7 +71,7 @@ export function applyMiddlewares(
  * @param name
  * @returns
  */
-export function getRoutePathByRouteName(
+export function getPathByRouteName(
   routes: TRoute[],
   name: string
 ): string | { [x: string]: string } {
@@ -80,7 +80,7 @@ export function getRoutePathByRouteName(
       return route.path;
     } else {
       if (route.children) {
-        return getRoutePathByRouteName(route.children, name);
+        return getPathByRouteName(route.children, name);
       }
     }
   }
@@ -227,6 +227,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           pParams?.params?.lang
         );
         // build URL
+        console.log("fullPath", fullPath, params);
         return compileUrl(fullPath, params.params);
       }
 

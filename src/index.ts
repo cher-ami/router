@@ -6,7 +6,7 @@ export {
   openRoute,
   getSubRouterBase,
   getSubRouterRoutes,
-  getRoutePathByRouteName,
+  getPathByRouteName as getRoutePathByRouteName,
 } from "./core/helpers";
 export type { TOpenRouteParams } from "./core/helpers";
 

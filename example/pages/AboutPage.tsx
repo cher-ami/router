@@ -5,7 +5,7 @@ import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
 import {
-  getRoutePathByRouteName,
+  getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
 } from "../../src/core/helpers";
@@ -25,7 +25,7 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
 
   // prepare routes & base for subRouter
   const router = useRouter();
-  const path = getRoutePathByRouteName(routesList, "AboutPage");
+  const path = getPathByRouteName(routesList, "AboutPage");
 
   return (
     <div className={componentName} ref={rootRef}>

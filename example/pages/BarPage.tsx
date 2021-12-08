@@ -2,7 +2,7 @@ import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { Link, Router, Stack, useRouter } from "../../src";
 import { useStack } from "../../src";
 import {
-  getRoutePathByRouteName,
+  getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
   joinPaths,
@@ -26,7 +26,7 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
   });
 
   const router = useRouter();
-  const path = getRoutePathByRouteName(routesList, "BarPage");
+  const path = getPathByRouteName(routesList, "BarPage");
   
   return (
     <div className={componentName} ref={rootRef}>

@@ -2,7 +2,7 @@ import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { Link, Router, Stack, useRouter } from "../../src";
 import { useStack } from "../../src";
 import {
-  getRoutePathByRouteName,
+  getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
   joinPaths,
@@ -26,7 +26,7 @@ export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>
   });
 
   const router = useRouter();
-  const path = getRoutePathByRouteName(routesList, "HelloPage");
+  const path = getPathByRouteName(routesList, "HelloPage");
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}

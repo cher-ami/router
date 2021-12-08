@@ -16,39 +16,33 @@ import OurPage from "./pages/OurPage";
 export const routesList: TRoute[] = [
   {
     path: "/",
-    // path: { en: "/", fr: "/", de: "/" },
     component: HomePage,
   },
   {
-    path: "/blog/:id",
-    //path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
+    path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
     component: ArticlePage,
     props: {
       color: "red",
     },
   },
   {
-    path: "/about",
-    //path: { en: "/about", fr: "/a-propos", de: "/uber" },
+    path: { en: "/about", fr: "/a-propos", de: "/uber" },
     component: AboutPage,
     children: [
       {
-        path: "/foo",
-        // path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
+        path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
         component: FooPage,
       },
       {
         path: "/bar",
         component: BarPage,
         children: [
-          { path: "/", component: null, name: "dlkdlkd" },
           {
             path: "/yolo/:id?",
             component: YoloPage,
           },
           {
-            path: "/hello",
-            //path: { en: "/hello", fr: "/salut", de: "/gutten-tag" },
+            path: { en: "/hello", fr: "/salut", de: "/gutten-tag" },
             component: HelloPage,
             children: [
               {
