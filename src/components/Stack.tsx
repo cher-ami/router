@@ -1,7 +1,8 @@
 import React from "react";
-import { IRouteStack, useRouter } from "..";
 import { IRouterContext } from "./Router";
 import debug from "@wbe/debug";
+import { IRouteStack } from "../hooks/useStack";
+import { useRouter } from "../hooks/useRouter";
 
 export type TManageTransitions = {
   previousRoute: IRouteStack;
