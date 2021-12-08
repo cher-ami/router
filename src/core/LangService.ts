@@ -1,8 +1,9 @@
+import { Router } from "..";
 import { Routers } from "../core/Routers";
 import {
   compileUrl,
+  createUrl,
   joinPaths,
-  prepareFullUrl,
   removeLastCharFromString,
 } from "../core/helpers";
 import debug from "@wbe/debug";
@@ -89,7 +90,11 @@ class LangService<TLang = any> {
    * @param toLang
    * @param forcePageReload
    */
-  public setLang(toLang: TLanguage<TLang>, forcePageReload = true): void {
+  public setLang(
+    toLang: TLanguage<TLang>,
+    forcePageReload = true,
+    currentRoute: TRoute = Routers.currentRoute
+  ): void {
     if (toLang.key === this.currentLang.key) {
       log("setLang: This is the same language, exit.");
       return;
@@ -99,8 +104,18 @@ class LangService<TLang = any> {
       return;
     }
 
-    // get fullUrl property from the last router url ex: /base/lang/first-level/second-level
-    const preparedNewUrl = prepareFullUrl(toLang);
+    // Translate currentRoute URL to new lang URL
+    // ex: /base/fr/path-fr/ -> /base/en/path-en/
+     const preparedNewUrl = createUrl({
+      name: currentRoute?.name,
+      params: {
+        ...(currentRoute.props?.params || {}),
+        lang: toLang.key,
+      },
+    });
+    console.log("currentRoute", currentRoute);
+    log("preparedNewUrl", preparedNewUrl);
+
     // create newUrl variable to set in each condition
     let newUrl: string;
     // choose force page reload in condition below

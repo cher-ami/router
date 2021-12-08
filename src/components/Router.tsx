@@ -108,14 +108,13 @@ function Router(props: {
    */
   const langService = React.useMemo(() => {
     if (!Routers.langService) Routers.langService = props.langService;
-    log(props.id, "Routers.langService", Routers.langService);
     return Routers.langService;
   }, [props.langService]);
 
   /**
    * 1. routes
    * Format and return routes list
-   * If is the first Router instance, register routes in 'Routers' store
+   * If is the first Router instance, register routes in 'Routers' store.
    * In other case, return current props.routes
    *
    *  const { routes } = useRouter();
@@ -189,13 +188,12 @@ function Router(props: {
     }
   );
 
-  // keep as reference
-  const currentRouteRef = React.useRef<TRoute>();
   /**
    * Handle history
    * Update routes when history change
    * Dispatch new routes via RouterContext
    */
+  const currentRouteRef = React.useRef<TRoute>();
   const handleHistory = (url: string = window.location.pathname): void => {
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
@@ -218,11 +216,11 @@ function Router(props: {
 
     const newRoute: TRoute = matchingRoute || notFoundRoute;
     if (newRoute) {
+      // Final process: update context currentRoute from dispatch method \o/ !
       dispatch({ type: "update-current-route", value: newRoute });
+      // & register this new route as currentRoute in local and in Routers store
       currentRouteRef.current = newRoute;
-
-      // TODO insternal props ID
-      Routers.currentRoutes[props.id - 1] = newRoute;
+      Routers.currentRoute = newRoute;
     }
   };
 
@@ -238,14 +236,6 @@ function Router(props: {
     return Routers.history.listen(({ location }) => {
       handleHistory(location.pathname);
     });
-  }, []);
-
-  // remove Router.currentRoutes entry of this current router
-  React.useEffect(() => {
-    return () => {
-      Routers.currentRoutes[props.id - 1] = null;
-      Routers.currentRoutes.filter((e) => e);
-    };
   }, []);
 
   // -------------------------------------------------------------------------------- RENDER

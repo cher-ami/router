@@ -27,10 +27,10 @@ export type TRouters = {
   isFirstRoute: boolean;
 
   /**
-   * Store current routes in array
+   * Store current route
    * Allows to always know what is last currentRoute path (for LangSerivce)
    */
-  currentRoutes: TRoute[];
+  currentRoute: TRoute;
 
   /**
    * LangService instance (stored in Router)
@@ -64,7 +64,7 @@ export const Routers: TRouters = {
   history: undefined,
   routeCounter: 1,
   isFirstRoute: true,
-  currentRoutes: [],
+  currentRoute: undefined,
   langService: undefined,
   createUrl,
   openRoute,

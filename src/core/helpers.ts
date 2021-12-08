@@ -1,4 +1,4 @@
-import { Routers } from "..";
+import { Routers } from "./Routers";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { TRoute } from "../components/Router";
@@ -38,7 +38,11 @@ export function patchMissingRootRoute(routes: TRoute[]): TRoute[] {
       route.path === "/"
   );
   if (!rootPathExist) {
-    routes.unshift({ path: "/", component: null });
+    routes.unshift({
+      path: "/",
+      component: null,
+      name: `1stLevelRoute-${Math.random()}`,
+    });
   }
   return routes;
 }
@@ -140,12 +144,12 @@ export function compileUrl(path: string, params?: TParams): string {
 }
 
 /**
- * Get URL by path part
+ * Get full path by path
  *  if path "/foo" is a children of path "/bar", his full url is "/bar/foo"
  *  With the second URL part "/foo", this function will returns "/bar/foo"
  * @returns string
  */
-export function getUrlByPathPart(
+export function getFullPathByPath(
   routes: TRoute[],
   path: string | { [x: string]: string },
   lang: string = Routers.langService?.currentLang.key || undefined,
@@ -167,7 +171,7 @@ export function getUrlByPathPart(
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = getUrlByPathPart(
+      const matchChildrenPath = getFullPathByPath(
         route.children,
         path,
         lang,
@@ -178,7 +182,7 @@ export function getUrlByPathPart(
         // keep path in local array
         localPath.push(langPath || routePath);
         // Return the function after localPath push
-        return getUrlByPathPart(route.children, path, lang, joinPaths(localPath));
+        return getFullPathByPath(route.children, path, lang, joinPaths(localPath));
       }
     }
   }
@@ -200,10 +204,10 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           log("getUrlByRouteName > There is no route with this name, exit", params.name);
           return;
         }
-        // get full URL
-        const urlByPath = getUrlByPathPart(pRoutes, route.path, pParams?.params?.lang);
-        // build URL with param and return
-        return compileUrl(urlByPath, params.params);
+        // get full path
+        const fullPath = getFullPathByPath(pRoutes, route.path, pParams?.params?.lang);
+        // build URL
+        return compileUrl(fullPath, params.params);
       }
 
       // if route has children
@@ -244,10 +248,12 @@ export function createUrl(
 
     // in case we recieve an object
   } else if (typeof args === "object" && args?.name) {
-    if (Routers.langService?.isInit && !args.params?.lang) {
+
+    // add lang to params
+    if (Routers.langService && !args.params?.lang) {
       args.params = {
         ...args.params,
-        ...{ lang: Routers.langService?.currentLang.key },
+        ...{ lang: Routers.langService.currentLang.key },
       };
     }
     // Get URL by the route name
@@ -255,7 +261,7 @@ export function createUrl(
 
     // in other case return.
   } else {
-    console.warn("setLocation param isn't valid. return.", args);
+    console.warn("createUrl param isn't valid. to use createUrl return.", args);
     return;
   }
 
@@ -266,40 +272,6 @@ export function createUrl(
     compileUrl(base, { lang: Routers.langService?.currentLang.key })
   );
   return urlToPush;
-}
-
-/**
- * Prepare **FULL** URL
- * Parse each router full URL with new lang param,
- *  then keep the last router full URL
- *
- *  -> /base/en/foo-en
- *  -> /base/en/foo-en/bar-en -> keep this one
- *
- * ex:
- *   "/base/en/foo-en-path/sub-en-path"
- * should become:
- *   "/base/fr/foo-fr-path/sub-fr-path"
- *
- */
-export function prepareFullUrl(toLang, currentRoutes = Routers.currentRoutes): string {
-  let pathToGenerate = [];
-
-  for (let current of currentRoutes) {
-    if (current) {
-      const newUrl = createUrl({
-        name: current.name,
-        params: {
-          ...(current.props?.params || {}),
-          lang: toLang.key,
-        },
-      });
-      pathToGenerate.push(newUrl);
-      log("pathToGenerate", pathToGenerate);
-    }
-  }
-  // get last item of array
-  return pathToGenerate.filter((v) => v).slice(-1)[0];
 }
 
 // ----------------------------------------------------------------------------- PATHS

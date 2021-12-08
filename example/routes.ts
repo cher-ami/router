@@ -41,6 +41,7 @@ export const routesList: TRoute[] = [
         path: "/bar",
         component: BarPage,
         children: [
+          {path: "/",component: null, name: "dlkdlkd"},
           {
             path: "/yolo/:id?",
             component: YoloPage,

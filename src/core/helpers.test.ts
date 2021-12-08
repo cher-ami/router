@@ -1,7 +1,7 @@
 import {
   compileUrl,
   getRoutePathByRouteName,
-  getUrlByPathPart,
+  getFullPathByPath,
   getUrlByRouteName,
   joinPaths,
   preventSlashes,
@@ -21,6 +21,7 @@ const routes: TRoute[] = [
       {
         path: "/bar",
         children: [
+          { path: "/", name: "1stLevelRoute" },
           { path: "/yolo/:id?", name: "YOLO" },
           { path: "/hello", name: "Hello" },
         ],
@@ -31,7 +32,6 @@ const routes: TRoute[] = [
 
 describe("getRoutePathByRouteName", () => {
   it("should return the right path with name", () => {
-    // prettier-ignore
     expect(getRoutePathByRouteName(routes, "Home")).toEqual("/");
     expect(getRoutePathByRouteName(routes, "About")).toEqual({
       en: "/about",
@@ -43,10 +43,63 @@ describe("getRoutePathByRouteName", () => {
   });
 });
 
-describe("getSubRouterBase", () => {});
-describe("getSubRouterRoutes", () => {});
+describe("getUrlByRouteName", () => {
+  it("should return full URL with only page name and params", () => {
+    const routesList = [
+      { path: "/", name: "foo" },
+      {
+        path: "/hello",
+        name: "bar",
+        children: [
+          { path: "/zoo", name: "ZooPage" },
+          { path: "/:id", name: "BlaPage" },
+        ],
+      },
+    ];
+    expect(getUrlByRouteName(routesList, { name: "bar" })).toBe("/hello");
+    expect(getUrlByRouteName(routesList, { name: "ZooPage" })).toBe("/hello/zoo");
+    expect(getUrlByRouteName(routesList, { name: "BlaPage", params: { id: 2 } })).toBe(
+      "/hello/2"
+    );
+  });
+});
+
+describe("getFullPathByPathPart", () => {
+  it("should return the full path", () => {
+    const routesList = [
+      { path: "/" },
+      {
+        path: "/hello",
+        children: [
+          { path: "/bar" },
+          {
+            path: "/foo",
+            children: [
+              { path: "/", name: "firstLevelRoute" },
+              { path: "/:zoo" },
+              {
+                path: "/bla",
+                children: [
+                  { path: "/", name: "firstLevelRoute-2" },
+                  { path: "/:yes" },
+                  { path: "/no" },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ];
+    expect(getFullPathByPath(routesList, "/foo")).toBe("/hello/foo");
+    expect(getFullPathByPath(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
+    expect(getFullPathByPath(routesList, "/no")).toBe("/hello/foo/bla/no");
+  });
+});
 
 // ------------------------------------------------------------ UTILS
+
+describe("getSubRouterBase", () => {});
+describe("getSubRouterRoutes", () => {});
 
 describe("removeLastCharFromString", () => {
   it("should not remove last character if string === lastChar", () => {
@@ -88,46 +141,5 @@ describe("preventSlashes", () => {
   it("should remove multi slashs", () => {
     expect(preventSlashes("///foo/")).toBe("/foo/");
     expect(preventSlashes("///foo/bar/////zoo")).toBe("/foo/bar/zoo");
-  });
-});
-
-describe("getUrlByPath", () => {
-  it("should return full URL", () => {
-    const routesList = [
-      { path: "/" },
-      {
-        path: "/hello",
-        children: [
-          { path: "/bar" },
-          {
-            path: "/foo",
-            children: [{ path: "/:zoo" }, { path: "/bla" }],
-          },
-        ],
-      },
-    ];
-    expect(getUrlByPathPart(routesList, "/foo")).toBe("/hello/foo");
-    expect(getUrlByPathPart(routesList, "/:zoo")).toBe("/hello/foo/:zoo");
-  });
-});
-
-describe("getUrlByRouteName", () => {
-  it("should return full URL with only page name and params", () => {
-    const routesList = [
-      { path: "/", name: "foo" },
-      {
-        path: "/hello",
-        name: "bar",
-        children: [
-          { path: "/zoo", name: "ZooPage" },
-          { path: "/:id", name: "BlaPage" },
-        ],
-      },
-    ];
-    expect(getUrlByRouteName(routesList, { name: "bar" })).toBe("/hello");
-    expect(getUrlByRouteName(routesList, { name: "ZooPage" })).toBe("/hello/zoo");
-    expect(getUrlByRouteName(routesList, { name: "BlaPage", params: { id: 2 } })).toBe(
-      "/hello/2"
-    );
   });
 });
