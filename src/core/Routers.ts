@@ -1,3 +1,4 @@
+import LangService from "../core/LangService";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { TRoute } from "../components/Router";
 import { createUrl, openRoute, TOpenRouteParams } from "./helpers";
@@ -24,6 +25,18 @@ export type TRouters = {
    * Is first route is true if routerCounter === 1
    */
   isFirstRoute: boolean;
+
+  /**
+   * Store current route
+   * Allows to always know what is last currentRoute path (for LangSerivce)
+   */
+  currentRoute: TRoute;
+
+  /**
+   * LangService instance (stored in Router)
+   */
+  langService: LangService;
+
   /**
    * build URL method
    */
@@ -46,11 +59,13 @@ export type TRouters = {
  * This object values do not depend of one single router
  */
 export const Routers: TRouters = {
+  base: undefined,
   routes: undefined,
   history: undefined,
   routeCounter: 1,
   isFirstRoute: true,
-  base: undefined,
+  currentRoute: undefined,
+  langService: undefined,
   createUrl,
   openRoute,
 };

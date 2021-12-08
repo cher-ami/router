@@ -1,7 +1,12 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { Link, Router, Stack, useRouter } from "../../src";
 import { useStack } from "../../src";
-import { joinPaths } from "../../src/api/helpers";
+import {
+  getPathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+  joinPaths,
+} from "../../src/core/helpers";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { routesList } from "../routes";
 
@@ -21,14 +26,15 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
   });
 
   const router = useRouter();
-
+  const path = getPathByRouteName(routesList, "BarPage");
+  
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
       <Router
         id={3}
-        base={joinPaths([router.base, "/bar"])}
-        routes={router.routes.find((route) => route.path === "/bar").children}
+        base={getSubRouterBase(path, router.base, false)}
+        routes={getSubRouterRoutes(path, router.routes)}
       >
         <div className={componentName}>
           <nav>

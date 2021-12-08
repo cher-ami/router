@@ -59,10 +59,7 @@ function Stack(props: IProps): JSX.Element {
   // 2. animate when route state changed
   // need to be "layoutEffect" to play transitions before render, to avoid screen "clip"
   React.useLayoutEffect(() => {
-    if (!currentRoute) {
-      log("local current route doesn't exist, return.");
-      return;
-    }
+    if (!currentRoute) return;
 
     (props.manageTransitions || sequencialTransition)({
       previousRoute: prevRef.current,

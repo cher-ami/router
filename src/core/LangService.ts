@@ -1,21 +1,24 @@
-import { Routers } from "../api/Routers";
+import { Router } from "..";
+import { Routers } from "../core/Routers";
 import {
   compileUrl,
+  createUrl,
   joinPaths,
-  prepareSetLocationFullUrl,
   removeLastCharFromString,
-} from "../api/helpers";
+} from "../core/helpers";
 import debug from "@wbe/debug";
+import { TRoute } from "../components/Router";
+import { getLangPathByLang } from "../core/helpers";
 
 const log = debug(`router:LangService`);
 
-export type TLanguage = {
-  key: string;
+export type TLanguage<T = any> = {
+  key: T | string;
   name?: string;
   default?: boolean;
 };
 
-class LangService {
+class LangService<TLang = any> {
   /**
    * Check if singleton is init
    */
@@ -24,17 +27,17 @@ class LangService {
   /**
    * contains available languages
    */
-  public languages: TLanguage[];
+  public languages: TLanguage<TLang>[];
 
   /**
    * Current language object
    */
-  public currentLang: TLanguage;
+  public currentLang: TLanguage<TLang>;
 
   /**
    * Default language object
    */
-  public defaultLang: TLanguage;
+  public defaultLang: TLanguage<TLang>;
 
   /**
    * Show default language in URL
@@ -52,7 +55,15 @@ class LangService {
    * @param showDefaultLangInUrl
    * @param base
    */
-  public init(languages: TLanguage[], showDefaultLangInUrl = true, base = "/"): void {
+  public constructor({
+    languages,
+    showDefaultLangInUrl = true,
+    base = "/",
+  }: {
+    languages: TLanguage<TLang>[];
+    showDefaultLangInUrl?: boolean;
+    base?: string;
+  }) {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
     }
@@ -70,7 +81,7 @@ class LangService {
    * Use fullUrl of last router instance (and not path), to manage lang as needed
    *
    *    ex:
-   *      -> /base/lang/path     (without lang)
+   *      -> /base/lang/path     (with lang)
    *      -> /base/new-lang/path (with new lang)
    *      -> /base/path          (without lang)
    *
@@ -79,11 +90,11 @@ class LangService {
    * @param toLang
    * @param forcePageReload
    */
-  public setLang(toLang: TLanguage, forcePageReload = true): void {
-    if (!this.isInit) {
-      console.warn("setLang: LangService is not init, exit.");
-      return;
-    }
+  public setLang(
+    toLang: TLanguage<TLang>,
+    forcePageReload = true,
+    currentRoute: TRoute = Routers.currentRoute
+  ): void {
     if (toLang.key === this.currentLang.key) {
       log("setLang: This is the same language, exit.");
       return;
@@ -93,8 +104,18 @@ class LangService {
       return;
     }
 
-    // get fullUrl property from the last router instance ex: /base/lang/first-level/second-level
-    const preparedNewUrl = prepareSetLocationFullUrl(toLang);
+    // Translate currentRoute URL to new lang URL
+    // ex: /base/fr/path-fr/ -> /base/en/path-en/
+    const preparedNewUrl = createUrl({
+      name: currentRoute?.name,
+      params: {
+        ...(currentRoute.props?.params || {}),
+        lang: toLang.key,
+      },
+    });
+    console.log("currentRoute", currentRoute);
+    log("preparedNewUrl", preparedNewUrl);
+
     // create newUrl variable to set in each condition
     let newUrl: string;
     // choose force page reload in condition below
@@ -122,7 +143,7 @@ class LangService {
         this.base.length,
         preparedNewUrl.length
       );
-      newUrl = joinPaths([this.base, "/", toLang.key, "/", newUrlWithoutBase]);
+      newUrl = joinPaths([this.base, "/", toLang.key as string, "/", newUrlWithoutBase]);
     }
 
     // 4. other cases
@@ -194,6 +215,86 @@ class LangService {
     }
   }
 
+  /**
+   * Add Langs to Routes
+   * Patch all first level routes with ":lang" param
+   * {
+   *    path: "/foo",
+   * }
+   * become
+   *
+   * * {
+   *    path: "/:lang/foo",
+   * }
+   * @param routes
+   * @param showLangInUrl
+   */
+  public addLangParamToRoutes(
+    routes: TRoute[],
+    showLangInUrl = this.showLangInUrl()
+  ): TRoute[] {
+    if (!this.isInit) return routes;
+
+    /**
+     * Add :lang param on path
+     * @param pPath
+     * @param pShowLang
+     */
+    const patchLangParam = (pPath: string, pShowLang): string =>
+      removeLastCharFromString(
+        joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : "/"]),
+        "/"
+      );
+
+    /**
+   * Patch routes
+   *  - Add "/:lang" param on each 1st level route
+   *  - format path recurcively (on children if exist)
+   * ex:
+   *     {
+   *      path: { en: "/home", fr: "/accueil" }
+   *     },
+   *  return:
+   *    {
+   *      path: "/:lang/home",
+   *      langPath: { en: "/:lang/home", fr: "/:lang/accueil" },
+   *    }
+
+   *
+   */
+    const patchRoutes = (pRoutes, children = false) => {
+      return pRoutes.map((route: TRoute) => {
+        const path = getLangPathByLang(route);
+        const hasChildren = route.children?.length > 0;
+        const showLang = !children && showLangInUrl;
+
+        let langPath = {};
+        if (typeof route.path === "object") {
+          Object.keys(route.path).forEach((lang) => {
+            langPath[lang] = patchLangParam(route.path[lang], showLang);
+          });
+        }
+
+        // even if route.path is not an object, add his value to route.langPath object property
+        else if (typeof route.path === "string") {
+          this.languages
+            .map((el) => el.key)
+            .forEach((key: string) => {
+              langPath[key] = patchLangParam(route.path as string, showLang);
+            });
+        }
+
+        return {
+          ...route,
+          path: patchLangParam(path, showLang),
+          langPath: Object.entries(langPath).length !== 0 ? langPath : null,
+          ...(hasChildren ? { children: patchRoutes(route.children, true) } : {}),
+        };
+      });
+    };
+    return patchRoutes(routes);
+  }
+
   // --------------------------------------------------------------------------- LOCAL
 
   /**
@@ -201,7 +302,7 @@ class LangService {
    * If no default language exist, it returns the first language object of the languages array
    * @param languages
    */
-  protected getDefaultLang(languages: TLanguage[]): TLanguage {
+  protected getDefaultLang(languages: TLanguage<TLang>[]): TLanguage<TLang> {
     return languages.find((el) => el?.default) ?? languages[0];
   }
 
@@ -209,7 +310,7 @@ class LangService {
    * Get current language from URL
    * @param pathname
    */
-  protected getLangFromUrl(pathname = window.location.pathname): TLanguage {
+  protected getLangFromUrl(pathname = window.location.pathname): TLanguage<TLang> {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
 
@@ -223,7 +324,7 @@ class LangService {
    * @protected
    */
   protected langIsAvailable(
-    langObject: TLanguage,
+    langObject: TLanguage<TLang>,
     languesList = this.languages
   ): boolean {
     return languesList.some((lang) => lang.key === langObject?.key);
@@ -240,4 +341,4 @@ class LangService {
   }
 }
 
-export default new LangService();
+export default LangService;

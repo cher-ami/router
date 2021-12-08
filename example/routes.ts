@@ -16,7 +16,6 @@ import OurPage from "./pages/OurPage";
 export const routesList: TRoute[] = [
   {
     path: "/",
-    // path: { en: "/", fr: "/", de: "/" },
     component: HomePage,
   },
   {
@@ -34,7 +33,7 @@ export const routesList: TRoute[] = [
     children: [
       {
         path: "/foo",
-        // path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
+        //path: { en: "/foo", fr: "/foo-fr", de: "/foo-de" },
         component: FooPage,
       },
       {
@@ -42,11 +41,12 @@ export const routesList: TRoute[] = [
         component: BarPage,
         children: [
           {
-            path: "/yolo",
+            path: "/yolo/:id?",
             component: YoloPage,
           },
           {
             path: "/hello",
+            //path: { en: "/hello", fr: "/salut", de: "/gutten-tag" },
             component: HelloPage,
             children: [
               {

@@ -7,12 +7,15 @@ import {
 } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { applyMiddlewares, patchMissingRootRoute } from "../api/helpers";
-import { getNotFoundRoute, getRouteFromUrl } from "../api/matcher";
-import { Routers } from "../api/Routers";
+import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
+import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
+import { Routers } from "../core/Routers";
+import LangService from "../core/LangService";
+
+// -------------------------------------------------------------------------------- TYPES
 
 export type TRoute = {
-  path: string;
+  path: string | { [x: string]: string };
   component?: React.ComponentType<any>;
   base?: string;
   name?: string;
@@ -39,6 +42,7 @@ export interface IRouterContext extends IRouterContextStackStates {
   history: BrowserHistory | HashHistory | MemoryHistory;
   currentRoute: TRoute;
   previousRoute: TRoute;
+  langService: LangService;
   routeIndex: number;
   previousPageIsMount: boolean;
   unmountPreviousPage: () => void;
@@ -51,6 +55,8 @@ export type TRouteReducerState = {
   index: number;
 };
 
+// -------------------------------------------------------------------------------- PREPARE / CONTEXT
+
 const componentName = "Router";
 const log = debug(`router:${componentName}`);
 
@@ -60,10 +66,11 @@ const log = debug(`router:${componentName}`);
  * Big thing is you can access this context from the closest provider in the tree.
  * This allow to manage easily nested stack instances.
  */
-export const RouterContext = React.createContext({
+export const RouterContext = React.createContext<IRouterContext>({
   base: "/",
   routes: undefined,
   history: undefined,
+  langService: undefined,
   currentRoute: undefined,
   previousRoute: undefined,
   routeIndex: 0,
@@ -78,6 +85,8 @@ Router.defaultProps = {
   id: 1,
 };
 
+// -------------------------------------------------------------------------------- COMPONENT
+
 /**
  * Router
  * @param props
@@ -89,26 +98,46 @@ function Router(props: {
   base: string;
   history?: BrowserHistory | HashHistory | MemoryHistory;
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
-  id?: number;
+  langService?: LangService;
+  id?: number | string;
 }): JSX.Element {
+  /**
+   * 0. LangService
+   * Check if langService props exist.
+   * If props exist, store langService instance in Routers store.
+   */
+  const langService = React.useMemo(() => {
+    if (!Routers.langService) Routers.langService = props.langService;
+    return Routers.langService;
+  }, [props.langService]);
+
   /**
    * 1. routes
    * Format and return routes list
-   * If is the first Router instance, register routes in 'Routers' store
+   * If is the first Router instance, register routes in 'Routers' store.
    * In other case, return current props.routes
    *
    *  const { routes } = useRouter();
    *  return current Router instance routes list, not all routes given to the first instance.
    */
   const routes = React.useMemo(() => {
-    const patchedRoutes = patchMissingRootRoute(props.routes);
-    if (!Routers.routes) {
-      Routers.routes = applyMiddlewares(patchedRoutes, props.middlewares);
-      return Routers.routes;
-    } else {
-      return patchedRoutes;
+    if (!props.routes) {
+      console.warn("props.routes is missing or empty, return.", props.routes);
     }
-  }, [props.routes]);
+    let routesList;
+
+    // For each instances
+    routesList = patchMissingRootRoute(props.routes);
+
+    // Only for first instance
+    if (!Routers.routes) {
+      routesList = applyMiddlewares(routesList, props.middlewares);
+      if (langService) routesList = langService.addLangParamToRoutes(routesList);
+      Routers.routes = routesList;
+    }
+    log(props.id, "routesList", routesList);
+    return routesList;
+  }, [props.routes, langService]);
 
   /**
    * 2. base
@@ -159,16 +188,13 @@ function Router(props: {
     }
   );
 
-  // keep as reference
-  const currentRouteRef = React.useRef<TRoute>();
-
   /**
    * Handle history
    * Update routes when history change
    * Dispatch new routes via RouterContext
    */
+  const currentRouteRef = React.useRef<TRoute>();
   const handleHistory = (url: string = window.location.pathname): void => {
-    log('"routes', routes);
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
@@ -190,8 +216,11 @@ function Router(props: {
 
     const newRoute: TRoute = matchingRoute || notFoundRoute;
     if (newRoute) {
+      // Final process: update context currentRoute from dispatch method \o/ !
       dispatch({ type: "update-current-route", value: newRoute });
+      // & register this new route as currentRoute in local and in Routers store
       currentRouteRef.current = newRoute;
+      Routers.currentRoute = newRoute;
     }
   };
 
@@ -220,12 +249,13 @@ function Router(props: {
       value={{
         routes,
         base,
+        langService,
+        history: Routers.history,
         currentRoute,
         previousRoute,
         routeIndex,
         previousPageIsMount,
         unmountPreviousPage,
-        history: Routers.history,
       }}
     />
   );

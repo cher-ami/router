@@ -4,8 +4,12 @@ import { transitionsHelper } from "../helper/transitionsHelper";
 import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
+import {
+  getPathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+} from "../../src/core/helpers";
 import { routesList } from "../routes";
-import { joinPaths } from "../../src/api/helpers";
 const componentName: string = "AboutPage";
 
 const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
@@ -19,16 +23,18 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
+  // prepare routes & base for subRouter
+  const router = useRouter();
+  const path = getPathByRouteName(routesList, "AboutPage");
 
-  const router = useRouter()
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
       <Router
         id={2}
-        base={joinPaths([router.base, '/about'])}
-        routes={routesList.find((route) => route.path === "/about").children}
+        base={getSubRouterBase(path, router.base)}
+        routes={getSubRouterRoutes(path, router.routes)}
       >
         <div className={componentName}>
           <nav>

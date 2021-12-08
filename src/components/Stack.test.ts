@@ -1,4 +1,4 @@
-import { Stack } from "../src";
+import { Stack } from "./Stack";
 
 describe("Stack", () => {
   it("should be defined", () => {

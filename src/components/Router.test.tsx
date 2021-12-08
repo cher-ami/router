@@ -1,7 +1,7 @@
 import React from "react";
-import { Router, TRoute } from "../src";
+import { Router } from "./Router";
 import { render } from "@testing-library/react";
-import { createBrowserHistory } from "history";
+import { TRoute } from "./Router";
 
 describe("Router", () => {
   const routesList: TRoute[] = [
@@ -16,10 +16,8 @@ describe("Router", () => {
   });
 
   it("should return a children", () => {
-    const history = createBrowserHistory();
-
     const { container } = render(
-      <Router routes={routesList} base={"/"} history={history}>
+      <Router routes={routesList}>
         <div id={"app"}>app</div>
       </Router>
     );
