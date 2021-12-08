@@ -55,10 +55,6 @@ Hooks:
 - [`useHistory`](#useHistory) Get global router history and handle history
   changes
 
-Middlewares:
-
-- [`langMiddleware`](#langMiddleware) Patch all routes with `:lang` params
-
 Services:
 
 - [`LangService`](#LangService) Manage `:lang` params
@@ -641,37 +637,29 @@ const history = useHistory((e) => {
 
 - **history** `location[]` : Location array of history API
 
-### <a name="langMiddleware"></a>langMiddleware
-
-Patch all first level routes with `:lang` params. For it to work, we need to
-initialize `LangService` first.
-
-```jsx
-import { langMiddleware } from "@cher-ami/router";
-
-<Router routes={routesList} base={"/"} middlewares={[langMiddleware]}>
-  // ...
-</Router>;
-```
-
 ### <a name="LangService"></a>LangService
 
 Manage `:lang` params from anywhere inside Router scope.
 
 ```jsx
-import { LangService, langMiddleware } from "@cher-ami/router";
+import { LangService } from "@cher-ami/router";
 import { Stack } from "./Stack";
 
-const baseUrl = "/";
+const base = "/";
+
 // first lang object is default lang
-const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+const languages = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 // optionally, default lang can be defined explicitly
-// const locales = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
+// const languages = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
 
-// initialize LangService
-LangService.init(locales, true, baseUrl);
+// Create LangService instance
+const langService = new LangService({
+  languages,
+  showDefaultLangInUrl: true,
+  base,
+});
 
-<Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
+<Router langService={langService} routes={routesList} base={base}>
   <App />
 </Router>;
 ```
@@ -699,16 +687,32 @@ function App() {
 
 **Methods:**
 
-#### init(languages: TLanguage[], showDefaultLangInUrl = true, base = "/") `void`
+#### constructor({ languages: TLanguage<TLang>[]; showDefaultLangInUrl?: boolean; base?: string; }) `void`
 
-Initialize LangService. Need to be call before first router instance
+Initialize LangService by passing it to "langService" Router props
+
+constructor object properties:
 
 - `languages`: list on language objects
 - `showDefaultLangInUrl`: choose if default language is visible in URL or not
 - `base`: set the same than router base
 
 ```jsx
-LangService.init([{ key: "en" }, { key: "fr" }], true, "/base");
+const langService = new LangService({
+  languages: { key: "en" }, { key: "fr" },
+  showDefaultLangInUrl: true,
+  base: "/",
+});
+
+```
+
+`langService` instance is available in Router scope from `useRouter()` hook.
+
+```tsx
+const Page = () => {
+  const { langService } = useRouter();
+  // langService.setLang() ...
+};
 ```
 
 #### languages `Tlanguage[]`
@@ -716,7 +720,7 @@ LangService.init([{ key: "en" }, { key: "fr" }], true, "/base");
 Return languages list
 
 ```jsx
-const langages = LangService.languages;
+const langages = langService.languages;
 ```
 
 #### currentLang `TLanguage`
@@ -724,7 +728,7 @@ const langages = LangService.languages;
 Return current Language object.
 
 ```jsx
-const lang = LangService.currentLang;
+const lang = langService.currentLang;
 // { key: "..." }
 ```
 
@@ -733,16 +737,16 @@ const lang = LangService.currentLang;
 Return default language object
 
 ```jsx
-const defaultLang = LangService.defaultLang;
+const defaultLang = langService.defaultLang;
 // { key: "..." }
 ```
 
 #### isInit `boolean`
 
-Return LangService init state
+Return langService init state
 
 ```jsx
-const isInit = LangService.isInit;
+const isInit = langService.isInit;
 ```
 
 #### setLang(toLang: TLanguage, forcePageReload = true) `void`
@@ -754,7 +758,7 @@ component only.
   internal router stack to change the language
 
 ```jsx
-LangService.setLang({ key: "de" });
+langService.setLang({ key: "de" });
 ```
 
 #### redirect(forcePageReload = true) `void`
@@ -767,12 +771,12 @@ only.
   internal router stack to change the language
 
 ```jsx
-LangService.redirect();
+langService.redirect();
 ```
 
 ### <a name="TranslatePath"></a>Translate Path
 
-Paths can be translated by lang in route path property:
+Paths can be translated by lang in route path property. This option works only if LangService instance is created and passed to the Router component.
 
 ```js
   {
@@ -809,6 +813,12 @@ Final routes array used by the router be
 `HashHistory | MemoryHistory | BrowserHistory`
 
 Selected history mode. all history API is avaible from this one.
+
+#### Routers.langService
+
+`LangService`
+
+LangService instance given to the first Router component.
 
 #### Routers.routeCounter
 
