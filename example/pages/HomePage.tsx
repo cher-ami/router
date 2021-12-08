@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react";
+import React, { ForwardedRef, forwardRef, useRef } from "react";
 import { useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import debug from "@wbe/debug";

@@ -1,32 +1,24 @@
 import { useState } from "react";
-import { useHistory } from "..";
-import { createUrl, TOpenRouteParams } from "../api/helpers";
-import { Routers } from "../api/Routers";
+import { useHistory } from "../hooks/useHistory";
+import { createUrl, TOpenRouteParams } from "../core/helpers";
 import debug from "@wbe/debug";
-
 const log = debug("router:useLocation");
 
 /**
  * useLocation
- * @dec Allow to
  */
 export const useLocation = (): [string, (param: string | TOpenRouteParams) => void] => {
-  /**
-   * Get dynamic current location
-   */
-  const [location, setLoc] = useState(Routers.history.location.pathname);
-  useHistory((event) => {
-    setLoc(event.location.pathname);
+  const history = useHistory((event) => {
+    setPathname(event.location.pathname);
   }, []);
 
-  /**
-   * Prepare setLocation function, who push in history
-   * @param args
-   */
+  // Get dynamic current location
+  const [pathname, setPathname] = useState(window.location.pathname);
+
+  // Prepare setLocation function, who push in history
   function setLocation(args: string & TOpenRouteParams): void {
-    const urlToPush = createUrl(args);
-    Routers.history.push(urlToPush);
+    history?.push(createUrl(args));
   }
 
-  return [location, setLocation];
+  return [pathname, setLocation];
 };

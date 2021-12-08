@@ -1,29 +1,35 @@
-import { RouterManager, TRoute, useRouter, langMiddleware } from "..";
-import React, {
-  createContext,
-  memo,
-  ReactElement,
-  useEffect,
-  useMemo,
-  useReducer,
-  useState,
-} from "react";
-import { joinPaths } from "../api/helpers";
-import { Routers } from "../api/Routers";
-import { LangService } from "..";
-import { getLangPathByPath } from "../lang/langHelpers";
-import { BrowserHistory, HashHistory, MemoryHistory } from "history";
+import debug from "@wbe/debug";
+import {
+  BrowserHistory,
+  createBrowserHistory,
+  HashHistory,
+  MemoryHistory,
+} from "history";
+import { Match } from "path-to-regexp";
+import React from "react";
+import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
+import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
+import { Routers } from "../core/Routers";
+import LangService from "../core/LangService";
 
-const componentName = "Router";
+// -------------------------------------------------------------------------------- TYPES
 
-interface IProps {
-  base: string;
-  children: ReactElement;
-  // routes array is required for 1st instance only
-  routes?: TRoute[];
-  middlewares?: any[];
-  history?: BrowserHistory | HashHistory | MemoryHistory;
-}
+export type TRoute = {
+  path: string | { [x: string]: string };
+  component?: React.ComponentType<any>;
+  base?: string;
+  name?: string;
+  parser?: Match;
+  props?: {
+    params?: { [x: string]: any };
+    [x: string]: any;
+  };
+  children?: TRoute[];
+  url?: string;
+  fullUrl?: string; // full URL who not depend of current instance
+  fullPath?: string; // full Path /base/:lang/foo/second-foo
+  langPath?: { [x: string]: string } | null;
+};
 
 export interface IRouterContextStackStates {
   unmountPreviousPage?: () => void;
@@ -31,11 +37,28 @@ export interface IRouterContextStackStates {
 }
 
 export interface IRouterContext extends IRouterContextStackStates {
+  base: string;
+  routes: TRoute[];
+  history: BrowserHistory | HashHistory | MemoryHistory;
   currentRoute: TRoute;
   previousRoute: TRoute;
+  langService: LangService;
   routeIndex: number;
-  base: string;
+  previousPageIsMount: boolean;
+  unmountPreviousPage: () => void;
 }
+
+export type TRouteReducerState = {
+  currentRoute: TRoute;
+  previousRoute: TRoute;
+  previousPageIsMount: boolean;
+  index: number;
+};
+
+// -------------------------------------------------------------------------------- PREPARE / CONTEXT
+
+const componentName = "Router";
+const log = debug(`router:${componentName}`);
 
 /**
  * Router Context
@@ -43,141 +66,201 @@ export interface IRouterContext extends IRouterContextStackStates {
  * Big thing is you can access this context from the closest provider in the tree.
  * This allow to manage easily nested stack instances.
  */
-const defaultRouterContext = {
-  currentRoute: null,
-  previousRoute: null,
-  routeIndex: 0,
+export const RouterContext = React.createContext<IRouterContext>({
   base: "/",
-};
-export const RouterContext = createContext<IRouterContext>(defaultRouterContext);
-RouterContext.displayName = componentName;
-
-/**
- * Routes Reducer
- * Allows to dispatch routes states to components three
- */
-export type TRouteReducerState = {
-  currentRoute: TRoute;
-  previousRoute: TRoute;
-  previousPageIsMount: boolean;
-  index: number;
-};
-const initialState: TRouteReducerState = {
-  currentRoute: null,
-  previousRoute: null,
+  routes: undefined,
+  history: undefined,
+  langService: undefined,
+  currentRoute: undefined,
+  previousRoute: undefined,
+  routeIndex: 0,
   previousPageIsMount: true,
-  index: 0,
+  unmountPreviousPage: () => {},
+});
+RouterContext.displayName = "RouterContext";
+
+Router.defaultProps = {
+  base: "/",
+  history: createBrowserHistory(),
+  id: 1,
 };
 
-export type TRouteReducerActionType = "update-current-route" | "unmount-previous-page";
-const reducer = (
-  state: TRouteReducerState,
-  action: { type: TRouteReducerActionType; value }
-) => {
-  switch (action.type) {
-    case "update-current-route":
-      return {
-        previousRoute: state.currentRoute,
-        currentRoute: action.value,
-        index: state.index + 1,
-        previousPageIsMount: true,
-      };
-    case "unmount-previous-page":
-      return { ...state, previousPageIsMount: !action.value };
-  }
-};
+// -------------------------------------------------------------------------------- COMPONENT
 
 /**
  * Router
- * This component returns children wrapped by provider who contains router instance
+ * @param props
+ * @returns JSX.Element
  */
-export const Router = memo((props: IProps) => {
-  //
-  const [reducerState, dispatch] = useReducer(reducer, initialState);
-  // get parent router instance if exist, in case we are one sub router
-  const parentRouter = useRouter();
-  // deduce a router ID
-  const id = Routers.instances?.length > 0 ? Routers.instances.length + 1 : 1;
-  // get routes list by props first
-  // if there is no props.routes, we deduce that we are on a subrouter
-  const routes = useMemo(() => {
-    let currentRoutesList: TRoute[];
-    if (props.routes) {
-      Routers.routes = props.routes;
-      currentRoutesList = props.routes;
-    } else {
-      currentRoutesList = Routers.routes?.find((el) => {
-        return (
-          getLangPathByPath({ path: el.path }) === getLangPathByPath({ path: props.base })
-        );
-      })?.children;
-      if (LangService.isInit) {
-        // If sub router, need to selected appropriate route path by lang
-        currentRoutesList = langMiddleware(currentRoutesList, false);
-      }
-    }
-    return currentRoutesList;
-  }, [props.routes, props.base]);
+function Router(props: {
+  children: React.ReactNode;
+  routes: TRoute[];
+  base: string;
+  history?: BrowserHistory | HashHistory | MemoryHistory;
+  middlewares?: ((routes: TRoute[]) => TRoute[])[];
+  langService?: LangService;
+  id?: number | string;
+}): JSX.Element {
+  /**
+   * 0. LangService
+   * Check if langService props exist.
+   * If props exist, store langService instance in Routers store.
+   */
+  const langService = React.useMemo(() => {
+    if (!Routers.langService) Routers.langService = props.langService;
+    return Routers.langService;
+  }, [props.langService]);
 
-  // join each parent router base
-  const base = useMemo(() => {
-    const parentBase: string = parentRouter?.base;
-    const addLang: boolean = id !== 1 && LangService.showLangInUrl();
-    const base: string = addLang ? getLangPathByPath({ path: props.base }) : props.base;
-    return joinPaths([
-      parentBase, // ex: /master-base
-      addLang && "/:lang",
-      base, // ex: "/about
-    ]);
+  /**
+   * 1. routes
+   * Format and return routes list
+   * If is the first Router instance, register routes in 'Routers' store.
+   * In other case, return current props.routes
+   *
+   *  const { routes } = useRouter();
+   *  return current Router instance routes list, not all routes given to the first instance.
+   */
+  const routes = React.useMemo(() => {
+    if (!props.routes) {
+      console.warn("props.routes is missing or empty, return.", props.routes);
+    }
+    let routesList;
+
+    // For each instances
+    routesList = patchMissingRootRoute(props.routes);
+
+    // Only for first instance
+    if (!Routers.routes) {
+      routesList = applyMiddlewares(routesList, props.middlewares);
+      if (langService) routesList = langService.addLangParamToRoutes(routesList);
+      Routers.routes = routesList;
+    }
+    log(props.id, "routesList", routesList);
+    return routesList;
+  }, [props.routes, langService]);
+
+  /**
+   * 2. base
+   * Format and return base URL
+   * Register base in 'Routers' obj if is the first Router instance
+   * In all case, return current props.base
+   */
+  const base = React.useMemo(() => {
+    if (!Routers.base) Routers.base = props.base;
+    return props.base;
   }, [props.base]);
 
-  // keep router instance in state
-  const [routerState] = useState<RouterManager>(() => {
-    const newRouter = new RouterManager({
-      base,
-      routes,
-      id,
-      middlewares: props.middlewares,
-      history: props.history,
-      setNewCurrentRoute: (newCurrentRoute) =>
-        dispatch({ type: "update-current-route", value: newCurrentRoute }),
-    });
-    // keep new router in global constant
-    Routers.instances.push(newRouter);
-    // return it as state
-    return newRouter;
-  });
+  /**
+   * 3. history
+   * If is the first Router instance, register history in 'Routers' store
+   * 'history' object need to be the same between each Router instance
+   */
+  if (!Routers.history) Routers.history = props.history;
 
-  // on destroy, we need to remove this current router instance from ROUTERS.instances array
-  // remove 1 element from specific index
-  useEffect(() => {
-    return () => {
-      Routers.instances.splice(
-        Routers.instances.findIndex((el) => el.id === routerState.id),
-        1
-      );
-      routerState.destroyEvents();
-    };
-  }, [routerState]);
+  // -------------------------------------------------------------------------------- ROUTE CHANGE
+
+  /**
+   * States list muted when history change
+   */
+  const [reducerState, dispatch] = React.useReducer(
+    (
+      state,
+      action: { type: "update-current-route" | "unmount-previous-page"; value?: any }
+    ) => {
+      switch (action.type) {
+        case "update-current-route":
+          return {
+            ...state,
+            previousRoute: state.currentRoute,
+            currentRoute: action.value,
+            routeIndex: state.routeIndex + 1,
+            previousPageIsMount: true,
+          };
+        case "unmount-previous-page":
+          return { ...state, previousPageIsMount: false };
+      }
+    },
+    {
+      currentRoute: undefined,
+      previousRoute: undefined,
+      previousPageIsMount: false,
+      routeIndex: 0,
+    }
+  );
+
+  /**
+   * Handle history
+   * Update routes when history change
+   * Dispatch new routes via RouterContext
+   */
+  const currentRouteRef = React.useRef<TRoute>();
+  const handleHistory = (url: string = window.location.pathname): void => {
+    const matchingRoute = getRouteFromUrl({
+      pUrl: url,
+      pRoutes: routes,
+      pBase: props.base,
+      id: props.id,
+    });
+
+    const notFoundRoute = getNotFoundRoute(props.routes);
+    if (!matchingRoute && !notFoundRoute) {
+      log(props.id, "matchingRoute not found & 'notFoundRoute' not found, return.");
+      return;
+    }
+
+    const currentRouteUrl = currentRouteRef.current?.url;
+    if (currentRouteUrl != null && currentRouteUrl === matchingRoute?.url) {
+      log(props.id, "this is the same route 'url', return.");
+      return;
+    }
+
+    const newRoute: TRoute = matchingRoute || notFoundRoute;
+    if (newRoute) {
+      // Final process: update context currentRoute from dispatch method \o/ !
+      dispatch({ type: "update-current-route", value: newRoute });
+      // & register this new route as currentRoute in local and in Routers store
+      currentRouteRef.current = newRoute;
+      Routers.currentRoute = newRoute;
+    }
+  };
+
+  /**
+   * Here we go!
+   * Listen history change.
+   * If it change:
+   * - Get matching route with current URL
+   * - Dispatch new routes states from RouterContext
+   */
+  React.useEffect(() => {
+    handleHistory();
+    return Routers.history.listen(({ location }) => {
+      handleHistory(location.pathname);
+    });
+  }, []);
+
+  // -------------------------------------------------------------------------------- RENDER
+
+  const { currentRoute, previousRoute, routeIndex, previousPageIsMount } = reducerState;
+  const unmountPreviousPage = () => dispatch({ type: "unmount-previous-page" });
 
   return (
     <RouterContext.Provider
       children={props.children}
       value={{
-        ...defaultRouterContext,
+        routes,
         base,
-        currentRoute: reducerState.currentRoute,
-        previousRoute: reducerState.previousRoute,
-        routeIndex: reducerState.index,
-        previousPageIsMount: reducerState.previousPageIsMount,
-        unmountPreviousPage: () =>
-          dispatch({
-            type: "unmount-previous-page",
-            value: true,
-          }),
+        langService,
+        history: Routers.history,
+        currentRoute,
+        previousRoute,
+        routeIndex,
+        previousPageIsMount,
+        unmountPreviousPage,
       }}
     />
   );
-});
+}
 
 Router.displayName = componentName;
+const MemoizedRouter = React.memo(Router);
+export { MemoizedRouter as Router };

@@ -10,11 +10,11 @@ import {
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { routesList } from "../routes";
 
-const componentName: string = "BarPage";
+const componentName: string = "HelloPage";
 
 interface IProps {}
 
-export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
+export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
   useStack({
@@ -26,13 +26,13 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
   });
 
   const router = useRouter();
-  const path = getPathByRouteName(routesList, "BarPage");
-  
+  const path = getPathByRouteName(routesList, "HelloPage");
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
+
       <Router
-        id={3}
+        id={4}
         base={getSubRouterBase(path, router.base, false)}
         routes={getSubRouterRoutes(path, router.routes)}
       >
@@ -40,10 +40,10 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
           <nav>
             <ul>
               <li>
-                <Link to={{ name: "YoloPage" }}>Yolo</Link>
+                <Link to={{ name: "LaPage" }}>La</Link>
               </li>
               <li>
-                <Link to={{ name: "HelloPage" }}>Hello (has sub router)</Link>
+                <Link to={{ name: "OurPage" }}>Our</Link>
               </li>
             </ul>
           </nav>
@@ -54,5 +54,5 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
   );
 });
 
-BarPage.displayName = componentName;
-export default BarPage;
+HelloPage.displayName = componentName;
+export default HelloPage;

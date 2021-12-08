@@ -1,12 +1,14 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { openRoute, useStack } from "../../src";
+import { useLocation, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
-const componentName: string = "FooPage";
+const componentName: string = "OurPage";
 
 interface IProps {}
 
-const FooPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
+const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
+
+  const [location, setLocation] = useLocation();
 
   useStack({
     componentName,
@@ -22,11 +24,11 @@ const FooPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
       <br />
       <button
         children={`navigate to FooPage`}
-        onClick={() => openRoute({ name: "OurPage" })}
+        onClick={() => setLocation({ name: "FooPage" })}
       />
     </div>
   );
 });
 
-FooPage.displayName = componentName;
-export default FooPage;
+OurPage.displayName = componentName;
+export default OurPage;

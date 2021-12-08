@@ -31,7 +31,7 @@ and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 - [Installation](#Installation)
 - [Simple usage](#SimpleUsage)
 - [Dynamic routes](#DynamicRoutes)
-- [Nested routes](#NestedRoutes)
+- [Sub Routers](#SubRouters)
 - [Manage Transitions](#ManageTransitions)
   - [Default sequential transitions](#DefaultSequentialTransitions)
   - [Custom transitions](#CustomTransitions)
@@ -52,12 +52,8 @@ Hooks:
 - [`useLocation`](#useLocation) Get current location and set new location
 - [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
-- [`useHistory`](#useHistory) Get global router history and handle history
+- [`useHistory`](#useHistory) Execute callback each time history changes
   changes
-
-Middlewares:
-
-- [`langMiddleware`](#langMiddleware) Patch all routes with `:lang` params
 
 Services:
 
@@ -207,11 +203,12 @@ const routesList = [
 
 **[Demo codesandbox: not found route](https://codesandbox.io/s/not-found-route-eu4bi)**
 
-## <a name="NestedRoutes"></a>Nested Routes
+## <a name="SubRouters"></a>Sub-router
 
-cher-ami router supports nested routes 🙏🏽
+cher-ami router supports nested routes from sub routers instance 🙏🏽.
+It is possible to nest as many routers as you want.
 
-1. Define children routes in initial routes list with `children` key;
+1. Define children routes in initial routes list with `children` property;
 
 ```js
 const routesList = [
@@ -241,34 +238,42 @@ const routesList = [
 2. Children were defined within the route that render `FooPage` component, so
    you can then create a new router instance in this component.
 
-**Only if it's a nested router, you must not pass `routes` Router props again**.
-The previous routes array, passed to the root component, will be used
-by `Router`.
-
-`Router` props `base` need to be the same than the path who contains children
-routes. In this case, `/foo` will be the new nested router base. The stack will
-then be able to render `/foo/people` and `/foo/yolo`.
+3. The new subRouters needs his own base and routes.
+   `getSubRoutersBase` and `getSubRoutersRoutes` functions available to get them.
 
 ```jsx
 import React from "react";
-import { Router, useStack, Stack } from "@cher-ami/router";
+import {
+  Router,
+  useStack,
+  Stack,
+  useRouter,
+  getPathByRouteName,
+  getSubRoutersBase,
+  getSubRoutersRoutes,
+} from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
+  // Get parent router context
+  const { base, routes } = useRouter();
+
+  // Parsed routes list and get path by route name
+  const path = getPathByRouteName(routesList, "FooPage"); // "/foo"
   // ...
   return (
-    <div
-      className="FooPage"
-      // ...
-    >
-      <Router base={"/foo"}>
+    <div>
+      <Router
+        // -> "/base/:lang/foo" (if last param is false, ':lang' will be not added)
+        base={getSubRoutersBase(path, base, true)}
+        // children routes array of FooPage
+        routes={getSubRoutersRoutes(path, routes)}
+      >
         <Stack />
       </Router>
     </div>
   );
 });
 ```
-
-**[Demo codesandbox: nested router](https://codesandbox.io/s/nested-router-bvspe?file=/src/index.tsx)**
 
 ## <a name="ManageTransitions"></a>Manage transitions
 
@@ -370,7 +375,7 @@ $ npm run dev
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={} history={} middlewares={}>
+<Router routes={} base={} history={} middlewares={} id={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -388,7 +393,8 @@ Router component creates a new router instance.
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
   the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
-- **middlewares** `[]` add routes middleware function to patch each routes (check [langMiddleware](src/lang/LangMiddleware.ts) example)
+- **middlewares** `[]` add routes middleware function to patch each routes)
+- **id** `?number | string`
 
 ### <a name="Link"></a>Link
 
@@ -630,39 +636,31 @@ const history = useHistory((e) => {
 
 **Returns:**
 
-- **history** `location[]` : Location array of history API
-
-### <a name="langMiddleware"></a>langMiddleware
-
-Patch all first level routes with `:lang` params. For it to work, we need to
-initialize `LangService` first.
-
-```jsx
-import { langMiddleware } from "@cher-ami/router";
-
-<Router routes={routesList} base={"/"} middlewares={[langMiddleware]}>
-  // ...
-</Router>;
-```
+- **history** `location[]` : global history object. (`Routers.history`)
 
 ### <a name="LangService"></a>LangService
 
 Manage `:lang` params from anywhere inside Router scope.
 
 ```jsx
-import { LangService, langMiddleware } from "@cher-ami/router";
+import { LangService } from "@cher-ami/router";
 import { Stack } from "./Stack";
 
-const baseUrl = "/";
+const base = "/";
+
 // first lang object is default lang
-const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+const languages = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 // optionally, default lang can be defined explicitly
-// const locales = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
+// const languages = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
 
-// initialize LangService
-LangService.init(locales, true, baseUrl);
+// Create LangService instance
+const langService = new LangService({
+  languages,
+  showDefaultLangInUrl: true,
+  base,
+});
 
-<Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
+<Router langService={langService} routes={routesList} base={base}>
   <App />
 </Router>;
 ```
@@ -690,16 +688,32 @@ function App() {
 
 **Methods:**
 
-#### init(languages: TLanguage[], showDefaultLangInUrl = true, base = "/") `void`
+#### constructor({ languages: TLanguage<TLang>[]; showDefaultLangInUrl?: boolean; base?: string; }) `void`
 
-Initialize LangService. Need to be call before first router instance
+Initialize LangService by passing it to "langService" Router props
+
+constructor object properties:
 
 - `languages`: list on language objects
 - `showDefaultLangInUrl`: choose if default language is visible in URL or not
 - `base`: set the same than router base
 
 ```jsx
-LangService.init([{ key: "en" }, { key: "fr" }], true, "/base");
+const langService = new LangService({
+  languages: { key: "en" }, { key: "fr" },
+  showDefaultLangInUrl: true,
+  base: "/",
+});
+
+```
+
+`langService` instance is available in Router scope from `useRouter()` hook.
+
+```tsx
+const Page = () => {
+  const { langService } = useRouter();
+  // langService.setLang() ...
+};
 ```
 
 #### languages `Tlanguage[]`
@@ -707,7 +721,7 @@ LangService.init([{ key: "en" }, { key: "fr" }], true, "/base");
 Return languages list
 
 ```jsx
-const langages = LangService.languages;
+const langages = langService.languages;
 ```
 
 #### currentLang `TLanguage`
@@ -715,7 +729,7 @@ const langages = LangService.languages;
 Return current Language object.
 
 ```jsx
-const lang = LangService.currentLang;
+const lang = langService.currentLang;
 // { key: "..." }
 ```
 
@@ -724,16 +738,16 @@ const lang = LangService.currentLang;
 Return default language object
 
 ```jsx
-const defaultLang = LangService.defaultLang;
+const defaultLang = langService.defaultLang;
 // { key: "..." }
 ```
 
 #### isInit `boolean`
 
-Return LangService init state
+Return langService init state
 
 ```jsx
-const isInit = LangService.isInit;
+const isInit = langService.isInit;
 ```
 
 #### setLang(toLang: TLanguage, forcePageReload = true) `void`
@@ -745,7 +759,7 @@ component only.
   internal router stack to change the language
 
 ```jsx
-LangService.setLang({ key: "de" });
+langService.setLang({ key: "de" });
 ```
 
 #### redirect(forcePageReload = true) `void`
@@ -758,12 +772,12 @@ only.
   internal router stack to change the language
 
 ```jsx
-LangService.redirect();
+langService.redirect();
 ```
 
 ### <a name="TranslatePath"></a>Translate Path
 
-Paths can be translated by lang in route path property:
+Paths can be translated by lang in route path property. This option works only if LangService instance is created and passed to the Router component.
 
 ```js
   {
@@ -779,21 +793,15 @@ we need a global object to store shared informations between router instances. I
 
 #### Routers.createUrl()
 
-`(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => string`
+`(args: string | TOpenRouteParams, base?:string, allRoutes?: TRoute[]) => string`
 
 Create a formated URL by string, or `TOpenRouteParams`
 
 #### Routers.openRoute()
 
-`(args: string | TOpenRouteParams, availablesRoutes?: TRoute[]) => void`
+`(args: string | TOpenRouteParams, history?) => void`
 
 Push new route in current history. Stack(s) component(s) will return appriopriated route.
-
-#### Routers.preMiddlewareRoutes
-
-`TRoute[]`
-
-Routes givent to the router before Middleware process.
 
 #### Routers.routes
 
@@ -801,23 +809,17 @@ Routes givent to the router before Middleware process.
 
 Final routes array used by the router be
 
-#### Routers.instances
-
-`RouterManager[]`
-
-Contains all router instances. This array is updated each time a router is added or removed from DOM.
-
 #### Routers.history
 
 `HashHistory | MemoryHistory | BrowserHistory`
 
 Selected history mode. all history API is avaible from this one.
 
-#### Routers.locationsHistory
+#### Routers.langService
 
-`Location[]`
+`LangService`
 
-Array of history navigation locations from the start of the session. This information is provided by `history`.
+LangService instance given to the first Router component.
 
 #### Routers.routeCounter
 

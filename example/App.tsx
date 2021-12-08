@@ -1,6 +1,5 @@
-import React, { useEffect } from "react";
-import { Link, Stack } from "../src";
-import { LangService } from "../src";
+import React from "react";
+import { Link, Routers, Stack } from "../src";
 
 const componentName = "App";
 
@@ -8,10 +7,6 @@ const componentName = "App";
  * @name App
  */
 export default function App() {
-  useEffect(() => {
-    LangService.redirect();
-  }, []);
-
   return (
     <div className={componentName}>
       {["en", "fr", "de", "nl"].map((el, i) => (
@@ -19,7 +14,7 @@ export default function App() {
           key={i}
           children={el}
           onClick={() => {
-            LangService.setLang({ key: el });
+            Routers.langService?.setLang({ key: el });
           }}
         />
       ))}
@@ -30,15 +25,12 @@ export default function App() {
             <Link to={{ name: "HomePage" }}>Home</Link>
           </li>
           <li>
-            <Link to={{ name: "AboutPage" }}>About</Link>
-          </li>
-          <li>
             <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>
               Blog id:article-1
             </Link>
           </li>
           <li>
-            <Link to={"/not/found/"}>Not found route</Link>
+            <Link to={{ name: "AboutPage" }}>About (has sub router)</Link>
           </li>
         </ul>
       </nav>

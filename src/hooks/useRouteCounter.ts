@@ -1,6 +1,6 @@
-import { useHistory } from "..";
+import { useHistory } from "../hooks/useHistory";
 import { useState } from "react";
-import { Routers } from "../api/Routers";
+import { Routers } from "../core/Routers";
 
 /**
  * use Route Counter

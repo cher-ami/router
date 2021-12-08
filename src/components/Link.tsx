@@ -1,11 +1,12 @@
 import React, { AnchorHTMLAttributes, PropsWithChildren, useMemo } from "react";
-import { useLocation } from "..";
+import { useLocation, useRouter } from "..";
 import {
   createUrl,
   joinPaths,
   removeLastCharFromString,
   TOpenRouteParams,
-} from "../api/helpers";
+} from "../core/helpers";
+import debug from "@wbe/debug";
 
 // exclude href because it collides with "to"
 type TAnchorWithoutHref = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href">;
@@ -16,23 +17,28 @@ export interface ILinkProps extends PropsWithChildren<TAnchorWithoutHref> {
   className?: string;
 }
 
+const log = debug("router:Link");
+
 /**
  * @name Link
  */
 function Link(props: ILinkProps) {
-  const [location, setLocation] = useLocation();
+  const { history, routes, base } = useRouter();
+  const [location] = useLocation();
 
-  const url = useMemo(() => createUrl(props.to), [props.to]);
+  // Compute URL
+  const url = useMemo(() => createUrl(props.to, base, routes), [props.to, routes, base]);
 
+  // Link is active if its URL is the current URL
   const isActive = useMemo(
     () => location === url || location === removeLastCharFromString(url, "/", true),
     [location, url]
   );
 
-  const handleClick = (e) => {
-    e.preventDefault();
+  const handleClick = (event): void => {
+    event.preventDefault();
     props.onClick?.();
-    setLocation(props.to);
+    history?.push(url);
   };
 
   return (
