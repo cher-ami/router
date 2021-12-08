@@ -1,7 +1,6 @@
 import LangService from "../core/LangService";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { TRoute } from "../components/Router";
-import { createUrl, openRoute, TOpenRouteParams } from "./helpers";
 
 export type TRouters = {
   /**
@@ -36,22 +35,6 @@ export type TRouters = {
    * LangService instance (stored in Router)
    */
   langService: LangService;
-
-  /**
-   * build URL method
-   */
-  createUrl: (
-    args: string | TOpenRouteParams,
-    base: string,
-    allRoutes: TRoute[]
-  ) => string;
-  /**
-   * Open route method
-   */
-  openRoute: (
-    args: string | TOpenRouteParams,
-    history: HashHistory | MemoryHistory | BrowserHistory
-  ) => void;
 };
 
 /**
@@ -66,6 +49,4 @@ export const Routers: TRouters = {
   isFirstRoute: true,
   currentRoute: undefined,
   langService: undefined,
-  createUrl,
-  openRoute,
 };
