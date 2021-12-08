@@ -15,7 +15,7 @@ export default function App() {
           key={i}
           children={el}
           onClick={() => {
-            setLang({ key: el }, true);
+            setLang(el, true);
           }}
         />
       ))}

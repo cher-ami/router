@@ -10,17 +10,23 @@ const log = debug("router:useLang");
  */
 export const useLang = (
   langService: LangService = Routers.langService
-): [lang: TLanguage, setLang: (lang: TLanguage, force: boolean) => void] => {
-  const [lang, setLang] = React.useState(langService.currentLang);
+): [lang: TLanguage, setLang: (lang: TLanguage | string, force: boolean) => void] => {
+  const [lang, setLang] = React.useState<TLanguage>(langService.currentLang);
 
+  // each time history change, set the current language in state
   useHistory(() => {
     setLang(langService.currentLang);
-    log("lang", lang);
   }, []);
 
   // Prepare setLocation function, who push in history
-  function setNewLang(lang: TLanguage, force = true): void {
-    langService.setLang(lang, force);
+  function setNewLang(lang: TLanguage | string, force = true): void {
+    let langToPush;
+    if (typeof lang === "string") {
+      langToPush = langService.languages.find((el) => el.key === lang);
+    } else {
+      langToPush = lang;
+    }
+    langService.setLang(langToPush, force);
   }
 
   return [lang, setNewLang];

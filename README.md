@@ -53,6 +53,7 @@ Hooks:
 - [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
 - [`useHistory`](#useHistory) Execute callback each time history changes
+- [`useLang`](#useLang) get and set langService current language object
   changes
 
 Services:
@@ -637,6 +638,30 @@ const history = useHistory((e) => {
 **Returns:**
 
 - **history** `location[]` : global history object. (`Routers.history`)
+
+### <a name="useLang"></a>useLang
+
+Get and update langService current language object.
+
+```tsx
+const [lang, setLang] = useLang();
+useEffect(() => {
+  // when current lang change
+  // it's usefull only if setLang method do not refresh the page.
+}, [lang]);
+
+// set new lang with lang object "key" property value only
+setLang("en");
+// set new lang with the lang object
+setLang({ key: "en" });
+```
+
+**Returns:**
+
+Array of :
+
+- **lang** `TLanguage` : current lang object
+- **setLang** `(lang: TLanguage | string, force: boolean) => void` : set new lang object (same API than `langService.setLang`)
 
 ### <a name="LangService"></a>LangService
 
