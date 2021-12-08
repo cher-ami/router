@@ -252,7 +252,7 @@ import {
   useStack,
   Stack,
   useRouter,
-  getRoutePathByRouteName,
+  getPathByRouteName,
   getSubRoutersBase,
   getSubRoutersRoutes,
 } from "@cher-ami/router";
@@ -262,7 +262,7 @@ const FooPage = forwardRef((props, handleRef) => {
   const { base, routes } = useRouter();
 
   // Parsed routes list and get path by route name
-  const path = getRoutePathByRouteName(routesList, "FooPage"); // "/foo"
+  const path = getPathByRouteName(routesList, "FooPage"); // "/foo"
   // ...
   return (
     <div>

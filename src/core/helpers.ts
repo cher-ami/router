@@ -66,7 +66,9 @@ export function applyMiddlewares(
 }
 
 /**
- * Get route path by route name. (or component name)
+ * Get current route path by route name. (or component name)
+ * (ex: "foo/bla" => if page is BlaPage, return "/bla")
+ * This is just path of the route, not "fullParh" /foo/bla
  * @param routes
  * @param name
  * @returns
@@ -198,7 +200,7 @@ export function getFullPathByPath(
 }
 
 /**
- * Get URL by route name and params
+ * Get "full" URL by route name and params
  * @returns string
  */
 export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams): string {

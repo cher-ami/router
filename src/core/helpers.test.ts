@@ -66,7 +66,7 @@ const routesList = [
   },
 ];
 
-describe("getRoutePathByRouteName", () => {
+describe("getPathByRouteName", () => {
   it("should return the right path with name", () => {
     expect(getPathByRouteName(routesList, "helloPage")).toEqual("/hello");
     expect(getPathByRouteName(routesList, "aboutPage")).toEqual({
@@ -80,7 +80,7 @@ describe("getRoutePathByRouteName", () => {
   });
 });
 
-describe("getRoutePathByRouteName", () => {
+describe("getPathByRouteName", () => {
   it("should return full URL with only page name and params", () => {
     expect(getUrlByRouteName(routesList, { name: "helloPage" })).toBe("/hello");
     expect(getUrlByRouteName(routesList, { name: "fooPage" })).toBe("/hello/foo");
