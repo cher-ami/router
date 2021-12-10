@@ -24,8 +24,8 @@ export const ArticlePage = forwardRef((props: IProps, handleRef: ForwardedRef<an
     componentName,
     handleRef,
     rootRef,
-    playIn: () => transitionsHelper(rootRef.current, true),
-    playOut: () => transitionsHelper(rootRef.current, false),
+    playIn: () => transitionsHelper(rootRef.current, true, { x: -50 }, { x: 0 }),
+    playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   });
 
   return (
@@ -51,14 +51,6 @@ export const ArticlePage = forwardRef((props: IProps, handleRef: ForwardedRef<an
       </button>
       <code>{`  setLocation({ name: "ArticlePage", params: { id: "hello" } })`}</code>
       <br />
-      <button
-        onClick={() => {
-          setLocation({ name: "BarPage" });
-        }}
-      >
-        {`navigate to BarPage`}
-      </button>
-      <code>{`  setLocation({ name: "BarPage" })`}</code>
     </div>
   );
 });

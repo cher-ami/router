@@ -12,8 +12,9 @@ const FooPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
     componentName,
     handleRef,
     rootRef,
-    playIn: () => transitionsHelper(rootRef.current, true),
-    playOut: () => transitionsHelper(rootRef.current, false),
+    playIn: () =>
+      transitionsHelper(rootRef.current, true, { y: -50, autoAlpha: 1 }, { y: 0 }),
+    playOut: () => transitionsHelper(rootRef.current, false, { y: -0 }, { y: 50, autoAlpha:0}),
   });
 
   return (

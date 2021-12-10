@@ -5,7 +5,6 @@ import {
   getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
-  joinPaths,
 } from "../../src/core/helpers";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { routesList } from "../routes";
@@ -21,13 +20,13 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
     componentName,
     handleRef,
     rootRef,
-    playIn: () => transitionsHelper(rootRef.current, true),
-    playOut: () => transitionsHelper(rootRef.current, false),
+    playIn: () => transitionsHelper(rootRef.current, true, { y: -20 }, { y: 0 }),
+    playOut: () => transitionsHelper(rootRef.current, false, { y: -0 }, { y: 20 }),
   });
 
   const router = useRouter();
   const path = getPathByRouteName(routesList, "BarPage");
-  
+
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
