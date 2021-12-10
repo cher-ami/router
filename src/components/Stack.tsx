@@ -5,8 +5,8 @@ import { IRouteStack } from "../hooks/useStack";
 import { useRouter } from "../hooks/useRouter";
 
 export type TManageTransitions = {
-  previousRoute: IRouteStack;
-  currentRoute: IRouteStack;
+  previousPage: IRouteStack;
+  currentPage: IRouteStack;
   unmountPreviousPage: () => void;
 };
 
@@ -37,20 +37,22 @@ function Stack(props: IProps): JSX.Element {
   // if manageTransitions props doesn't exist
   const sequencialTransition = React.useCallback(
     ({
-      previousRoute,
-      currentRoute,
+      previousPage,
+      currentPage,
       unmountPreviousPage,
     }: TManageTransitions): Promise<void> => {
       return new Promise(async (resolve) => {
-        const $current = currentRoute?.$element;
+        const $current = currentPage?.$element;
         if ($current) $current.style.visibility = "hidden";
-        if (previousRoute) {
-          await previousRoute?.playOut();
+        if (previousPage) {
+          await previousPage.playOut();
           unmountPreviousPage();
         }
-        await currentRoute?.isReadyPromise();
-        if ($current) $current.style.visibility = "visible";
-        await currentRoute?.playIn();
+        if (currentPage) {
+          await currentPage.isReadyPromise();
+          if ($current) $current.style.visibility = "visible";
+          await currentPage.playIn();
+        }
         resolve();
       });
     },
@@ -63,13 +65,13 @@ function Stack(props: IProps): JSX.Element {
     if (!currentRoute) return;
 
     (props.manageTransitions || sequencialTransition)({
-      previousRoute: prevRef.current,
-      currentRoute: currentRef.current,
+      previousPage: prevRef.current,
+      currentPage: currentRef.current,
       unmountPreviousPage,
     } as TManageTransitions).then(() => {
       unmountPreviousPage();
     });
-  }, [routeIndex, props.manageTransitions]);
+  }, [routeIndex]);
 
   return (
     <div className={["Stack", props.className].filter((e) => e).join(" ")}>
