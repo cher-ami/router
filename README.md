@@ -251,8 +251,8 @@ import {
   Stack,
   useRouter,
   getPathByRouteName,
-  getSubRoutersBase,
-  getSubRoutersRoutes,
+  getSubRouterBase,
+  getSubRouterRoutes,
 } from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
@@ -266,9 +266,9 @@ const FooPage = forwardRef((props, handleRef) => {
     <div>
       <Router
         // -> "/base/:lang/foo" (if last param is false, ':lang' will be not added)
-        base={getSubRoutersBase(path, base, true)}
+        base={getSubRouterBase(path, base, true)}
         // children routes array of FooPage
-        routes={getSubRoutersRoutes(path, routes)}
+        routes={getSubRouterRoutes(path, routes)}
       >
         <Stack />
       </Router>
@@ -307,7 +307,7 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
     // show and play in new page
     if (currentPage) {
       if ($current) $current.style.visibility = "visible";
-      await currentPage?.playIn?.();
+      await currentPage?.playIn();
     }
 
     resolve();
@@ -327,8 +327,8 @@ const App = (props, handleRef) => {
   const customSenario = ({ previousPage, currentPage, unmountPreviousPage }) => {
     return new Promise(async (resolve) => {
       // write a custom "crossed" senario...
-      if (previousPage) previousPage?.playOut?.();
-      if (currentPage) await currentPage?.playIn?.();
+      if (previousPage) previousPage?.playOut();
+      if (currentPage) await currentPage?.playIn();
 
       resolve();
     });
@@ -829,9 +829,10 @@ Push new route in current history. Stack(s) component(s) will return the appriop
 
 ## <a name="Routers"></a>Routers
 
-#### Routers.routes
 
 Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack, we need a global object to store shared informations between router instances.
+
+#### Routers.routes
 
 `TRoute[]`
 
