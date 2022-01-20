@@ -122,7 +122,8 @@ function Router(props: {
    */
   const routes = React.useMemo(() => {
     if (!props.routes) {
-      console.warn("props.routes is missing or empty, return.", props.routes);
+      console.error(props.id, "props.routes is missing or empty, return.", props);
+      return;
     }
     let routesList;
 

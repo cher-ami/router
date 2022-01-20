@@ -10,7 +10,7 @@ const log = debug(`router:matcher`);
  * @returns TRoute
  */
 export const getNotFoundRoute = (routes: TRoute[]): TRoute =>
-  routes.find(
+  routes?.find(
     (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage"
   );
 
