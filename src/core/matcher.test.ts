@@ -4,7 +4,19 @@ import { getRouteFromUrl } from "./matcher";
 
 // prettier-ignore
 const routesList: TRoute[] = [
-  { path: "/", name: "HomePage" },
+  { 
+    path: "/", name: "HomePage" ,
+    children: [
+      {
+        path: "/hello",
+        name: "HelloPage",
+      },
+      {
+        path: "/hello-2",
+        name: "Hello2Page",
+      }
+    ]
+},
   { path: "/bar/:id", name: "BarPage", props: { color: "blue" } },
   {
     path: "/about",
@@ -26,11 +38,13 @@ const routesList: TRoute[] = [
       },
     ],
   },
+  { path: "/end", name: "EndPage" },
 ];
 const base = "/custom/base";
 
-describe("getRouteFromUrl", () => {
+describe("Get route from URL", () => {
   it("should get right route from URL", () => {
+    // exemple 1
     const getRoute = getRouteFromUrl({
       pUrl: preventSlashes(`${base}/bar/my-id`),
       pRoutes: routesList,
@@ -43,6 +57,15 @@ describe("getRouteFromUrl", () => {
     expect(getRoute.url).toBe("/bar/my-id");
     expect(getRoute.name).toBe(`BarPage`);
     expect(getRoute.props).toEqual({ params: { id: "my-id" }, color: "blue" });
+
+    // example 2
+    // prettier-ignore
+    const getRoute3 = getRouteFromUrl({ pUrl: "/hello-2", pRoutes: routesList, pBase: "/" });
+    expect(getRoute3.fullPath).toBe(`/hello-2`);
+
+    // example 3
+    const getRoute2 = getRouteFromUrl({ pUrl: "/end", pRoutes: routesList, pBase: "/" });
+    expect(getRoute2.name).toBe(`EndPage`);
   });
 
   it("should get right route from URL with subRoute", () => {
