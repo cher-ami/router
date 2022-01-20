@@ -93,7 +93,11 @@ export const getRouteFromUrl = ({
         });
 
         // only if matching, return this match, else continue to next iteration
-        if (matchingChildren) return matchingChildren;
+        if (matchingChildren) {
+          return matchingChildren;
+        } else {
+          firstLevelCurrentRoute = undefined;
+        }
       }
     }
   }
