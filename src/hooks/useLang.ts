@@ -11,10 +11,16 @@ const log = debug("router:useLang");
 export const useLang = (
   langService: LangService = Routers.langService
 ): [lang: TLanguage, setLang: (lang: TLanguage | string, force: boolean) => void] => {
-  const [lang, setLang] = React.useState<TLanguage>(langService.currentLang);
+  const [lang, setLang] = React.useState<TLanguage>(langService?.currentLang);
 
   // each time history change, set the current language in state
   useHistory(() => {
+    if (!langService) {
+      console.warn(
+        `useLang - LangService isn't init. You need to create a LangService instance before using this hook. https://github.com/cher-ami/router/tree/main#LangService`
+      );
+      return;
+    }
     setLang(langService.currentLang);
   }, []);
 

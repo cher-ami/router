@@ -38,8 +38,11 @@ export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute
   const rootPathExist = routes.some(
     (route) =>
       (typeof route.path === "object" &&
-        Object.keys(route.path).some((el) => route.path[el] === "/")) ||
-      route.path === "/"
+        Object.keys(route.path).some(
+          (el) => route.path[el] === "/" || route.path[el] === "/:lang"
+        )) ||
+      route.path === "/" ||
+      route.path === "/:lang"
   );
   if (!rootPathExist) {
     routes.unshift({
@@ -83,10 +86,19 @@ export function getPathByRouteName(
 ): string | { [x: string]: string } {
   for (let route of routes) {
     if (route.name === name || route.component?.displayName === name) {
-      return route.path;
+      // specific case, we want to retrieve path of route with "/" route and langService is used,
+      // we need to patch it with lang param
+      if (route.path === "/" && Routers.langService) {
+        return "/:lang";
+      } else {
+        return route.path;
+      }
     } else {
       if (route.children) {
-        return getPathByRouteName(route.children, name);
+        const next = getPathByRouteName(route.children, name);
+        if (next) {
+          return next;
+        }
       }
     }
   }

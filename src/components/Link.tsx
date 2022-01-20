@@ -24,11 +24,11 @@ const log = debug("router:Link");
  * @name Link
  */
 function Link(props: ILinkProps) {
-  const { history, routes, base } = useRouter();
+  const { history } = useRouter();
   const [location] = useLocation();
 
   // Compute URL
-  const url = useMemo(() => createUrl(props.to, base, routes), [props.to, routes, base]);
+  const url = useMemo(() => createUrl(props.to), [props.to]);
 
   // Link is active if its URL is the current URL
   const isActive = useMemo(

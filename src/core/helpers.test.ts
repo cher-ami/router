@@ -11,25 +11,6 @@ import { createUrl } from "./helpers";
 
 // ------------------------------------------------------------ ROUTES
 
-// const routes: TRoute[] = [
-//   { path: "/", component: null, name: "Home" },
-//   {
-//     path: { en: "/about", fr: "/a-propos", de: "/uber" },
-//     component: { displayName: "About" } as any,
-//     children: [
-//       { path: "/foo" },
-//       {
-//         path: "/bar",
-//         children: [
-//           { path: "/", name: "1stLevelRoute" },
-//           { path: "/yolo/:id?", name: "YOLO" },
-//           { path: "/hello", name: "Hello" },
-//         ],
-//       },
-//     ],
-//   },
-// ];
-
 const routesList = [
   { path: "/" },
   {
@@ -64,9 +45,13 @@ const routesList = [
       },
     ],
   },
+  {
+    path: "/end",
+    name: "endPage",
+  }
 ];
 
-describe("getPathByRouteName", () => {
+describe("get path by route name", () => {
   it("should return the right path with name", () => {
     expect(getPathByRouteName(routesList, "helloPage")).toEqual("/hello");
     expect(getPathByRouteName(routesList, "aboutPage")).toEqual({
@@ -75,12 +60,14 @@ describe("getPathByRouteName", () => {
       de: "/uber",
     });
 
+    expect(getPathByRouteName(routesList, "endPage")).toEqual("/end");
     // FIXME: this is not working
     // expect(getPathByRouteName(routesList, "zooPage")).toEqual("/hello/foo/zoo/:id?");
+
   });
 });
 
-describe("getPathByRouteName", () => {
+describe("get URL by route name", () => {
   it("should return full URL with only page name and params", () => {
     expect(getUrlByRouteName(routesList, { name: "helloPage" })).toBe("/hello");
     expect(getUrlByRouteName(routesList, { name: "fooPage" })).toBe("/hello/foo");
