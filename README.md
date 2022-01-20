@@ -695,9 +695,12 @@ Inside the App
 
 ```jsx
 function App() {
+  // get langService instance from router context
+  const { langService } = useRouter();
+  
   return (
     <div>
-      <button onClick={() => LangService.setLang({ key: "de" })}>
+      <button onClick={() => langService.setLang({ key: "de" })}>
         switch to "de" lang
       </button>
       <nav>
@@ -730,7 +733,6 @@ const langService = new LangService({
   showDefaultLangInUrl: true,
   base: "/",
 });
-
 ```
 
 `langService` instance is available in Router scope from `useRouter()` hook.
@@ -826,9 +828,7 @@ Create a formated URL by string, or `TOpenRouteParams`
 
 Push new route in current history. Stack(s) component(s) will return the appriopriate route.
 
-
 ## <a name="Routers"></a>Routers
-
 
 Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack, we need a global object to store shared informations between router instances.
 
