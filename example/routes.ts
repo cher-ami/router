@@ -17,19 +17,6 @@ export const routesList: TRoute[] = [
   {
     path: "/",
     component: HomePage,
-  },
-  {
-    path: "/blog/:id",
-    //path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
-    component: ArticlePage,
-    props: {
-      color: "red",
-    },
-  },
-  {
-    //path: "/about",
-    path: { en: "/about", fr: "/a-propos", de: "/uber" },
-    component: AboutPage,
     children: [
       {
         path: "/foo",
@@ -41,27 +28,39 @@ export const routesList: TRoute[] = [
         component: BarPage,
         children: [
           {
-            path: "/yolo/:id?",
+            path: "/yolo",
             component: YoloPage,
           },
           {
             path: "/hello",
-            //path: { en: "/hello", fr: "/salut", de: "/gutten-tag" },
             component: HelloPage,
-            children: [
-              {
-                path: "/la",
-                component: LaPage,
-              },
-              {
-                path: "/our",
-                component: OurPage,
-              },
-            ],
-          },
+          }
         ],
       },
     ],
+  },
+  {
+    // path: "/about",
+    path: { en: "/about", fr: "/a-propos", de: "/uber" },
+    component: AboutPage,
+    children: [
+      {
+        path: "/la",
+        component: LaPage,
+      },
+      {
+        path: "/our",
+        component: OurPage,
+      }
+    ],
+  },
+   {
+    // path: "/blog/:id",
+    path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
+    component: ArticlePage,
+    props: {
+      color: "red",
+    },
   },
   {
     path: "/:rest",

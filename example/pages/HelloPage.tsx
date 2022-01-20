@@ -31,25 +31,7 @@ export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>
     <div className={componentName} ref={rootRef}>
       {componentName}
 
-      <Router
-        id={4}
-        base={getSubRouterBase(path, router.base, false)}
-        routes={getSubRouterRoutes(path, router.routes)}
-      >
-        <div className={componentName}>
-          <nav>
-            <ul>
-              <li>
-                <Link to={{ name: "LaPage" }}>La</Link>
-              </li>
-              <li>
-                <Link to={{ name: "OurPage" }}>Our</Link>
-              </li>
-            </ul>
-          </nav>
-          <Stack />
-        </div>
-      </Router>
+     
     </div>
   );
 });

@@ -5,6 +5,7 @@ import {
   getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
+  openRoute,
 } from "../../src/core/helpers";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { routesList } from "../routes";
@@ -30,13 +31,17 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
+      <br />
+      <Link to={{ name: "OurPage" }}>Our</Link>
+      <br />
+      <button onClick={() => openRoute({ name: "OurPage" })}>OurPage</button>
       <Router
         id={3}
         base={getSubRouterBase(path, router.base, false)}
         routes={getSubRouterRoutes(path, router.routes)}
       >
-        <div className={componentName}>
-          <nav>
+      <div className={componentName}>
+      <nav>
             <ul>
               <li>
                 <Link to={{ name: "YoloPage" }}>Yolo</Link>
@@ -47,8 +52,8 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
             </ul>
           </nav>
           <Stack />
-        </div>
-      </Router>
+       </div>
+      </Router> 
     </div>
   );
 });

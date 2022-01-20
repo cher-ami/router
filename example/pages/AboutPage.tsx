@@ -27,29 +27,32 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
   const router = useRouter();
   const path = getPathByRouteName(routesList, "AboutPage");
 
+  console.log('getSubRouterRoutes(path, router.routes)', "/base/about",  getSubRouterRoutes(path, router.routes))
+
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
 
       <Router
-        id={2}
-        base={getSubRouterBase(path, router.base)}
+        id={4}
+        base={getSubRouterBase(path, router.base, true)}
         routes={getSubRouterRoutes(path, router.routes)}
       >
         <div className={componentName}>
           <nav>
             <ul>
               <li>
-                <Link to={{ name: "FooPage" }}>Foo</Link>
+                <Link to={{ name: "LaPage" }}>La</Link>
               </li>
               <li>
-                <Link to={{ name: "BarPage" }}>Bar (has sub router)</Link>
+                <Link to={{ name: "OurPage" }}>Our</Link>
               </li>
             </ul>
           </nav>
           <Stack />
         </div>
       </Router>
+     
     </div>
   );
 });

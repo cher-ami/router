@@ -1,7 +1,17 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { useStack } from "../../src";
+import {
+  getPathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+  Link,
+  Router,
+  Stack,
+  useRouter,
+  useStack,
+} from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import debug from "@wbe/debug";
+import { routesList } from "../routes";
 
 const componentName: string = "HomePage";
 const log = debug(`router:${componentName}`);
@@ -23,9 +33,32 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
     playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   });
 
+  const router = useRouter();
+  const path = getPathByRouteName(routesList, "HomePage");
+  
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
+
+      <Router
+        id={2}
+        base={getSubRouterBase(path, router.base)}
+        routes={getSubRouterRoutes(path, router.routes)}
+      >
+        <div className={componentName}>
+          <nav>
+            <ul>
+              <li>
+                <Link to={{ name: "FooPage" }}>Foo</Link>
+              </li>
+              <li>
+                <Link to={{ name: "BarPage" }}>Bar (has sub router)</Link>
+              </li>
+            </ul>
+          </nav>
+          <Stack />
+        </div>
+      </Router>
     </div>
   );
 });

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Stack, TManageTransitions, useLang } from "../src";
+import { Link, Stack, TManageTransitions, useLang, useLocation } from "../src";
 const componentName = "App";
 
 /**
@@ -7,6 +7,7 @@ const componentName = "App";
  */
 export default function App() {
   const [lang, setLang] = useLang();
+  const [location, setLocation] = useLocation()
 
   const customSenario = ({
     previousPage,
@@ -45,12 +46,12 @@ export default function App() {
             <Link to={{ name: "HomePage" }}>Home</Link>
           </li>
           <li>
+            <Link to={{ name: "AboutPage" }}>About</Link>
+          </li>
+          <li>
             <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>
               Blog id:article-1
             </Link>
-          </li>
-          <li>
-            <Link to={{ name: "AboutPage" }}>About (has sub router)</Link>
           </li>
         </ul>
       </nav>
