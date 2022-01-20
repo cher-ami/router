@@ -240,8 +240,7 @@ const routesList = [
 2. Children were defined within the route that render `FooPage` component, so
    you can then create a new router instance in this component.
 
-3. The new subRouters needs his own base and routes.
-   `getSubRoutersBase` and `getSubRoutersRoutes` functions available to get them.
+3. The new subRouter needs his own base and routes list, `getSubRouterBase` and `getSubRouterRoutes` functions are available to get them.
 
 ```jsx
 import React from "react";
@@ -697,7 +696,7 @@ Inside the App
 function App() {
   // get langService instance from router context
   const { langService } = useRouter();
-  
+
   return (
     <div>
       <button onClick={() => langService.setLang({ key: "de" })}>
