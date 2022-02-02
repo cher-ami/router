@@ -6,7 +6,7 @@ import {
   MemoryHistory,
 } from "history";
 import { Match } from "path-to-regexp";
-import React from "react";
+import React, { useState } from "react";
 import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
@@ -46,6 +46,8 @@ export interface IRouterContext extends IRouterContextStackStates {
   routeIndex: number;
   previousPageIsMount: boolean;
   unmountPreviousPage: () => void;
+  isInTransition: boolean;
+  setIsIntransition: (state: boolean) => void;
 }
 
 export type TRouteReducerState = {
@@ -76,6 +78,8 @@ export const RouterContext = React.createContext<IRouterContext>({
   routeIndex: 0,
   previousPageIsMount: true,
   unmountPreviousPage: () => {},
+  isInTransition: false,
+  setIsIntransition: () => {},
 });
 RouterContext.displayName = "RouterContext";
 
@@ -239,6 +243,11 @@ function Router(props: {
     });
   }, []);
 
+  /**
+   * Is in transition state
+   */
+  const [isInTransition, setIsIntransition] = useState<boolean>(false);
+
   // -------------------------------------------------------------------------------- RENDER
 
   const { currentRoute, previousRoute, routeIndex, previousPageIsMount } = reducerState;
@@ -257,6 +266,8 @@ function Router(props: {
         routeIndex,
         previousPageIsMount,
         unmountPreviousPage,
+        isInTransition,
+        setIsIntransition,
       }}
     />
   );

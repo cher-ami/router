@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, useRef } from "react";
+import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react";
 import { useRouter, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import { Router } from "../../src";
@@ -27,7 +27,9 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
   const router = useRouter();
   const path = getPathByRouteName(routesList, "AboutPage");
 
-  console.log('getSubRouterRoutes(path, router.routes)', "/base/about",  getSubRouterRoutes(path, router.routes))
+  useEffect(() => {
+    console.log("is in transition", router.isInTransition);
+  }, [router.isInTransition]);
 
   return (
     <div className={componentName} ref={rootRef}>
@@ -52,7 +54,6 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
           <Stack />
         </div>
       </Router>
-     
     </div>
   );
 });

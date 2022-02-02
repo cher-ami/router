@@ -28,6 +28,8 @@ function Stack(props: IProps): JSX.Element {
     previousRoute,
     unmountPreviousPage,
     previousPageIsMount,
+    setIsIntransition,
+    isInTransition
   } = useRouter() as IRouterContext;
 
   const prevRef = React.useRef<IRouteStack>(null);
@@ -63,13 +65,14 @@ function Stack(props: IProps): JSX.Element {
   // need to be "layoutEffect" to play transitions before render, to avoid screen "clip"
   React.useLayoutEffect(() => {
     if (!currentRoute) return;
-
+    setIsIntransition(true);
     (props.manageTransitions || sequencialTransition)({
       previousPage: prevRef.current,
       currentPage: currentRef.current,
       unmountPreviousPage,
     } as TManageTransitions).then(() => {
       unmountPreviousPage();
+      setIsIntransition(false);
     });
   }, [routeIndex]);
 
