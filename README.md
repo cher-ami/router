@@ -462,6 +462,8 @@ const router = useRouter();
 - **previousRoute** `TRoute` Previous route object
 - **routeIndex** `number` Current router index
 - **base** `string` Formated base URL
+- **setPaused** `(paused:boolean) => void` Paused router instance
+- **getPaused** `() => void` Get paused state of router instance
 
 ```ts
 // previousRoute and currentRoute

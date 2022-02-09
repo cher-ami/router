@@ -46,8 +46,8 @@ export interface IRouterContext extends IRouterContextStackStates {
   routeIndex: number;
   previousPageIsMount: boolean;
   unmountPreviousPage: () => void;
-  getPaused: () => boolean
-  setPaused: (value:boolean) => void
+  getPaused: () => boolean;
+  setPaused: (value: boolean) => void;
 }
 
 export type TRouteReducerState = {
@@ -79,7 +79,7 @@ export const RouterContext = React.createContext<IRouterContext>({
   previousPageIsMount: true,
   unmountPreviousPage: () => {},
   getPaused: () => false,
-  setPaused: (value:boolean) => {}
+  setPaused: (value: boolean) => {},
 });
 RouterContext.displayName = "RouterContext";
 
@@ -194,15 +194,10 @@ function Router(props: {
   );
 
   /**
-   * Handle history
-   * Update routes when history change
-   * Dispatch new routes via RouterContext
+   * Enable paused on Router instance
    */
-  const currentRouteRef = React.useRef<TRoute>();
-
   const _waitingUrl = React.useRef(null);
   const _paused = React.useRef<boolean>(false);
-  
   const getPaused = () => _paused.current;
   const setPaused = (value: boolean) => {
     _paused.current = value;
@@ -211,7 +206,14 @@ function Router(props: {
       _waitingUrl.current = null;
     }
   };
+  
+  const currentRouteRef = React.useRef<TRoute>();
 
+  /**
+   * Handle history
+   * Update routes when history change
+   * Dispatch new routes via RouterContext
+   */
   const handleHistory = (url: string = window.location.pathname): void => {
     if (_paused.current) {
       _waitingUrl.current = url;
