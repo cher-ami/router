@@ -38,6 +38,7 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
         base={getSubRouterBase(path, router.base, true)}
         routes={getSubRouterRoutes(path, router.routes)}
       >
+
         <div className={componentName}>
           <nav>
             <ul>
@@ -49,8 +50,13 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
               </li>
             </ul>
           </nav>
+
           <Stack />
+          
         </div>
+
+
+
       </Router>
      
     </div>
