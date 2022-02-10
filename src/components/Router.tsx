@@ -6,7 +6,7 @@ import {
   MemoryHistory,
 } from "history";
 import { Match } from "path-to-regexp";
-import React from "react";
+import React, { useState } from "react";
 import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
@@ -46,6 +46,8 @@ export interface IRouterContext extends IRouterContextStackStates {
   routeIndex: number;
   previousPageIsMount: boolean;
   unmountPreviousPage: () => void;
+  getPaused: () => boolean;
+  setPaused: (value: boolean) => void;
 }
 
 export type TRouteReducerState = {
@@ -76,6 +78,8 @@ export const RouterContext = React.createContext<IRouterContext>({
   routeIndex: 0,
   previousPageIsMount: true,
   unmountPreviousPage: () => {},
+  getPaused: () => false,
+  setPaused: (value: boolean) => {},
 });
 RouterContext.displayName = "RouterContext";
 
@@ -190,12 +194,32 @@ function Router(props: {
   );
 
   /**
+   * Enable paused on Router instance
+   */
+  const _waitingUrl = React.useRef(null);
+  const _paused = React.useRef<boolean>(false);
+  const getPaused = () => _paused.current;
+  const setPaused = (value: boolean) => {
+    _paused.current = value;
+    if (!value && _waitingUrl.current) {
+      handleHistory(_waitingUrl.current);
+      _waitingUrl.current = null;
+    }
+  };
+  
+  const currentRouteRef = React.useRef<TRoute>();
+
+  /**
    * Handle history
    * Update routes when history change
    * Dispatch new routes via RouterContext
    */
-  const currentRouteRef = React.useRef<TRoute>();
   const handleHistory = (url: string = window.location.pathname): void => {
+    if (_paused.current) {
+      _waitingUrl.current = url;
+      return;
+    }
+
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
@@ -257,6 +281,8 @@ function Router(props: {
         routeIndex,
         previousPageIsMount,
         unmountPreviousPage,
+        getPaused,
+        setPaused,
       }}
     />
   );
