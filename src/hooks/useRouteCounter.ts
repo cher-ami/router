@@ -1,4 +1,4 @@
-import { useHistory } from "../hooks/useHistory";
+import { useHistory } from "./useHistory";
 import { useState } from "react";
 import { Routers } from "../core/Routers";
 

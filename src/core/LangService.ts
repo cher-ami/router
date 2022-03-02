@@ -1,13 +1,13 @@
-import { Routers } from "../core/Routers";
+import { Routers } from "./Routers";
 import {
   compileUrl,
   createUrl,
   joinPaths,
   removeLastCharFromString,
-} from "../core/helpers";
+} from "./helpers";
 import debug from "@wbe/debug";
 import { TRoute } from "../components/Router";
-import { getLangPathByLang } from "../core/helpers";
+import { getLangPathByLang } from "./helpers";
 
 const log = debug(`router:LangService`);
 
@@ -335,7 +335,7 @@ class LangService<TLang = any> {
    * @protected
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
-    forcePageReload ? window.open(newUrl, "_self") : Routers.history.push(newUrl);
+    forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl);
   }
 }
 

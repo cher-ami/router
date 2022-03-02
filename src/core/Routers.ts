@@ -1,4 +1,4 @@
-import LangService from "../core/LangService";
+import LangService from "./LangService";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { TRoute } from "../components/Router";
 
@@ -15,6 +15,11 @@ export type TRouters = {
    * Global browser history
    */
   history: HashHistory | MemoryHistory | BrowserHistory;
+
+  /**
+   * Global static location
+   */
+  staticLocation: string;
   /**
    * Global route counter increment on each history push
    */
@@ -45,6 +50,7 @@ export const Routers: TRouters = {
   base: undefined,
   routes: undefined,
   history: undefined,
+  staticLocation: undefined,
   routeCounter: 1,
   isFirstRoute: true,
   currentRoute: undefined,

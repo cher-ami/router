@@ -1,12 +1,7 @@
 import debug from "@wbe/debug";
-import {
-  BrowserHistory,
-  createBrowserHistory,
-  HashHistory,
-  MemoryHistory,
-} from "history";
+import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
-import React, { useState } from "react";
+import React from "react";
 import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
@@ -39,7 +34,8 @@ export interface IRouterContextStackStates {
 export interface IRouterContext extends IRouterContextStackStates {
   base: string;
   routes: TRoute[];
-  history: BrowserHistory | HashHistory | MemoryHistory;
+  history: BrowserHistory | HashHistory | MemoryHistory | undefined;
+  staticLocation: string;
   currentRoute: TRoute;
   previousRoute: TRoute;
   langService: LangService;
@@ -77,6 +73,7 @@ export const RouterContext = React.createContext<IRouterContext>({
   previousRoute: undefined,
   routeIndex: 0,
   previousPageIsMount: true,
+  staticLocation: undefined,
   unmountPreviousPage: () => {},
   getPaused: () => false,
   setPaused: (value: boolean) => {},
@@ -85,7 +82,6 @@ RouterContext.displayName = "RouterContext";
 
 Router.defaultProps = {
   base: "/",
-  history: createBrowserHistory(),
   id: 1,
 };
 
@@ -100,7 +96,8 @@ function Router(props: {
   children: React.ReactNode;
   routes: TRoute[];
   base: string;
-  history?: BrowserHistory | HashHistory | MemoryHistory;
+  history?: BrowserHistory | HashHistory | MemoryHistory | undefined;
+  staticLocation?: string;
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   langService?: LangService;
   id?: number | string;
@@ -160,7 +157,23 @@ function Router(props: {
    * If is the first Router instance, register history in 'Routers' store
    * 'history' object need to be the same between each Router instance
    */
-  if (!Routers.history) Routers.history = props.history;
+  const history = React.useMemo(() => {
+    if (props.history && !Routers.history) {
+      Routers.history = props.history;
+    }
+    return Routers.history;
+  }, [props.history]);
+
+  /**
+   * 4 static location
+   * Is useful in SSR context
+   */
+  const staticLocation = React.useMemo((): string | undefined => {
+    if (props.staticLocation && !Routers.staticLocation) {
+      Routers.staticLocation = props.staticLocation;
+    }
+    return Routers.staticLocation;
+  }, [props.staticLocation]);
 
   // -------------------------------------------------------------------------------- ROUTE CHANGE
 
@@ -206,7 +219,7 @@ function Router(props: {
       _waitingUrl.current = null;
     }
   };
-  
+
   const currentRouteRef = React.useRef<TRoute>();
 
   /**
@@ -214,7 +227,7 @@ function Router(props: {
    * Update routes when history change
    * Dispatch new routes via RouterContext
    */
-  const handleHistory = (url: string = window.location.pathname): void => {
+  const handleHistory = (url: string = ""): void => {
     if (_paused.current) {
       _waitingUrl.current = url;
       return;
@@ -256,11 +269,30 @@ function Router(props: {
    * - Get matching route with current URL
    * - Dispatch new routes states from RouterContext
    */
+  const historyListener = React.useMemo(() => {
+    // server
+    if (staticLocation) {
+      handleHistory(staticLocation);
+      return undefined;
+      // client
+    } else if (history) {
+      handleHistory(window.location.pathname);
+      return history?.listen(({ location }) => {
+        handleHistory(location.pathname);
+      });
+      // log warn
+    } else {
+      console.warn(`
+          An history or staticLocation props is required.
+          ex: <Router history={createBrowserHistory()}>...</Router>
+        `);
+      return undefined;
+    }
+  }, [staticLocation, history]);
+
+  // kill historyListener
   React.useEffect(() => {
-    handleHistory();
-    return Routers.history.listen(({ location }) => {
-      handleHistory(location.pathname);
-    });
+    return historyListener;
   }, []);
 
   // -------------------------------------------------------------------------------- RENDER
@@ -275,7 +307,8 @@ function Router(props: {
         routes,
         base,
         langService,
-        history: Routers.history,
+        history,
+        staticLocation,
         currentRoute,
         previousRoute,
         routeIndex,
