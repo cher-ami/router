@@ -1,14 +1,16 @@
-import React, {
-  ForwardedRef,
-  forwardRef,
-  useRef
-} from "react";
-import { useLocation } from "../../src";
+import React, { ForwardedRef, forwardRef, useRef } from "react";
+import { Link, Router, Stack, useRouter } from "../../src";
 import { useStack } from "../../src";
+import {
+  getPathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+  openRoute,
+} from "../../src/core/helpers";
 import { transitionsHelper } from "../helper/transitionsHelper";
+import { routesList } from "../routes";
 
 const componentName: string = "BarPage";
-const debug = require("debug")(`router:${componentName}`);
 
 interface IProps {}
 
@@ -19,26 +21,39 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
     componentName,
     handleRef,
     rootRef,
-    playIn: () => transitionsHelper(rootRef.current, true),
-    playOut: () => transitionsHelper(rootRef.current, false),
+    playIn: () => transitionsHelper(rootRef.current, true, { y: -20 }, { y: 0 }),
+    playOut: () => transitionsHelper(rootRef.current, false, { y: -0 }, { y: 20 }),
   });
 
-  const [location, setLocation] = useLocation();
+  const router = useRouter();
+  const path = getPathByRouteName(routesList, "BarPage");
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-
       <br />
+      <Link to={{ name: "OurPage" }}>Our</Link>
       <br />
-      <button
-        onClick={() => {
-          setLocation({ name: "ArticlePage", params: { id: "form-sub-router" } });
-        }}
+      <button onClick={() => openRoute({ name: "OurPage" })}>OurPage</button>
+      <Router
+        id={3}
+        base={getSubRouterBase(path, router.base, false)}
+        routes={getSubRouterRoutes(path, router.routes)}
       >
-        {`navigate to ArticlePage (1st level)`}
-      </button>
-      <code>{`  setLocation({ name: "ArticlePage", params: { id: "form-sub-router" } })`}</code>
+      <div className={componentName}>
+      <nav>
+            <ul>
+              <li>
+                <Link to={{ name: "YoloPage" }}>Yolo</Link>
+              </li>
+              <li>
+                <Link to={{ name: "HelloPage" }}>Hello (has sub router)</Link>
+              </li>
+            </ul>
+          </nav>
+          <Stack />
+       </div>
+      </Router> 
     </div>
   );
 });

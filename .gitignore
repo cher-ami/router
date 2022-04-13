@@ -6,3 +6,4 @@ tsconfig.tsbuildinfo
 .cache
 dist
 example/dist
+.parcel-cache

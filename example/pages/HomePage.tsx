@@ -1,8 +1,20 @@
-import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react";
-import { useHistory, useStack } from "../../src";
+import React, { ForwardedRef, forwardRef, useRef } from "react";
+import {
+  getPathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+  Link,
+  Router,
+  Stack,
+  useRouter,
+  useStack,
+} from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
+import debug from "@wbe/debug";
+import { routesList } from "../routes";
+
 const componentName: string = "HomePage";
-const debug = require("debug")(`router:${componentName}`);
+const log = debug(`router:${componentName}`);
 
 interface IProps {
   params: {
@@ -13,26 +25,40 @@ interface IProps {
 const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
-  const history = useHistory();
-  useEffect(() => {
-    debug("history form home", history);
-  }, [history]);
-
-  useEffect(() => {
-    debug("props.params.lang", props.params.lang);
-  }, [props.params.lang]);
-
   useStack({
     componentName,
     handleRef,
     rootRef,
-    playIn: () => transitionsHelper(rootRef.current, true),
-    playOut: () => transitionsHelper(rootRef.current, false),
+    playIn: () => transitionsHelper(rootRef.current, true, { x: -50 }, { x: 0 }),
+    playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   });
 
+  const router = useRouter();
+  const path = getPathByRouteName(routesList, "HomePage");
+  
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
+
+      <Router
+        id={2}
+        base={getSubRouterBase(path, router.base)}
+        routes={getSubRouterRoutes(path, router.routes)}
+      >
+        <div className={componentName}>
+          <nav>
+            <ul>
+              <li>
+                <Link to={{ name: "FooPage" }}>Foo</Link>
+              </li>
+              <li>
+                <Link to={{ name: "BarPage" }}>Bar (has sub router)</Link>
+              </li>
+            </ul>
+          </nav>
+          <Stack />
+        </div>
+      </Router>
     </div>
   );
 });

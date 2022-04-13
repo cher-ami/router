@@ -23,15 +23,15 @@ is designed to allow flexible transitions. It provides Stack component who
 render previous and current page component when route change.
 
 This router loads [history](https://github.com/ReactTraining/history)
-, [path-parser](https://github.com/troch/path-parser)
-and [debug](https://github.com/visionmedia/debug) as dependencies.
+, [path-to-regexp](https://github.com/pillarjs/path-to-regexp)
+and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 
 ## Summary
 
 - [Installation](#Installation)
 - [Simple usage](#SimpleUsage)
 - [Dynamic routes](#DynamicRoutes)
-- [Nested routes](#NestedRoutes)
+- [Sub Routers](#SubRouters)
 - [Manage Transitions](#ManageTransitions)
   - [Default sequential transitions](#DefaultSequentialTransitions)
   - [Custom transitions](#CustomTransitions)
@@ -48,23 +48,23 @@ Components:
 
 Hooks:
 
-- [`useRouter`](#useRouter) Get router instance from any component
+- [`useRouter`](#useRouter) Get current router informations like currentRoute and previousRoute
 - [`useLocation`](#useLocation) Get current location and set new location
-- [`useRoute`](#useRoute) Get previous and current route object
-- [`useStack`](#useStack) Allow to the parent Stack to handle page transitions
-  and refs
+- [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
-- [`useHistory`](#useHistory) Get global router history and handle history
+- [`useHistory`](#useHistory) Execute callback each time history changes
+- [`useLang`](#useLang) get and set langService current language object
   changes
-
-Middlewares:
-
-- [`langMiddleware`](#langMiddleware) Patch all routes with `:lang` params
 
 Services:
 
 - [`LangService`](#LangService) Manage `:lang` params
 - [`Translate Path`](#TranslatePath)
+
+Global:
+
+- [`Helpers`](#Helpers) Global Routers helpers
+- [`Routers object`](#Routers) Global Routers object contains all routers properties (history, instances...)
 
 ## <a name="Installation"></a>Installation
 
@@ -143,9 +143,9 @@ const FooPage = forwardRef((props, handleRef) => {
 
 ## <a name="DynamicRoutes"></a>Dynamic routes
 
-cher-ami router use [path-parser](https://github.com/troch/path-parser) which
+cher-ami router use [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which
 accept path parameters. (check
-this [documentation](https://github.com/troch/path-parser#defining-parameters)).
+this [documentation](https://github.com/pillarjs/path-to-regexp)).
 For example, URL `/blog/my-article` will match with this route object:
 
 ```js
@@ -157,7 +157,7 @@ const routesList = [
 ];
 ```
 
-You can access route parameters by page component props or by `useRoute()` hook.
+You can access route parameters by page component props or by `useRouter()` hook.
 
 ```jsx
 import React, { useEffect, forwardRef } from "react";
@@ -169,7 +169,7 @@ const ArticlePage = forwardRef((props, handleRef) => {
   }, [props]);
 
   // or from any nested components
-  const { currentRoute } = useRoute();
+  const { currentRoute } = useRouter();
   useEffect(() => {
     console.log(currentRoute.props.params); // { id: "my-article" }
   }, [currentRoute]);
@@ -205,11 +205,12 @@ const routesList = [
 
 **[Demo codesandbox: not found route](https://codesandbox.io/s/not-found-route-eu4bi)**
 
-## <a name="NestedRoutes"></a>Nested Routes
+## <a name="SubRouters"></a>Sub-router
 
-cher-ami router supports nested routes 🙏🏽
+cher-ami router supports nested routes from sub routers instance 🙏🏽.
+It is possible to nest as many routers as you want.
 
-1. Define children routes in initial routes list with `children` key;
+1. Define children routes in initial routes list with `children` property;
 
 ```js
 const routesList = [
@@ -239,34 +240,41 @@ const routesList = [
 2. Children were defined within the route that render `FooPage` component, so
    you can then create a new router instance in this component.
 
-**Only if it's a nested router, you must not pass `routes` Router props again**.
-The previous routes array, passed to the root component, will be used
-by `Router`.
-
-`Router` props `base` need to be the same than the path who contains children
-routes. In this case, `/foo` will be the new nested router base. The stack will
-then be able to render `/foo/people` and `/foo/yolo`.
+3. The new subRouter needs his own base and routes list, `getSubRouterBase` and `getSubRouterRoutes` functions are available to get them.
 
 ```jsx
 import React from "react";
-import { Router, useStack, Stack } from "@cher-ami/router";
+import {
+  Router,
+  useStack,
+  Stack,
+  useRouter,
+  getPathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+} from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
+  // Get parent router context
+  const { base, routes } = useRouter();
+
+  // Parsed routes list and get path by route name
+  const path = getPathByRouteName(routesList, "FooPage"); // "/foo"
   // ...
   return (
-    <div
-      className="FooPage"
-      // ...
-    >
-      <Router base={"/foo"}>
+    <div>
+      <Router
+        // -> "/base/:lang/foo" (if last param is false, ':lang' will be not added)
+        base={getSubRouterBase(path, base, true)}
+        // children routes array of FooPage
+        routes={getSubRouterRoutes(path, routes)}
+      >
         <Stack />
       </Router>
     </div>
   );
 });
 ```
-
-**[Demo codesandbox: nested router](https://codesandbox.io/s/nested-router-bvspe?file=/src/index.tsx)**
 
 ## <a name="ManageTransitions"></a>Manage transitions
 
@@ -298,7 +306,7 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
     // show and play in new page
     if (currentPage) {
       if ($current) $current.style.visibility = "visible";
-      await currentPage?.playIn?.();
+      await currentPage?.playIn();
     }
 
     resolve();
@@ -318,8 +326,8 @@ const App = (props, handleRef) => {
   const customSenario = ({ previousPage, currentPage, unmountPreviousPage }) => {
     return new Promise(async (resolve) => {
       // write a custom "crossed" senario...
-      if (previousPage) previousPage?.playOut?.();
-      if (currentPage) await currentPage?.playIn?.();
+      if (previousPage) previousPage?.playOut();
+      if (currentPage) await currentPage?.playIn();
 
       resolve();
     });
@@ -336,7 +344,7 @@ const App = (props, handleRef) => {
 
 ## <a name="Debug"></a>Debug
 
-[debug](https://github.com/visionmedia/debug) is used on this project. It allows
+[@wbe/debug](https://github.com/willybrauner/debug) is used on this project. It allows
 to easily get logs informations on development and production modes.
 
 To use it, add this line in your browser console:
@@ -368,7 +376,7 @@ $ npm run dev
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={} history={} middlewares={}>
+<Router routes={} base={} history={} middlewares={} id={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -377,8 +385,7 @@ Router component creates a new router instance.
 
 - **routes** `TRoute[]` Routes list
 - **base** `string` Base URL - default: `"/"`
-- **history** `BrowserHistory | HashHistory | MemoryHistory` _(optional)_ create and set an history () -
-  default : `BrowserHistory`
+- **history** `BrowserHistory | HashHistory | MemoryHistory` _(optional)_ create and set an history - default : `BrowserHistory`
   History mode can
   be [BROWSER](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#createbrowserhistory)
   ,
@@ -387,7 +394,8 @@ Router component creates a new router instance.
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
   the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
-- **middlewares** `[]` add routes middleware function to patch each routes (check [langMiddleware](src/lang/LangMiddleware.ts) example)
+- **middlewares** `[]` add routes middleware function to patch each routes)
+- **id** `?number | string`
 
 ### <a name="Link"></a>Link
 
@@ -440,7 +448,7 @@ interface IRouteStack {
 
 ### <a name="useRouter"></a>useRouter
 
-Get current router instance.
+Get current router informations:
 
 ```jsx
 const router = useRouter();
@@ -448,7 +456,27 @@ const router = useRouter();
 
 **Returns:**
 
-Current router instance.
+`useRouter()` returns an object with these public properties:
+
+- **currentRoute** `TRoute` Current route object
+- **previousRoute** `TRoute` Previous route object
+- **routeIndex** `number` Current router index
+- **base** `string` Formated base URL
+- **setPaused** `(paused:boolean) => void` Paused router instance
+- **getPaused** `() => void` Get paused state of router instance
+
+```ts
+// previousRoute and currentRoute
+type TRoute = {
+  path: string;
+  component: React.ComponentType<any>;
+  props?: { [x: string]: any };
+  parser?: Path;
+  children?: TRoute[];
+  matchUrl?: string;
+  fullUrl?: string;
+};
+```
 
 ### <a name="useLocation"></a>useLocation
 
@@ -473,33 +501,6 @@ An array with these properties:
 type TOpenRouteParams = {
   name: string;
   params?: { [x: string]: any };
-};
-```
-
-### <a name="useRoute"></a>useRoute
-
-Get previous and current route properties (TRoute)
-
-```jsx
-const { currentRoute, previousRoute } = useRoute();
-```
-
-**Returns:**
-
-An object with these properties:
-
-- **currentRoute** `TRoute` Current route object
-- **previousRoute** `TRoute` Previous route object
-
-```ts
-type TRoute = {
-  path: string;
-  component: React.ComponentType<any>;
-  props?: { [x: string]: any };
-  parser?: Path;
-  children?: TRoute[];
-  matchUrl?: string;
-  fullUrl?: string;
 };
 ```
 
@@ -638,39 +639,55 @@ const history = useHistory((e) => {
 
 **Returns:**
 
-- **history** `location[]` : Location array of history API
+- **history** `location[]` : global history object. (`Routers.history`)
 
-### <a name="langMiddleware"></a>langMiddleware
+### <a name="useLang"></a>useLang
 
-Patch all first level routes with `:lang` params. For it to work, we need to
-initialize `LangService` first.
+Get and update langService current language object.
 
-```jsx
-import { langMiddleware } from "@cher-ami/router";
+```tsx
+const [lang, setLang] = useLang();
+useEffect(() => {
+  // when current lang change
+  // it's usefull only if setLang method do not refresh the page.
+}, [lang]);
 
-<Router routes={routesList} base={"/"} middlewares={[langMiddleware]}>
-  // ...
-</Router>;
+// set new lang with lang object "key" property value only
+setLang("en");
+// set new lang with the lang object
+setLang({ key: "en" });
 ```
+
+**Returns:**
+
+Array of :
+
+- **lang** `TLanguage` : current lang object
+- **setLang** `(lang: TLanguage | string, force: boolean) => void` : set new lang object (same API than `langService.setLang`)
 
 ### <a name="LangService"></a>LangService
 
 Manage `:lang` params from anywhere inside Router scope.
 
 ```jsx
-import { LangService, langMiddleware } from "@cher-ami/router";
+import { LangService } from "@cher-ami/router";
 import { Stack } from "./Stack";
 
-const baseUrl = "/";
+const base = "/";
+
 // first lang object is default lang
-const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+const languages = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 // optionally, default lang can be defined explicitly
-// const locales = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
+// const languages = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
 
-// initialize LangService
-LangService.init(locales, true, baseUrl);
+// Create LangService instance
+const langService = new LangService({
+  languages,
+  showDefaultLangInUrl: true,
+  base,
+});
 
-<Router routes={routesList} base={baseUrl} middlewares={[langMiddleware]}>
+<Router langService={langService} routes={routesList} base={base}>
   <App />
 </Router>;
 ```
@@ -679,9 +696,12 @@ Inside the App
 
 ```jsx
 function App() {
+  // get langService instance from router context
+  const { langService } = useRouter();
+
   return (
     <div>
-      <button onClick={() => LangService.setLang({ key: "de" })}>
+      <button onClick={() => langService.setLang({ key: "de" })}>
         switch to "de" lang
       </button>
       <nav>
@@ -698,16 +718,31 @@ function App() {
 
 **Methods:**
 
-#### init(languages: TLanguage[], showDefaultLangInUrl = true, base = "/") `void`
+#### constructor({ languages: TLanguage<TLang>[]; showDefaultLangInUrl?: boolean; base?: string; }) `void`
 
-Initialize LangService. Need to be call before first router instance
+Initialize LangService by passing it to "langService" Router props
+
+constructor object properties:
 
 - `languages`: list on language objects
 - `showDefaultLangInUrl`: choose if default language is visible in URL or not
 - `base`: set the same than router base
 
 ```jsx
-LangService.init([{ key: "en" }, { key: "fr" }], true, "/base");
+const langService = new LangService({
+  languages: [{ key: "en" }, { key: "fr" }],
+  showDefaultLangInUrl: true,
+  base: "/",
+});
+```
+
+`langService` instance is available in Router scope from `useRouter()` hook.
+
+```tsx
+const Page = () => {
+  const { langService } = useRouter();
+  // langService.setLang() ...
+};
 ```
 
 #### languages `Tlanguage[]`
@@ -715,7 +750,7 @@ LangService.init([{ key: "en" }, { key: "fr" }], true, "/base");
 Return languages list
 
 ```jsx
-const langages = LangService.languages;
+const langages = langService.languages;
 ```
 
 #### currentLang `TLanguage`
@@ -723,7 +758,7 @@ const langages = LangService.languages;
 Return current Language object.
 
 ```jsx
-const lang = LangService.currentLang;
+const lang = langService.currentLang;
 // { key: "..." }
 ```
 
@@ -732,16 +767,16 @@ const lang = LangService.currentLang;
 Return default language object
 
 ```jsx
-const defaultLang = LangService.defaultLang;
+const defaultLang = langService.defaultLang;
 // { key: "..." }
 ```
 
 #### isInit `boolean`
 
-Return LangService init state
+Return langService init state
 
 ```jsx
-const isInit = LangService.isInit;
+const isInit = langService.isInit;
 ```
 
 #### setLang(toLang: TLanguage, forcePageReload = true) `void`
@@ -753,7 +788,7 @@ component only.
   internal router stack to change the language
 
 ```jsx
-LangService.setLang({ key: "de" });
+langService.setLang({ key: "de" });
 ```
 
 #### redirect(forcePageReload = true) `void`
@@ -766,12 +801,12 @@ only.
   internal router stack to change the language
 
 ```jsx
-LangService.redirect();
+langService.redirect();
 ```
 
 ### <a name="TranslatePath"></a>Translate Path
 
-Paths can be translated by lang in route path property:
+Paths can be translated by lang in route path property. This option works only if LangService instance is created and passed to the Router component.
 
 ```js
   {
@@ -779,6 +814,54 @@ Paths can be translated by lang in route path property:
     component: FooPage,
   }
 ```
+
+## <a name="Helpers"></a>Helpers
+
+#### createUrl()
+
+`(args: string | TOpenRouteParams, base?:string, allRoutes?: TRoute[]) => string`
+
+Create a formated URL by string, or `TOpenRouteParams`
+
+#### openRoute()
+
+`(args: string | TOpenRouteParams, history?) => void`
+
+Push new route in current history. Stack(s) component(s) will return the appriopriate route.
+
+## <a name="Routers"></a>Routers
+
+Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack, we need a global object to store shared informations between router instances.
+
+#### Routers.routes
+
+`TRoute[]`
+
+Final routes array used by the router be
+
+#### Routers.history
+
+`HashHistory | MemoryHistory | BrowserHistory`
+
+Selected history mode. all history API is avaible from this one.
+
+#### Routers.langService
+
+`LangService`
+
+LangService instance given to the first Router component.
+
+#### Routers.routeCounter
+
+`number`
+
+How many route are resolved from the start of the session. This property is also available from `useRouteCounter`.
+
+#### Routers.isFirstRoute
+
+`boolean`
+
+Is it the first route of the session. This property is also available from `useRouteCounter`.
 
 ## Credits
 

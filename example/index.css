@@ -36,8 +36,11 @@ button:hover {
 
 .Stack {
   padding-left: 1rem;
+  position: relative;
 }
-
 .Stack > * {
   padding-left: 2rem;
+  position: absolute;
+  width: 100%;
+  top:0;
 }

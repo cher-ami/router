@@ -1,48 +1,45 @@
-import React, { useEffect } from "react";
-import { Link, Stack } from "../src";
-import { LangService } from "../src";
-
+import React from "react";
+import { Link, Stack, TManageTransitions, useLang, useLocation } from "../src";
 const componentName = "App";
-const debug = require("debug")(`router:${componentName}`);
 
 /**
  * @name App
  */
 export default function App() {
-  useEffect(() => {
-    LangService.redirect();
-  }, []);
+  const [lang, setLang] = useLang();
+  const [location, setLocation] = useLocation()
+
+  const customSenario = ({
+    previousPage,
+    currentPage,
+    unmountPreviousPage,
+  }: TManageTransitions): Promise<void> => {
+    return new Promise(async (resolve) => {
+      const $currentPageElement = currentPage?.$element;
+      if ($currentPageElement) {
+        $currentPageElement.style.visibility = "hidden";
+      }
+      if (previousPage) previousPage.playOut();
+      await currentPage?.isReadyPromise();
+      if ($currentPageElement) {
+        $currentPageElement.style.visibility = "visible";
+      }
+      await currentPage.playIn();
+      resolve();
+    });
+  };
 
   return (
     <div className={componentName}>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "en" });
-        }}
-      >
-        CHANGE LANGUAGE TO EN
-      </button>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "fr" });
-        }}
-      >
-        CHANGE LANGUAGE TO FR
-      </button>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "de" });
-        }}
-      >
-        CHANGE LANGUAGE TO DE
-      </button>
-      <button
-        onClick={() => {
-          LangService.setLang({ key: "nl" });
-        }}
-      >
-        CHANGE LANGUAGE TO NL
-      </button>
+      {["en", "fr", "de"].map((el, i) => (
+        <button
+          key={i}
+          children={el}
+          onClick={() => {
+            setLang(el, true);
+          }}
+        />
+      ))}
       <nav>
         <ul>
           <li>
@@ -56,12 +53,9 @@ export default function App() {
               Blog id:article-1
             </Link>
           </li>
-          <li>
-            <Link to={"/not/found/"}>Not found route</Link>
-          </li>
         </ul>
       </nav>
-      <Stack className={"App_stack"} />
+      <Stack className={"App_stack"} manageTransitions={customSenario} />
     </div>
   );
 }

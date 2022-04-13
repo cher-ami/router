@@ -1,43 +1,64 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { Router } from "../../src";
-import { useStack } from "../../src";
+import { useRouter, useStack } from "../../src";
 import { transitionsHelper } from "../helper/transitionsHelper";
+import { Router } from "../../src";
 import { Link } from "../../src";
 import { Stack } from "../../src";
+import {
+  getPathByRouteName,
+  getSubRouterBase,
+  getSubRouterRoutes,
+} from "../../src/core/helpers";
+import { routesList } from "../routes";
 const componentName: string = "AboutPage";
-const debug = require("debug")(`router:${componentName}`);
 
-interface IProps {}
-
-const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
+const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
 
   useStack({
     componentName,
     handleRef,
     rootRef,
-    playIn: () => transitionsHelper(rootRef.current, true),
-    playOut: () => transitionsHelper(rootRef.current, false),
+    playIn: () => transitionsHelper(rootRef.current, true, { x: -50 }, { x: 0 }),
+    playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   });
+
+  // prepare routes & base for subRouter
+  const router = useRouter();
+  const path = getPathByRouteName(routesList, "AboutPage");
+
+  console.log('getSubRouterRoutes(path, router.routes)', "/base/about",  getSubRouterRoutes(path, router.routes))
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <Router base={"/about"}>
+
+      <Router
+        id={4}
+        base={getSubRouterBase(path, router.base, true)}
+        routes={getSubRouterRoutes(path, router.routes)}
+      >
+
         <div className={componentName}>
           <nav>
             <ul>
               <li>
-                <Link to={{ name: "FooPage" }}>Foo</Link>
+                <Link to={{ name: "LaPage" }}>La</Link>
               </li>
               <li>
-                <Link to={{ name: "BarPage" }}>Bar</Link>{" "}
+                <Link to={{ name: "OurPage" }}>Our</Link>
               </li>
             </ul>
           </nav>
-          <Stack key={"about-stack"} />
+
+          <Stack />
+          
         </div>
+
+
+
       </Router>
+     
     </div>
   );
 });
