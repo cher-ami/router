@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client"
 import React from "react";
 import "./index.css";
 import App from "./App";
@@ -18,9 +18,10 @@ const langService = new LangService<TLang>({
 /**
  * Init Application
  */
-ReactDOM.render(
+ const root = createRoot(document.getElementById("root"))
+
+root.render(
   <Router langService={langService} routes={routesList} base={base}>
     <App />
-  </Router>,
-  document.getElementById("root")
+  </Router>
 );
