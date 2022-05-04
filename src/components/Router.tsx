@@ -269,30 +269,26 @@ function Router(props: {
    * - Get matching route with current URL
    * - Dispatch new routes states from RouterContext
    */
-  const historyListener = React.useMemo(() => {
-    // server
-    if (staticLocation) {
-      handleHistory(staticLocation)
-      return
-      // client
-    } else if (history) {
-      handleHistory(window.location.pathname)
-      return history?.listen(({ location }) => {
-        handleHistory(location.pathname)
-      })
-      // log warn
-    } else {
-      console.warn(`
-          An history or staticLocation props is required.
-          ex: <Router history={createBrowserHistory()}>...</Router>
-        `)
-      return
-    }
-  }, [staticLocation, history])
-
   React.useEffect(() => {
-    return historyListener
-  }, [])
+      // server
+      if (staticLocation) {
+        handleHistory(staticLocation)
+        return
+        // client
+      } else if (history) {
+        handleHistory(window.location.pathname)
+        return history?.listen(({ location }) => {
+          handleHistory(location.pathname)
+        })
+        // log warn
+      } else {
+        console.warn(`
+            An history or staticLocation props is required.
+            ex: <Router history={createBrowserHistory()}>...</Router>
+          `)
+        return
+      }
+  }, [staticLocation, history])
 
   // -------------------------------------------------------------------------------- RENDER
 

@@ -7,7 +7,7 @@ const componentName = "App";
  */
 export default function App() {
   const [lang, setLang] = useLang();
-  const [location, setLocation] = useLocation()
+  const [location, setLocation] = useLocation();
 
   const customSenario = ({
     previousPage,

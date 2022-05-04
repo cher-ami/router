@@ -32,11 +32,6 @@ function Link(props: ILinkProps) {
   const url = useMemo(() => createUrl(props.to), [props.to]);
 
   // Link is active if its URL is the current URL
-  const isActive = useMemo(() => {
-    const l = history ? location : staticLocation;
-    return l === url || l === removeLastCharFromString(url, "/", true);
-  }, [history, staticLocation, location, url]);
-
 
   const handleClick = (event): void => {
     event.preventDefault();
@@ -44,10 +39,16 @@ function Link(props: ILinkProps) {
     history?.push(url);
   };
 
+  // FIXME re add active link
+  // const isActive = useMemo(() => {
+  //   const l = history ? location : staticLocation;
+  //   return l === url || l === removeLastCharFromString(url, "/", true);
+  // }, [history, staticLocation, location, url]);
+
   return (
     <a
       {...{ ...props, to: undefined }}
-      className={joinPaths(["Link", props.className, isActive && "active"], " ")}
+      className={joinPaths(["Link", props.className], " ")}
       onClick={handleClick}
       children={props.children}
       href={url}
