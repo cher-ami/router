@@ -4,6 +4,7 @@ import LangService from "../core/LangService";
 import { Link } from "../components/Link";
 import { act, render } from "@testing-library/react";
 import { TRoute } from "../components/Router";
+import { createBrowserHistory } from "history";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
@@ -14,7 +15,12 @@ const routesList: TRoute[] = [
 const mockClickHandler = jest.fn();
 const App = ({ base = "/", to = "/foo", langService }) => {
   return (
-    <Router base={base} routes={routesList} langService={langService}>
+    <Router
+      base={base}
+      routes={routesList}
+      langService={langService}
+      history={createBrowserHistory()}
+    >
       <Link
         to={to}
         className={"containerLink"}

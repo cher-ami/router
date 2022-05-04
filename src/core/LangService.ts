@@ -335,7 +335,7 @@ class LangService<TLang = any> {
    * @protected
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
-    forcePageReload ? window.open(newUrl, "_self") : Routers.history.push(newUrl);
+    forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl);
   }
 }
 

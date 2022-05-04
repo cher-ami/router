@@ -23,6 +23,7 @@ const log = debug(`router:${componentName}`);
  */
 function Stack(props: IProps): JSX.Element {
   const {
+    staticLocation,
     routeIndex,
     currentRoute,
     previousRoute,
@@ -61,9 +62,8 @@ function Stack(props: IProps): JSX.Element {
 
   // 2. animate when route state changed
   // need to be "layoutEffect" to play transitions before render, to avoid screen "clip"
-  React.useLayoutEffect(() => {
+  React[staticLocation ? "useEffect" : "useLayoutEffect"](() => {
     if (!currentRoute) return;
-
     (props.manageTransitions || sequencialTransition)({
       previousPage: prevRef.current,
       currentPage: currentRef.current,
