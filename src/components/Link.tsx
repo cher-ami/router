@@ -1,4 +1,9 @@
-import React, { AnchorHTMLAttributes, PropsWithChildren, useMemo } from "react";
+import React, {
+  AnchorHTMLAttributes,
+  MutableRefObject,
+  PropsWithChildren,
+  useMemo,
+} from "react";
 import {
   createUrl,
   joinPaths,
@@ -24,7 +29,7 @@ const log = debug("router:Link");
 /**
  * @name Link
  */
-function Link(props: ILinkProps) {
+function Link(props: ILinkProps, ref: MutableRefObject<any>) {
   const { history, staticLocation } = useRouter();
   const [location] = useLocation();
 
@@ -32,28 +37,29 @@ function Link(props: ILinkProps) {
   const url = useMemo(() => createUrl(props.to), [props.to]);
 
   // Link is active if its URL is the current URL
-
   const handleClick = (event): void => {
     event.preventDefault();
     props.onClick?.();
     history?.push(url);
   };
 
-  // FIXME re add active link
-  // const isActive = useMemo(() => {
-  //   const l = history ? location : staticLocation;
-  //   return l === url || l === removeLastCharFromString(url, "/", true);
-  // }, [history, staticLocation, location, url]);
+  // const prepare active link
+  const isActive = useMemo(() => {
+    const l = history ? location : staticLocation;
+    return l === url || l === removeLastCharFromString(url, "/", true);
+  }, [history, staticLocation, location, url]);
 
   return (
     <a
       {...{ ...props, to: undefined }}
-      className={joinPaths(["Link", props.className], " ")}
+      className={joinPaths(["Link", props.className, isActive && "active"], " ")}
       onClick={handleClick}
       children={props.children}
       href={url}
+      ref={ref}
     />
   );
 }
 
-export { Link };
+const ForwardLink = React.forwardRef(Link);
+export { ForwardLink as Link };
