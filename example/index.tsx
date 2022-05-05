@@ -1,10 +1,11 @@
-import { createRoot } from "react-dom/client"
+import { createRoot } from "react-dom/client";
 import React from "react";
 import "./index.css";
 import App from "./App";
 import { Router } from "../src/components/Router";
 import { routesList } from "./routes";
 import { LangService } from "../src";
+import { createBrowserHistory } from "history";
 
 const base = "/base/";
 type TLang = "en" | "fr" | "de";
@@ -18,10 +19,16 @@ const langService = new LangService<TLang>({
 /**
  * Init Application
  */
- const root = createRoot(document.getElementById("root"))
+const root = createRoot(document.getElementById("root"));
 
 root.render(
-  <Router langService={langService} routes={routesList} base={base}>
+  <Router
+    history={createBrowserHistory()}
+    // staticLocation="/base/en/about"
+    langService={langService}
+    routes={routesList}
+    base={base}
+  >
     <App />
   </Router>
 );

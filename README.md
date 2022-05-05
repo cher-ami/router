@@ -35,6 +35,7 @@ and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 - [Manage Transitions](#ManageTransitions)
   - [Default sequential transitions](#DefaultSequentialTransitions)
   - [Custom transitions](#CustomTransitions)
+- [SSR support](#SSRSupport)  
 - [Debug](#Debug)
 - [Example](#Example)
 
@@ -342,15 +343,19 @@ const App = (props, handleRef) => {
 
 **[Demo codesandbox: custom manage transitions](https://codesandbox.io/s/inspiring-thompson-tw4qn)**
 
-## <a name="Debug"></a>Debug
+## <a name="SSRSupport"></a>SSR Support
 
-[@wbe/debug](https://github.com/willybrauner/debug) is used on this project. It allows
-to easily get logs informations on development and production modes.
+This router is compatible with SSR due to using `staticLocation` props instead of `history` props on Router instance.
+In this case, the router will match only with `staticLocation` props value and render the appropiate route without invoking the browser history. (Because `window` is not available on the server).
 
-To use it, add this line in your browser console:
-
-```shell
-localStorage.debug = "router:*"
+```jsx
+    <Router 
+      routes={routesList} 
+      staticLocation={"/foo"}
+      // history={createBrowserHistory()}  
+      >
+      // ...
+    </Router>
 ```
 
 ## <a name="Example"></a>Example
@@ -376,7 +381,7 @@ $ npm run dev
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={} history={} middlewares={} id={}>
+<Router routes={} base={} history={} staticLocation={} middlewares={} id={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -394,8 +399,9 @@ Router component creates a new router instance.
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
   the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
-- **middlewares** `[]` add routes middleware function to patch each routes)
-- **id** `?number | string`
+- **staticLocation** `string` _(optional)_  use static URL location matching instead of history
+- **middlewares** `[]`  _(optional)_ add routes middleware function to patch each routes)
+- **id** `?number | string`  _(optional)_ id of the router instance - default : `1`
 
 ### <a name="Link"></a>Link
 
