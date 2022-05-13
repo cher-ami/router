@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import React from "react";
+import React, { StrictMode } from "react";
 import "./index.css";
 import App from "./App";
 import { Router } from "../src/components/Router";
@@ -22,13 +22,15 @@ const langService = new LangService<TLang>({
 const root = createRoot(document.getElementById("root"));
 
 root.render(
+  
   <Router
     history={createBrowserHistory()}
-    // staticLocation="/base/en/about"
+    //staticLocation="/base/en/about"
     langService={langService}
     routes={routesList}
     base={base}
   >
     <App />
   </Router>
+  
 );

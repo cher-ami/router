@@ -107,10 +107,8 @@ function Router(props: {
    * Check if langService props exist.
    * If props exist, store langService instance in Routers store.
    */
-  const langService = React.useMemo(() => {
-    if (!Routers.langService) Routers.langService = props.langService;
-    return Routers.langService;
-  }, [props.langService]);
+  if (!Routers.langService) Routers.langService = props.langService;
+  const langService = Routers.langService;
 
   /**
    * 1. routes
@@ -121,25 +119,27 @@ function Router(props: {
    *  const { routes } = useRouter();
    *  return current Router instance routes list, not all routes given to the first instance.
    */
-  const routes = React.useMemo(() => {
+  const [routes, setRoutes] = React.useState<TRoute[]>(null);
+  React.useEffect(() => {
     if (!props.routes) {
-      console.error(props.id, "props.routes is missing or empty, return.", props);
+      console.error(props.id, "props.routes is missing or empty, return.");
       return;
     }
-    let routesList;
-
-    // For each instances
-    routesList = patchMissingRootRoute(props.routes);
+    // For each router instances, patching routes
+    let routesList = patchMissingRootRoute(props.routes);
 
     // Only for first instance
     if (!Routers.routes) {
       routesList = applyMiddlewares(routesList, props.middlewares);
-      if (langService) routesList = langService.addLangParamToRoutes(routesList);
+      if (langService) {
+        routesList = langService.addLangParamToRoutes(routesList);
+      }
       Routers.routes = routesList;
     }
-    log(props.id, "routesList", routesList);
-    return routesList;
-  }, [props.routes, langService]);
+
+    setRoutes(routesList);
+    log(props.id, "routes", routesList);
+  }, [props.routes]);
 
   /**
    * 2. base
@@ -147,33 +147,32 @@ function Router(props: {
    * Register base in 'Routers' obj if is the first Router instance
    * In all case, return current props.base
    */
-  const base = React.useMemo(() => {
-    if (!Routers.base) Routers.base = props.base;
-    return props.base;
-  }, [props.base]);
+
+  if (!Routers.base) {
+    Routers.base = props.base;
+  }
+  const base = Routers.base;
 
   /**
    * 3. history
    * If is the first Router instance, register history in 'Routers' store
    * 'history' object need to be the same between each Router instance
    */
-  const history = React.useMemo(() => {
-    if (props.history && !Routers.history) {
-      Routers.history = props.history;
-    }
-    return Routers.history;
-  }, [props.history]);
+
+  if (props.history && !Routers.history) {
+    Routers.history = props.history;
+  }
+  const history = Routers.history;
 
   /**
    * 4 static location
    * Is useful in SSR context
    */
-  const staticLocation = React.useMemo((): string | undefined => {
-    if (props.staticLocation) {
-      Routers.staticLocation = props.staticLocation;
-    }
-    return Routers.staticLocation;
-  }, [props.staticLocation]);
+
+  if (props.staticLocation) {
+    Routers.staticLocation = props.staticLocation;
+  }
+  const staticLocation: string | undefined = Routers.staticLocation;
 
   // -------------------------------------------------------------------------------- ROUTE CHANGE
 
@@ -270,35 +269,44 @@ function Router(props: {
    * - Dispatch new routes states from RouterContext
    */
 
-  const historyListener = React.useMemo(() => {
-    // server
-    if (staticLocation) {
-      handleHistory(staticLocation);
-      return;
-      // client
-    } else if (history) {
-      handleHistory(window.location.pathname);
-      return history?.listen(({ location }) => {
-        handleHistory(location.pathname);
-      });
-      // log warn
-    } else {
-      console.warn(`
-          An history or staticLocation props is required.
-          ex: <Router history={createBrowserHistory()}>...</Router>
-        `);
-      return;
-    }
-  }, [staticLocation, history]);
-
   React.useEffect(() => {
-    return historyListener;
-  }, []);
+    if (!routes) return;
+
+    const historyListener = () => {
+      if (staticLocation && history) {
+        console.error(`You can't set history and staticLocation props together, return.`);
+        return;
+      }
+
+      // server
+      if (staticLocation) {
+        handleHistory(staticLocation);
+        return;
+        // client
+      } else if (history) {
+        handleHistory(window.location.pathname);
+        return history?.listen(({ location }) => {
+          handleHistory(location.pathname);
+        });
+        // log warn
+      } else {
+        console.error(`An history or staticLocation props is required, return.`);
+        return;
+      }
+    };
+
+    return historyListener();
+  }, [routes]);
 
   // -------------------------------------------------------------------------------- RENDER
 
   const { currentRoute, previousRoute, routeIndex, previousPageIsMount } = reducerState;
   const unmountPreviousPage = () => dispatch({ type: "unmount-previous-page" });
+
+  
+  // wait for next cycle to render children and context
+  // because "routes" is a state and wait for some transformations in useEffect
+  if (!routes) return
 
   return (
     <RouterContext.Provider

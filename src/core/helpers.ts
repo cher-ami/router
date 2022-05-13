@@ -411,7 +411,7 @@ export function removeLastCharFromString(
   exeptIfStringIsLastChar = true
 ): string {
   if (exeptIfStringIsLastChar && str === lastChar) return str;
-  if (str.endsWith(lastChar)) str = str.slice(0, -1);
+  if (str?.endsWith(lastChar)) str = str.slice(0, -1);
   return str;
 }
 

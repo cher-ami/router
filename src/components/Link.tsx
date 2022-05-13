@@ -2,6 +2,7 @@ import React, {
   AnchorHTMLAttributes,
   MutableRefObject,
   PropsWithChildren,
+  useCallback,
   useMemo,
 } from "react";
 import {
@@ -37,17 +38,26 @@ function Link(props: ILinkProps, ref: MutableRefObject<any>) {
   const url = useMemo(() => createUrl(props.to), [props.to]);
 
   // Link is active if its URL is the current URL
-  const handleClick = (event): void => {
-    event.preventDefault();
-    props.onClick?.();
-    history?.push(url);
-  };
+  const handleClick = useCallback(
+    (event): void => {
+      event.preventDefault();
+      props.onClick?.();
+      history?.push(url);
+    },
+    [url, history]
+  );
 
-  // const prepare active link
-  const isActive = useMemo(() => {
-    const l = history ? location : staticLocation;
-    return l === url || l === removeLastCharFromString(url, "/", true);
+  const [isActive, setIsActive] = React.useState<boolean>();
+  React.useEffect(() => {
+    const loc = history ? location : staticLocation;
+    setIsActive(loc === url || loc === removeLastCharFromString(url, "/", true));
   }, [history, staticLocation, location, url]);
+
+  // // const prepare active link
+  // const isActive = useMemo(() => {
+  //   const l = history ? location : staticLocation;
+  //   return l === url || l === removeLastCharFromString(url, "/", true);
+  // }, [history, staticLocation, location, url]);
 
   return (
     <a

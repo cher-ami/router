@@ -30,8 +30,6 @@ export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-
-     
     </div>
   );
 });
