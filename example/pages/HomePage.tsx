@@ -35,8 +35,7 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
 
   const router = useRouter();
   const path = getPathByRouteName(routesList, "HomePage");
-  log('getSubRouterRoutes(path, router.routes)', getSubRouterRoutes(path, router.routes), path, router.routes)
-  
+
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
