@@ -22,13 +22,15 @@ const langService = new LangService<TLang>({
 const root = createRoot(document.getElementById("root"));
 
 root.render(
+  <React.StrictMode>
   <Router
     history={createBrowserHistory()}
-    // staticLocation="/base/en/about"
+    //staticLocation="/base/en/about"
     langService={langService}
     routes={routesList}
     base={base}
   >
     <App />
   </Router>
+  </React.StrictMode>
 );
