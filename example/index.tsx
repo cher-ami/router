@@ -5,7 +5,7 @@ import App from "./App";
 import { Router } from "../src/components/Router";
 import { routesList } from "./routes";
 import { LangService } from "../src";
-import { createBrowserHistory } from "history";
+import { createBrowserHistory, createHashHistory } from "history";
 
 const base = "/base/";
 type TLang = "en" | "fr" | "de";
@@ -23,7 +23,7 @@ const root = createRoot(document.getElementById("root"));
 
 root.render(
   <Router
-    history={createBrowserHistory()}
+    history={createHashHistory()}
     //staticLocation="/base/en/about"
     langService={langService}
     routes={routesList}
