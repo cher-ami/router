@@ -267,7 +267,9 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  * (Get URL to push in history)
  *
  * @param args can be string or TOpenRouteParams object
+ * @param base
  * @param allRoutes
+ * @param langService
  */
 export function createUrl(
   args: string | TOpenRouteParams,

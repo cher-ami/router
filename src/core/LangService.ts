@@ -88,6 +88,7 @@ class LangService<TLang = any> {
    * Push new URL in history
    * @param toLang
    * @param forcePageReload
+   * @param currentRoute
    */
   public setLang(
     toLang: TLanguage<TLang>,
@@ -112,7 +113,6 @@ class LangService<TLang = any> {
         lang: toLang.key,
       },
     });
-    console.log("currentRoute", currentRoute);
     log("preparedNewUrl", preparedNewUrl);
 
     // create newUrl variable to set in each condition
