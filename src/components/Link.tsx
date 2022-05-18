@@ -53,12 +53,6 @@ function Link(props: ILinkProps, ref: MutableRefObject<any>) {
     setIsActive(loc === url || loc === removeLastCharFromString(url, "/", true));
   }, [history, staticLocation, location, url]);
 
-  // // const prepare active link
-  // const isActive = useMemo(() => {
-  //   const l = history ? location : staticLocation;
-  //   return l === url || l === removeLastCharFromString(url, "/", true);
-  // }, [history, staticLocation, location, url]);
-
   return (
     <a
       {...{ ...props, to: undefined }}
