@@ -42,8 +42,8 @@
     "path-to-regexp": "^6.2.0"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": ">=16.9.0",
+    "react-dom": ">=16.9.0"
   },
   "devDependencies": {
     "@babel/core": "*",
