@@ -222,14 +222,23 @@ function Router(props: {
    * Update routes when history change
    * Dispatch new routes via RouterContext
    */
-  const handleHistory = (url: string = ""): void => {
+
+  const handleHistory = (url: string = "", hash: string = ""): void => {  
+
+    // because we can get #" in hash history context, we need define current URL
+    // as the URL part after the "#"
+    let exactUrl: string = url
+    if (hash?.length > 0) {
+      exactUrl = hash.replace('#', '')
+    }
+
     if (_paused.current) {
-      _waitingUrl.current = url;
+      _waitingUrl.current = exactUrl;
       return;
     }
 
     const matchingRoute = getRouteFromUrl({
-      pUrl: url,
+      pUrl: exactUrl,
       pRoutes: routes,
       pBase: props.base,
       id: props.id,
@@ -288,9 +297,9 @@ function Router(props: {
         return;
         // client
       } else if (history) {
-        handleHistory(window.location.pathname);
+        handleHistory(window.location.pathname, window.location.hash);
         return history?.listen(({ location }) => {
-          handleHistory(location.pathname);
+          handleHistory(location.pathname, location.hash);
         });
         // log warn
       } else {
@@ -301,6 +310,7 @@ function Router(props: {
 
     return historyListener();
   }, [routes]);
+
 
   // -------------------------------------------------------------------------------- RENDER
 
