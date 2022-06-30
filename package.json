@@ -61,6 +61,7 @@
     "babel-jest": "*",
     "gsap": "^3.10.4",
     "jest": "^28.1.2",
+    "jest-environment-jsdom": "^28.1.2",
     "microbundle": "^0.15.0",
     "prettier": "^2.7.1",
     "react": "^18.2.0",
