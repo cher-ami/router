@@ -116,38 +116,26 @@ function Router(props: {
    * If is the first Router instance, register routes in 'Routers' store.
    * In other case, return current props.routes
    *
-   * const { routes } = useRouter();
-   * return current Router instance routes list, not all routes given to the first instance.
+   *  const { routes } = useRouter();
+   *  return current Router instance routes list, not all routes given to the first instance.
    */
-  const [routes, setRoutes] = React.useState<TRoute[]>(null);
-
-  // because strict mode breaks useEffect single render since React 18...
-  const mount = React.useRef(false);
-  
-  React.useEffect(() => {
-    if (mount.current) return;
-    mount.current = true;
-
+  const routes = React.useMemo(() => {
     if (!props.routes) {
-      console.error(props.id, "props.routes is missing or empty, return.");
+      console.error(props.id, "props.routes is missing or empty, return.", props);
       return;
     }
-
-    // For each router instances, patching routes
+    // For each instances
     let routesList = patchMissingRootRoute(props.routes);
 
     // Only for first instance
     if (!Routers.routes) {
       routesList = applyMiddlewares(routesList, props.middlewares);
-      if (langService) {
-        routesList = langService.addLangParamToRoutes(routesList);
-      }
+      if (langService) routesList = langService.addLangParamToRoutes(routesList);
       Routers.routes = routesList;
     }
-
-    setRoutes(routesList);
-    log(props.id, "routes", routesList);
-  }, []);
+    log(props.id, "routesList", routesList);
+    return routesList;
+  }, [props.routes, langService]);
 
   /**
    * 2. base
@@ -277,6 +265,14 @@ function Router(props: {
    * - Dispatch new routes states from RouterContext
    */
 
+  const isMount = React.useRef(false);
+  if (staticLocation) {
+    if (!isMount.current) {
+      isMount.current = true;
+      handleHistory(staticLocation);
+    }
+  }
+
   React.useEffect(() => {
     if (!routes) return;
 
@@ -310,10 +306,6 @@ function Router(props: {
 
   const { currentRoute, previousRoute, routeIndex, previousPageIsMount } = reducerState;
   const unmountPreviousPage = () => dispatch({ type: "unmount-previous-page" });
-
-  // wait for next cycle to render children and context
-  // because "routes" is a state and wait for some transformations in useEffect
-  if (!routes) return;
 
   return (
     <RouterContext.Provider
