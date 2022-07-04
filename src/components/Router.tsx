@@ -302,7 +302,7 @@ function Router(props: {
   // remove listener
   React.useEffect(() => {
     return () => {
-      log("stop to listen history");
+      log(props.id, "Stop to listen history.");
       historyListener();
     };
   }, [historyListener]);
