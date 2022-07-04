@@ -223,13 +223,12 @@ function Router(props: {
    * Dispatch new routes via RouterContext
    */
 
-  const handleHistory = (url: string = "", hash: string = ""): void => {  
-
+  const handleHistory = (url: string = "", hash: string = ""): void => {
     // because we can get #" in hash history context, we need define current URL
     // as the URL part after the "#"
-    let exactUrl: string = url
+    let exactUrl: string = url;
     if (hash?.length > 0) {
-      exactUrl = hash.replace('#', '')
+      exactUrl = hash.replace("#", "");
     }
 
     if (_paused.current) {
@@ -269,20 +268,11 @@ function Router(props: {
   /**
    * Here we go!
    * Listen history change.
-   * If it change:
+   * If it changes:
    * - Get matching route with current URL
    * - Dispatch new routes states from RouterContext
    */
-
-  const isMount = React.useRef(false);
-  if (staticLocation) {
-    if (!isMount.current) {
-      isMount.current = true;
-      handleHistory(staticLocation);
-    }
-  }
-
-  React.useEffect(() => {
+  const historyListener = React.useMemo(() => {
     if (!routes) return;
 
     const historyListener = () => {
@@ -290,7 +280,6 @@ function Router(props: {
         console.error(`You can't set history and staticLocation props together, return.`);
         return;
       }
-
       // server
       if (staticLocation) {
         handleHistory(staticLocation);
@@ -301,16 +290,22 @@ function Router(props: {
         return history?.listen(({ location }) => {
           handleHistory(location.pathname, location.hash);
         });
-        // log warn
+        // log error
       } else {
         console.error(`An history or staticLocation props is required, return.`);
         return;
       }
     };
-
     return historyListener();
-  }, [routes]);
+  }, [routes, history]);
 
+  // remove listener
+  React.useEffect(() => {
+    return () => {
+      log(props.id, "Stop to listen history.");
+      historyListener();
+    };
+  }, [historyListener]);
 
   // -------------------------------------------------------------------------------- RENDER
 
