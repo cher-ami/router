@@ -257,7 +257,7 @@ function Router(props: {
         if (newRoute?.getStaticProps) {
           try {
             const requestStaticProps = await newRoute.getStaticProps();
-            log("assign requestStaticProps to newRoute.props", requestStaticProps);
+            log("assign requestStaticProps to newRoute.props  ", requestStaticProps);
             Object.assign(newRoute.props, requestStaticProps);
           } catch (e) {
             console.error("requestStaticProps failed");
