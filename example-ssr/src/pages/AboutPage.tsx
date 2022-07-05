@@ -3,7 +3,6 @@ import { useStack } from "../../../src"
 import { transitionsHelper } from "../helpers/transitionsHelper"
 import pic from "../assets/pic.png"
 import css from "./AboutPage.module.css"
-import {useGetStaticProps} from "../helpers/useGetStaticProps"
 
 const componentName = "AboutPage"
 function AboutPage(props, handleRef) {
