@@ -2,6 +2,7 @@ import { Routers } from "./Routers";
 import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { TRoute } from "../components/Router";
+import LangService from "./LangService";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -148,6 +149,37 @@ export function getSubRouterRoutes(
 export function openRoute(args: string | TOpenRouteParams, history = Routers?.history) {
   const url = typeof args === "string" ? args : createUrl(args);
   history?.push(url);
+}
+
+/**
+ * Format and return routes list
+ * If is the first Router instance, register routes in 'Routers' store.
+ * In other case, return current props.routes
+ *
+ *  const { routes } = useRouter();
+ *  return current Router instance routes list, not all routes given to the first instance.
+ */
+export function formatRoutes(
+  routes: TRoute[],
+  middlewares?: ((routes: TRoute[]) => TRoute[])[],
+  langService?: LangService,
+  id?: number | string
+): TRoute[] {
+  if (!routes) {
+    console.error(id, "props.routes is missing or empty, return.");
+    return;
+  }
+  // For each instances
+  let routesList = patchMissingRootRoute(routes);
+
+  // Only for first instance
+  if (!Routers.routes) {
+    routesList = applyMiddlewares(routesList, middlewares);
+    if (langService) routesList = langService.addLangParamToRoutes(routesList);
+    Routers.routes = routesList;
+  }
+  log(id, "routesList", routesList);
+  return routesList;
 }
 
 // ----------------------------------------------------------------------------- URLS

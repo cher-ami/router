@@ -55,6 +55,7 @@ export const getRouteFromUrl = ({
       if (matcher) {
         const route = firstLevelCurrentRoute || currentRoute;
         const params = pMatcher?.params || matcher?.params;
+
         const routeObj = {
           fullPath: currentRoutePath,
           path: route?.path,
@@ -66,6 +67,8 @@ export const getRouteFromUrl = ({
           parser: pMatcher || matcher,
           langPath: route?.langPath,
           name: route?.name || route?.component?.displayName,
+          action: route?.action,
+          getStaticProps: route?.getStaticProps,
           props: {
             params,
             ...(route?.props || {}),

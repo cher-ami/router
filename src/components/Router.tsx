@@ -2,29 +2,31 @@ import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
+import { applyMiddlewares, formatRoutes, patchMissingRootRoute } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
 
 // -------------------------------------------------------------------------------- TYPES
 
-export type TRoute = {
+export type TRoute = Partial<{
   path: string | { [x: string]: string };
-  component?: React.ComponentType<any>;
-  base?: string;
-  name?: string;
-  parser?: Match;
-  props?: {
+  component: React.ComponentType<any>;
+  base: string;
+  name: string;
+  parser: Match;
+  props: {
     params?: { [x: string]: any };
     [x: string]: any;
   };
-  children?: TRoute[];
-  url?: string;
-  fullUrl?: string; // full URL who not depend of current instance
-  fullPath?: string; // full Path /base/:lang/foo/second-foo
-  langPath?: { [x: string]: string } | null;
-};
+  children: TRoute[];
+  url: string;
+  fullUrl: string; // full URL who not depend of current instance
+  fullPath: string; // full Path /base/:lang/foo/second-foo
+  langPath: { [x: string]: string } | null;
+  action?: () => any;
+  getStaticProps?: ()=> Promise<any>
+}>;
 
 export interface IRouterContextStackStates {
   unmountPreviousPage?: () => void;
@@ -119,23 +121,10 @@ function Router(props: {
    *  const { routes } = useRouter();
    *  return current Router instance routes list, not all routes given to the first instance.
    */
-  const routes = React.useMemo(() => {
-    if (!props.routes) {
-      console.error(props.id, "props.routes is missing or empty, return.", props);
-      return;
-    }
-    // For each instances
-    let routesList = patchMissingRootRoute(props.routes);
-
-    // Only for first instance
-    if (!Routers.routes) {
-      routesList = applyMiddlewares(routesList, props.middlewares);
-      if (langService) routesList = langService.addLangParamToRoutes(routesList);
-      Routers.routes = routesList;
-    }
-    log(props.id, "routesList", routesList);
-    return routesList;
-  }, [props.routes, langService]);
+  const routes = React.useMemo(
+    () => formatRoutes(props.routes, props.middlewares, langService, props.id),
+    [props.routes, langService, props.middlewares, props.id]
+  );
 
   /**
    * 2. base
@@ -258,6 +247,7 @@ function Router(props: {
     const newRoute: TRoute = matchingRoute || notFoundRoute;
     if (newRoute) {
       // Final process: update context currentRoute from dispatch method \o/ !
+
       dispatch({ type: "update-current-route", value: newRoute });
       // & register this new route as currentRoute in local and in Routers store
       currentRouteRef.current = newRoute;
