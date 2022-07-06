@@ -6,7 +6,6 @@ const componentName = "HomePage"
 function HomePage(props, handleRef) {
   const rootRef = useRef(null)
   const [n, setN] = useState(0)
-  console.log('HOME props ', props)
 
   useStack({
     componentName,

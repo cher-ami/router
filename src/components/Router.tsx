@@ -6,6 +6,7 @@ import { formatRoutes } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
+import { getDataFromCache, setDataInCache } from "../core/staticPropsCache";
 
 // -------------------------------------------------------------------------------- TYPES
 
@@ -105,7 +106,7 @@ function Router(props: {
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   langService?: LangService;
   id?: number | string;
-  staticProps?: { props: any; name: string };
+  initialStaticProps?: { props: any; name: string };
 }): JSX.Element {
   /**
    * 0. LangService
@@ -249,32 +250,46 @@ function Router(props: {
 
     const newRoute: TRoute = matchingRoute || notFoundRoute;
 
-    if (newRoute) {
-      // (server & client)
-      const isFirstRoute = newRoute.name === props.staticProps.name;
-      if (isFirstRoute) {
-        Object.assign(newRoute.props, props.staticProps.props);
-      } else {
-        // if is client and not first route
-        if (newRoute?.getStaticProps) {
-          try {
-            const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
-            log("assign requestStaticProps to newRoute.props  ", requestStaticProps);
-            Object.assign(newRoute.props, requestStaticProps);
-          } catch (e) {
-            console.error("requestStaticProps failed");
-          }
+    // if no newRoute, do not continue
+    if (!newRoute) return;
+
+    // check if new route data as been store in cache
+    const dataFromCache = getDataFromCache(newRoute.fullUrl);
+
+    // first route visited (server & client)
+    const isFirstRouteVisited = newRoute.name === props.initialStaticProps.name;
+
+    if (isFirstRouteVisited) {
+      Object.assign(newRoute.props, props.initialStaticProps.props);
+      if (!dataFromCache) {
+        setDataInCache(newRoute.fullUrl, props.initialStaticProps.props);
+      }
+    }
+    // if NOT first route (client)
+    else {
+      // if cache exist for this route, assign it
+      if (dataFromCache) {
+        Object.assign(newRoute.props, dataFromCache);
+      }
+      // Continue only if getStaticProps is not undefined
+      else if (newRoute.getStaticProps) {
+        try {
+          const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
+          Object.assign(newRoute.props, requestStaticProps);
+          setDataInCache(newRoute.fullUrl, requestStaticProps);
+        } catch (e) {
+          console.error("requestStaticProps failed");
         }
       }
-
-      // Final process: update context currentRoute from dispatch method \o/ !
-      dispatch({ type: "update-current-route", value: newRoute });
-
-      // & register this new route as currentRoute in local and in Routers store
-      currentRouteRef.current = newRoute;
-      Routers.currentRoute = newRoute;
-      Routers.isFirstRoute = false;
     }
+
+    // Final process: update context currentRoute from dispatch method \o/ !
+    dispatch({ type: "update-current-route", value: newRoute });
+
+    // & register this new route as currentRoute in local and in Routers store
+    currentRouteRef.current = newRoute;
+    Routers.currentRoute = newRoute;
+    Routers.isFirstRoute = false;
   };
 
   /**

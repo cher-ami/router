@@ -7,7 +7,6 @@ import css from "./AboutPage.module.css"
 const componentName = "AboutPage"
 function AboutPage(props, handleRef) {
   const rootRef = useRef(null)
-  console.log('ABOUT props ', props)
 
   useStack({
     componentName,

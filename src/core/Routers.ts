@@ -37,6 +37,11 @@ export type TRouters = {
    * LangService instance (stored in Router)
    */
   langService: LangService;
+
+  /**
+   * Cache of getStaticProps Promise results
+   */
+  staticPropsCache: { [x:string]: any }
 };
 
 /**
@@ -52,4 +57,5 @@ export const Routers: TRouters = {
   isFirstRoute: true,
   currentRoute: undefined,
   langService: undefined,
+  staticPropsCache: {}
 };

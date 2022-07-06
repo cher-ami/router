@@ -14,7 +14,7 @@ const GlobalContext = createContext(globalData)
 const root = hydrateRoot(
   document.getElementById("root"),
   // le fichier JS qui sera importé dans une balise script dans le fichier index.html
-  <Router routes={routes} history={createBrowserHistory()} staticProps={window["__SSR_STATIC_PROPS__"]}>
+  <Router routes={routes} history={createBrowserHistory()} initialStaticProps={window["__SSR_STATIC_PROPS__"]}>
     <App />
   </Router>
 );
