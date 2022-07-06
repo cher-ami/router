@@ -3,13 +3,14 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import NotFoundPage from "./pages/NotFoundPage"
 import { TRoute } from "../../src";
+import ArticlePage from "./pages/ArticlePage"
 
 export const routes: TRoute[] = [
   {
     path: "/",
     component: HomePage,
     name: "Home",
-    getStaticProps: async () => {
+    getStaticProps: async (props) => {
       const res = await fetch("https://worldtimeapi.org/api/ip");
       const time = await res.json();
       return { time };
@@ -20,6 +21,20 @@ export const routes: TRoute[] = [
     component: AboutPage,
     name: "About",
     getStaticProps: async () => {
+      const res = await fetch("https://jsonplaceholder.typicode.com/todos");
+      const todo = await res.json();
+      return { todo };
+    },
+  },
+  {
+    path: "/article/:slug",
+    component: ArticlePage,
+    name: "Article",
+    props: {
+      color: "blue",
+    },
+    getStaticProps: async (props) => {
+      console.log("article props", props)
       const res = await fetch("https://jsonplaceholder.typicode.com/todos");
       const todo = await res.json();
       return { todo };

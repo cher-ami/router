@@ -1,4 +1,4 @@
-import React from "react";
+import React, {createContext} from "react"
 import { hydrateRoot } from "react-dom/client";
 import { App } from "./components/App";
 import { routes } from "./routes";
@@ -7,10 +7,9 @@ import "./index.css";
 import { Router } from "../../src";
 
 
-// const routesWithCurrentRouteSurchargeParWindowObj = routes.find(e => e.name === "home")
-// Object.assign(routesWithCurrentRouteSurchargeParWindowObj.props, window["__SSR_STATIC_PROPS__"])
+const globalData = window["__GLOBAL_DATA__"]
 
-// console.log("window[\"__SSR_STATIC_PROPS__\"]" , window["__SSR_STATIC_PROPS__"])
+const GlobalContext = createContext(globalData)
 
 const root = hydrateRoot(
   document.getElementById("root"),

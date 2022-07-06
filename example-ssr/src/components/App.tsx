@@ -26,7 +26,7 @@ export function App() {
   return (
     <div className={"App"}>
       <nav>
-        <Link to="/">Home</Link> | <Link to="/about">About</Link> |{" "}
+        <Link to="/">Home</Link> | <Link to="/about">About</Link> |{" "} | <Link to="/article/my-article-1">Article 1</Link> |{" "}
         <Link to="/contact">Contact</Link>
       </nav>
       <Stack manageTransitions={crossedTransitions} />

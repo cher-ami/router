@@ -33,11 +33,13 @@ export async function render(url) {
 
   if (route?.getStaticProps) {
     try {
-      SSR_STATIC_PROPS.props = await route.getStaticProps();
+      SSR_STATIC_PROPS.props = await route.getStaticProps(route.props);
     } catch (e) {
       console.error("fetch action data error");
     }
   }
+
+//  const globalData = await requestGlobal()
 
   /**
    * 3. Retourner la réponse (dans le template)
@@ -48,6 +50,7 @@ export async function render(url) {
         <App />
       </Router>
     ),
-    ssrStaticProps: SSR_STATIC_PROPS
+    ssrStaticProps: SSR_STATIC_PROPS,
+   // globalData
   };
 }

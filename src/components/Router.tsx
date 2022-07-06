@@ -9,23 +9,25 @@ import LangService from "../core/LangService";
 
 // -------------------------------------------------------------------------------- TYPES
 
+export type TRouteProps = {
+  params?: { [x: string]: any };
+  [x: string]: any;
+};
+
 export type TRoute = Partial<{
   path: string | { [x: string]: string };
   component: React.ComponentType<any>;
   base: string;
   name: string;
   parser: Match;
-  props: {
-    params?: { [x: string]: any };
-    [x: string]: any;
-  };
+  props: TRouteProps;
   children: TRoute[];
   url: string;
   fullUrl: string; // full URL who not depend of current instance
   fullPath: string; // full Path /base/:lang/foo/second-foo
   langPath: { [x: string]: string } | null;
   action?: () => any;
-  getStaticProps?: () => Promise<any>;
+  getStaticProps?: (props: TRouteProps) => Promise<any>;
 }>;
 
 export interface IRouterContextStackStates {
@@ -256,7 +258,7 @@ function Router(props: {
         // if is client and not first route
         if (newRoute?.getStaticProps) {
           try {
-            const requestStaticProps = await newRoute.getStaticProps();
+            const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
             log("assign requestStaticProps to newRoute.props  ", requestStaticProps);
             Object.assign(newRoute.props, requestStaticProps);
           } catch (e) {
