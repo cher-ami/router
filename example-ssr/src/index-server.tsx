@@ -4,11 +4,11 @@ import { routes } from "./routes";
 import { App } from "./components/App";
 import { Router, TRoute } from "../../src";
 import { getNotFoundRoute, getRouteFromUrl } from "../../src/core/matcher";
-import { formatRoutes } from "../../src/core/helpers";
 import "./fetch-polyfill";
+import { formatRoutes } from "../../src/core/helpers";
+import { GlobalDataContext } from "./GlobalDataContext";
 
 export async function render(url) {
-  // FIXME regrouper tout ce bordel
   /**
    * 1. savoir quel composant je dois rendre dans mon router
    */
@@ -39,21 +39,29 @@ export async function render(url) {
     }
   }
 
-  // TODO
-  // create function requestStaticPropsFromRoute( getCurrentRoute(url, base, routes...)  )
+  // Get Global data
+  const requestGlobal = async () => {
+    const res = await fetch("https://jsonplaceholder.typicode.com/users")
+    const users = await res.json();
+    return {users}
+  }
 
-  //  const globalData = await requestGlobal()
+ const GLOBAL_DATA = await requestGlobal()
 
   /**
    * 3. Retourner la réponse (dans le template)
    */
   return {
     renderToString: ReactDOMServer.renderToString(
+
       <Router routes={routes} staticLocation={url} initialStaticProps={SSR_STATIC_PROPS}>
-        <App />
+        {/* Provide Global data */}
+        <GlobalDataContext.Provider value={{globalData: GLOBAL_DATA}}>
+          <App/>
+        </GlobalDataContext.Provider>
       </Router>
     ),
     ssrStaticProps: SSR_STATIC_PROPS,
-    // globalData
+    globalData: GLOBAL_DATA
   };
 }

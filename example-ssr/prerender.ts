@@ -23,12 +23,13 @@ export const prerender = async (request, response) => {
       .replace(/(https?:\/\/)|(\/)+/g, "$1$2");
 
     // get react app HTML render to string
-    const { renderToString, ssrStaticProps } = await render(preparedRoute);
+    const { renderToString, ssrStaticProps, globalData } = await render(preparedRoute);
 
     // include it in the template
     const template = layout
       .replace(`<!--app-html-->`, renderToString)
-      .replace(`"<!--ssr-static-props-->"`, JSON.stringify(ssrStaticProps));
+      .replace(`"<!--ssr-static-props-->"`, JSON.stringify(ssrStaticProps))
+      .replace(`"<!--ssr-global-data-->"`, JSON.stringify(globalData));
 
     // prepare sub folder templates if exist
     const routePath = path.resolve(`dist/static${preparedRoute}`);

@@ -1,11 +1,16 @@
-import React, {useState, useRef, useEffect} from "react"
+import React, {useState, useRef, useEffect, useContext} from "react"
 import { useStack } from "../../../src"
 import { transitionsHelper } from "../helpers/transitionsHelper"
+import {GlobalDataContext} from "../GlobalDataContext";
 
 const componentName = "HomePage"
 function HomePage(props, handleRef) {
   const rootRef = useRef(null)
   const [n, setN] = useState(0)
+    const {globalData} = useContext(GlobalDataContext)
+
+    console.log('HOME props ', props)
+    console.log("Global data", globalData)
 
   useStack({
     componentName,
@@ -23,6 +28,7 @@ function HomePage(props, handleRef) {
       HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME
       <br />
       <button onClick={() => setN(n + 1)}>+ {n}</button>
+        {globalData.users.map((user,i) => <p key={i}>{user.name}</p>)}
     </div>
   )
 }
