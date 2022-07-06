@@ -1,9 +1,9 @@
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import NotFoundPage from "./pages/NotFoundPage"
+import ArticlePage from "./pages/ArticlePage";
+import NotFoundPage from "./pages/NotFoundPage";
 import { TRoute } from "@cher-ami/router";
-import ArticlePage from "./pages/ArticlePage"
 
 export const routes: TRoute[] = [
   {
