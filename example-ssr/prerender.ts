@@ -11,12 +11,12 @@ export const prerender = async (request, response) => {
   // pre-render each route...
   for (const route of routes) {
     // prepare complete route path
-    const preparedRoute = [
+    let preparedRoute = [
       // base
       import.meta.env.VITE_APP_BASE || "/",
 
       // path
-      route.path === "/" ? "/index" : route.path,
+      route.path,
     ]
       .join("")
       // remove multi slashes
@@ -25,6 +25,7 @@ export const prerender = async (request, response) => {
     // get react app HTML render to string
     const { renderToString, ssrStaticProps, globalData } = await render(preparedRoute);
 
+    if (preparedRoute === "/") preparedRoute = "/index";
     // include it in the template
     const template = layout
       .replace(`<!--app-html-->`, renderToString)
