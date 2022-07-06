@@ -4,9 +4,9 @@ import { routes } from "./routes";
 import { App } from "./components/App";
 import { Router, TRoute } from "../../src";
 import { getNotFoundRoute, getRouteFromUrl } from "../../src/core/matcher";
-import "./fetch-polyfill";
 import { formatRoutes } from "../../src/core/helpers";
 import { GlobalDataContext } from "./GlobalDataContext";
+import 'isomorphic-unfetch';
 
 export async function render(url) {
   /**
