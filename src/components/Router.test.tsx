@@ -10,6 +10,7 @@ describe("Router", () => {
     {
       path: "/",
       component: null,
+      name: "Home"
     },
   ];
 

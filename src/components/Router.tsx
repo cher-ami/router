@@ -252,34 +252,37 @@ function Router(props: {
 
     // if no newRoute, do not continue
     if (!newRoute) return;
-    const cache = staticPropsCache();
+    
+    if (props.initialStaticProps) {
+      const cache = staticPropsCache();
 
-    // check if new route data as been store in cache
-    const dataFromCache = cache.get(newRoute.fullUrl);
+      // check if new route data as been store in cache
+      const dataFromCache = cache.get(newRoute.fullUrl);
 
-    // first route visited (server & client)
-    const isFirstRouteVisited = newRoute.name === props.initialStaticProps.name;
+      // first route visited (server & client)
+      const isFirstRouteVisited = newRoute.name === props.initialStaticProps.name;
 
-    if (isFirstRouteVisited) {
-      Object.assign(newRoute.props, props.initialStaticProps.props);
-      if (!dataFromCache) {
-        cache.set(newRoute.fullUrl, props.initialStaticProps.props);
+      if (isFirstRouteVisited) {
+        Object.assign(newRoute.props, props.initialStaticProps.props);
+        if (!dataFromCache) {
+          cache.set(newRoute.fullUrl, props.initialStaticProps.props);
+        }
       }
-    }
-    // if NOT first route (client)
-    else {
-      // if cache exist for this route, assign it
-      if (dataFromCache) {
-        Object.assign(newRoute.props, dataFromCache);
-      }
-      // Continue only if getStaticProps is not undefined
-      else if (newRoute.getStaticProps) {
-        try {
-          const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
-          Object.assign(newRoute.props, requestStaticProps);
-          cache.set(newRoute.fullUrl, requestStaticProps);
-        } catch (e) {
-          console.error("requestStaticProps failed");
+      // if NOT first route (client)
+      else {
+        // if cache exist for this route, assign it
+        if (dataFromCache) {
+          Object.assign(newRoute.props, dataFromCache);
+        }
+        // Continue only if getStaticProps is not undefined
+        else if (newRoute.getStaticProps) {
+          try {
+            const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
+            Object.assign(newRoute.props, requestStaticProps);
+            cache.set(newRoute.fullUrl, requestStaticProps);
+          } catch (e) {
+            console.error("requestStaticProps failed");
+          }
         }
       }
     }
