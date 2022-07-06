@@ -1,13 +1,14 @@
-import { Routers } from "../core/Routers";
+import { Routers } from "./Routers";
 import {
   compileUrl,
   createUrl,
   joinPaths,
   removeLastCharFromString,
-} from "../core/helpers";
-import debug from "@wbe/debug";
+  getLangPathByLang,
+  isSSR,
+} from "./helpers";
 import { TRoute } from "../components/Router";
-import { getLangPathByLang } from "../core/helpers";
+import debug from "@wbe/debug";
 
 const log = debug(`router:LangService`);
 
@@ -49,19 +50,27 @@ class LangService<TLang = any> {
   public base: string;
 
   /**
+   * Static Location used for SSR context
+   */
+  public staticLocation: string;
+
+  /**
    * Init languages service
    * @param languages
    * @param showDefaultLangInUrl
    * @param base
+   * @param staticLocation
    */
   public constructor({
     languages,
     showDefaultLangInUrl = true,
     base = "/",
+    staticLocation,
   }: {
     languages: TLanguage<TLang>[];
     showDefaultLangInUrl?: boolean;
     base?: string;
+    staticLocation?: string;
   }) {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
@@ -69,6 +78,7 @@ class LangService<TLang = any> {
     this.languages = languages;
     // remove extract / at the end, if exist
     this.base = removeLastCharFromString(base, "/", true);
+    this.staticLocation = staticLocation;
     this.defaultLang = this.getDefaultLang(languages);
     this.currentLang = this.getLangFromUrl() || this.defaultLang;
     this.showDefaultLangInUrl = showDefaultLangInUrl;
@@ -232,7 +242,12 @@ class LangService<TLang = any> {
     routes: TRoute[],
     showLangInUrl = this.showLangInUrl()
   ): TRoute[] {
-    if (!this.isInit) return routes;
+    if (routes?.some((el) => !!el.langPath)) {
+      log(
+        "Routes have already been formatted by 'addLangParamToRoutes()', return routes."
+      );
+      return routes;
+    }
 
     /**
      * Add :lang param on path
@@ -308,7 +323,9 @@ class LangService<TLang = any> {
    * Get current language from URL
    * @param pathname
    */
-  protected getLangFromUrl(pathname = window.location.pathname): TLanguage<TLang> {
+  protected getLangFromUrl(
+    pathname = this.staticLocation ?? window.location.pathname
+  ): TLanguage<TLang> {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
 
@@ -335,6 +352,7 @@ class LangService<TLang = any> {
    * @protected
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
+    if (isSSR()) return;
     forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl);
   }
 }

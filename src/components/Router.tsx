@@ -2,7 +2,7 @@ import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { formatRoutes } from "../core/helpers";
+import { formatRoutes, isSSR } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
@@ -125,10 +125,18 @@ function Router(props: {
    *  const { routes } = useRouter();
    *  return current Router instance routes list, not all routes given to the first instance.
    */
-  const routes = React.useMemo(
-    () => formatRoutes(props.routes, props.middlewares, langService, props.id),
-    [props.routes, langService, props.middlewares, props.id]
-  );
+  const routes = React.useMemo(() => {
+    const routesList = formatRoutes(
+      props.routes,
+      props.middlewares,
+      langService,
+      props.id
+    );
+
+    // if is first instance, register result in Routers
+    if (!Routers.routes) Routers.routes = routesList;
+    return routesList;
+  }, [props.routes, langService, props.middlewares, props.id]);
 
   /**
    * 2. base
@@ -252,7 +260,7 @@ function Router(props: {
 
     // if no newRoute, do not continue
     if (!newRoute) return;
-    
+
     if (props.initialStaticProps) {
       const cache = staticPropsCache();
 
@@ -262,10 +270,13 @@ function Router(props: {
       // first route visited (server & client)
       const isFirstRouteVisited = newRoute.name === props.initialStaticProps.name;
 
+      // In SSR context, we have to manage getStaticProps route properties from server and client
       if (isFirstRouteVisited) {
-        Object.assign(newRoute.props, props.initialStaticProps.props);
+        if (newRoute.props) {
+          Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
+        }
         if (!dataFromCache) {
-          cache.set(newRoute.fullUrl, props.initialStaticProps.props);
+          cache.set(newRoute.fullUrl, props.initialStaticProps?.props ?? {});
         }
       }
       // if NOT first route (client)

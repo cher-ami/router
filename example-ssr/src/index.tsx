@@ -4,8 +4,13 @@ import { App } from "./components/App";
 import { routes } from "./routes";
 import { createBrowserHistory } from "history";
 import "./index.css";
-import { Router } from "../../src";
+import { LangService, Router } from "../../src";
 import { GlobalDataContext } from "./GlobalDataContext";
+import languages from "./languages";
+
+const langService = new LangService({
+  languages,
+});
 
 /**
  * Client side
@@ -16,6 +21,7 @@ const root = hydrateRoot(
     routes={routes}
     history={createBrowserHistory()}
     initialStaticProps={window["__SSR_STATIC_PROPS__"]}
+    langService={langService}
   >
     <GlobalDataContext.Provider value={{ globalData: window["__GLOBAL_DATA__"] }}>
       <App />
