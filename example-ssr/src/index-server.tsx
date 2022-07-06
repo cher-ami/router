@@ -41,27 +41,25 @@ export async function render(url) {
 
   // Get Global data
   const requestGlobal = async () => {
-    const res = await fetch("https://jsonplaceholder.typicode.com/users")
+    const res = await fetch("https://jsonplaceholder.typicode.com/users");
     const users = await res.json();
-    return {users}
-  }
-
- const GLOBAL_DATA = await requestGlobal()
+    return { users };
+  };
+  const GLOBAL_DATA = await requestGlobal();
 
   /**
    * 3. Retourner la réponse (dans le template)
    */
   return {
     renderToString: ReactDOMServer.renderToString(
-
       <Router routes={routes} staticLocation={url} initialStaticProps={SSR_STATIC_PROPS}>
         {/* Provide Global data */}
-        <GlobalDataContext.Provider value={{globalData: GLOBAL_DATA}}>
-          <App/>
+        <GlobalDataContext.Provider value={{ globalData: GLOBAL_DATA }}>
+          <App />
         </GlobalDataContext.Provider>
       </Router>
     ),
     ssrStaticProps: SSR_STATIC_PROPS,
-    globalData: GLOBAL_DATA
+    globalData: GLOBAL_DATA,
   };
 }
