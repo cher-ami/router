@@ -182,12 +182,6 @@ export function formatRoutes(
     routesList = langService.addLangParamToRoutes(routesList);
   }
 
-  // Only first time register routes in Routers
-  // if (isFirstRouterInstance) {
-  //   Routers.routes = routesList;
-  // }
-
-  log(id, "formatRoutes > routesList", routesList);
   return routesList;
 }
 
