@@ -6,7 +6,7 @@ import { formatRoutes } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
-import { getDataFromCache, setDataInCache } from "../core/staticPropsCache";
+import { staticPropsCache } from "../core/staticPropsCache";
 
 // -------------------------------------------------------------------------------- TYPES
 
@@ -252,9 +252,10 @@ function Router(props: {
 
     // if no newRoute, do not continue
     if (!newRoute) return;
+    const cache = staticPropsCache();
 
     // check if new route data as been store in cache
-    const dataFromCache = getDataFromCache(newRoute.fullUrl);
+    const dataFromCache = cache.get(newRoute.fullUrl);
 
     // first route visited (server & client)
     const isFirstRouteVisited = newRoute.name === props.initialStaticProps.name;
@@ -262,7 +263,7 @@ function Router(props: {
     if (isFirstRouteVisited) {
       Object.assign(newRoute.props, props.initialStaticProps.props);
       if (!dataFromCache) {
-        setDataInCache(newRoute.fullUrl, props.initialStaticProps.props);
+        cache.set(newRoute.fullUrl, props.initialStaticProps.props);
       }
     }
     // if NOT first route (client)
@@ -276,7 +277,7 @@ function Router(props: {
         try {
           const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
           Object.assign(newRoute.props, requestStaticProps);
-          setDataInCache(newRoute.fullUrl, requestStaticProps);
+          cache.set(newRoute.fullUrl, requestStaticProps);
         } catch (e) {
           console.error("requestStaticProps failed");
         }

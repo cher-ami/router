@@ -4,30 +4,35 @@ const componentName: string = "staticPropsCache";
 const log = debug(`router:${componentName}`);
 
 /**
- * Get data in static props cache
+ * Cache used to store getStaticProps result
+ * @param cache
  */
-export const getDataFromCache = (key: string): any => {
-  const dataAlreadyExist = Object.keys(Routers.staticPropsCache).some((el) => el === key);
+export function staticPropsCache(cache = Routers.staticPropsCache) {
+  /**
+   * Get data in static props cache
+   */
+  const get = (key: string): any => {
+    const dataAlreadyExist = Object.keys(cache).some((el) => el === key);
 
-  if (!dataAlreadyExist) {
-    log(
-      `"${key}" key doesn't exist in 'Routers.staticPropsCache', we need to request the API.`,
-      Routers.staticPropsCache
-    );
-    return null;
-  }
-  const dataCache = Routers.staticPropsCache[key];
-  log(
-    "current page data is already in 'Routers.staticPropsCache', we use it.",
-    dataCache
-  );
-  return dataCache;
-};
+    if (!dataAlreadyExist) {
+      log(`"${key}" key doesn't exist in cache, we need to request the API.`, cache);
+      return null;
+    }
+    const dataCache = cache[key];
+    log("current page data is already in 'cache', we use it.", dataCache);
+    return dataCache;
+  };
 
-/**
- * Set Data in static props cache
- */
-export const setDataInCache = (key: string, data): void => {
-  Routers.staticPropsCache[key] = data;
-  log("Routers.staticPropsCache after set", Routers.staticPropsCache);
-};
+  /**
+   * Set Data in static props cache
+   */
+  const set = (key: string, data): void => {
+    cache[key] = data;
+    log("cache after set", cache);
+  };
+
+  return Object.freeze({
+    get,
+    set,
+  });
+}
