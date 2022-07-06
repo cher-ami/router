@@ -518,7 +518,7 @@ export function removeBaseToUrl(path: string, base: string): string {
 }
 
 /**
- *
+ * Check if we are in SRR context
  */
 export function isSSR() {
   return !(typeof window != "undefined" && window.document);
