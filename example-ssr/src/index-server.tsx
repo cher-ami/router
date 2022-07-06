@@ -1,22 +1,29 @@
+import "isomorphic-unfetch";
 import * as React from "react";
 import ReactDOMServer from "react-dom/server";
 import { routes } from "./routes";
 import { App } from "./components/App";
-import { Router, TRoute } from "../../src";
+import { LangService, Router, TRoute } from "../../src";
 import { getNotFoundRoute, getRouteFromUrl } from "../../src/core/matcher";
 import { formatRoutes } from "../../src/core/helpers";
 import { GlobalDataContext } from "./GlobalDataContext";
-import 'isomorphic-unfetch';
+import languages from "./languages";
 
 export async function render(url) {
   /**
    * 1. savoir quel composant je dois rendre dans mon router
    */
+  const langService = new LangService({
+    staticLocation: url,
+    languages,
+  });
+
   const matchingRoute = getRouteFromUrl({
     pUrl: url,
     pBase: "/",
-    pRoutes: formatRoutes(routes),
+    pRoutes: formatRoutes(routes, null, langService),
   });
+
   const notFoundRoute = getNotFoundRoute(routes);
   if (!matchingRoute && !notFoundRoute) {
     console.error("matchingRoute not found & 'notFoundRoute' not found, return.");
@@ -52,7 +59,12 @@ export async function render(url) {
    */
   return {
     renderToString: ReactDOMServer.renderToString(
-      <Router routes={routes} staticLocation={url} initialStaticProps={SSR_STATIC_PROPS}>
+      <Router
+        routes={routes}
+        staticLocation={url}
+        initialStaticProps={SSR_STATIC_PROPS}
+        langService={langService}
+      >
         {/* Provide Global data */}
         <GlobalDataContext.Provider value={{ globalData: GLOBAL_DATA }}>
           <App />

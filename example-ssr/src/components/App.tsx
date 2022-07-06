@@ -1,5 +1,5 @@
-import React from "react"
-import { Link, Stack } from "../../../src"
+import React from "react";
+import { Link, Stack } from "../../../src";
 
 export function App() {
   const crossedTransitions = ({
@@ -8,28 +8,30 @@ export function App() {
     unmountPreviousPage,
   }): Promise<void> => {
     return new Promise(async (resolve) => {
-      const $current = currentPage?.$element
-      if ($current) $current.style.visibility = "hidden"
+      const $current = currentPage?.$element;
+      if ($current) $current.style.visibility = "hidden";
       if (previousPage) {
-        previousPage.playOut()
+        previousPage.playOut();
       }
       if (currentPage) {
-        await currentPage.isReadyPromise()
-        if ($current) $current.style.visibility = "visible"
-        await currentPage.playIn()
-        unmountPreviousPage()
+        await currentPage.isReadyPromise();
+        if ($current) $current.style.visibility = "visible";
+        await currentPage.playIn();
+        unmountPreviousPage();
       }
-      resolve()
-    })
-  }
+      resolve();
+    });
+  };
 
   return (
     <div className={"App"}>
       <nav>
-        <Link to="/">Home</Link> | <Link to="/about">About</Link> |{" "} | <Link to="/article/my-article-1">Article 1</Link> |{" "}
-        <Link to="/contact">Contact</Link>
+        <Link to={{ name: "Home" }}>Home</Link> |{" "}
+        <Link to={{ name: "About" }}>About</Link> |{" "}
+        <Link to={{ name: "Article", params: { slug: "article-1" } }}>Article 1</Link> |{" "}
+        <Link to={{ name: "Contact" }}>Contact</Link>
       </nav>
-        <Stack manageTransitions={crossedTransitions} />
+      <Stack manageTransitions={crossedTransitions} />
     </div>
-  )
+  );
 }

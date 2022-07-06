@@ -144,7 +144,7 @@ export function getSubRouterRoutes(
  * openRoute push a route in history
  *  the Stack component will render the new route
  * @param args can be string or TOpenRouteParams object
- * @param availablesRoutes
+ * @param history
  */
 export function openRoute(args: string | TOpenRouteParams, history = Routers?.history) {
   const url = typeof args === "string" ? args : createUrl(args);
@@ -169,16 +169,25 @@ export function formatRoutes(
     console.error(id, "props.routes is missing or empty, return.");
     return;
   }
+
   // For each instances
   let routesList = patchMissingRootRoute(routes);
 
-  // Only for first instance
-  if (!Routers.routes) {
+  // subRouter instances shouldn't inquired middlewares and LangService
+  if (middlewares) {
     routesList = applyMiddlewares(routesList, middlewares);
-    if (langService) routesList = langService.addLangParamToRoutes(routesList);
-    Routers.routes = routesList;
   }
-  log(id, "routesList", routesList);
+  // Only for first instance
+  if (langService) {
+    routesList = langService.addLangParamToRoutes(routesList);
+  }
+
+  // Only first time register routes in Routers
+  // if (isFirstRouterInstance) {
+  //   Routers.routes = routesList;
+  // }
+
+  log(id, "formatRoutes > routesList", routesList);
   return routesList;
 }
 
@@ -506,4 +515,11 @@ export function addBaseToUrl(url: string, base = Routers.base): string {
 export function removeBaseToUrl(path: string, base: string): string {
   let baseStartIndex = path.indexOf(base);
   return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
+}
+
+/**
+ *
+ */
+export function isSSR() {
+  return !(typeof window != "undefined" && window.document);
 }
