@@ -5,6 +5,7 @@ import { App } from "./components/App";
 import { Router, Routers, TRoute } from "../../src";
 import { getNotFoundRoute, getRouteFromUrl } from "../../src/core/matcher";
 import { applyMiddlewares, formatRoutes } from "../../src/core/helpers";
+import './fetch-polyfill'
 
 export async function render(url) {
   // FIXME regrouper tout ce bordel
