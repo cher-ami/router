@@ -240,7 +240,7 @@ export async function requestStaticPropsFromRoute({
 /**
  * Compile an URL with path and params via path-to-regex
  * ex:
- *  compile("foo/:id")({id: example}) // "foo/example"
+ *  compile("foo/:id")({id: example-client}) // "foo/example-client"
  */
 export function compileUrl(path: string, params?: TParams): string {
   return compile(path)(params);

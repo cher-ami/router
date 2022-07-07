@@ -70,12 +70,12 @@ describe("matcher", () => {
     expect(getRoute.name).toBe(`BarPage`);
     expect(getRoute.props).toEqual({ params: { id: "my-id" }, color: "blue" });
 
-    // example 2
+    // example-client 2
     // prettier-ignore
     const getRoute3 = getRouteFromUrl({ pUrl: "/hello-2", pRoutes: routesList, pBase: "/" });
     expect(getRoute3.fullPath).toBe(`/hello-2`);
 
-    // example 3
+    // example-client 3
     const getRoute2 = getRouteFromUrl({ pUrl: "/end", pRoutes: routesList, pBase: "/" });
     expect(getRoute2.name).toBe(`EndPage`);
   });
@@ -108,7 +108,7 @@ describe("matcher", () => {
   });
 
   it("should get current route (matching route or notFound route)", () => {
-    // example returns right route
+    // example-client returns right route
     const route2 = getCurrentRoute({
       url: "/bar/test-id",
       base: "/",
@@ -117,7 +117,7 @@ describe("matcher", () => {
     });
     expect(route2.name).toBe("BarPage");
 
-    // example returns NotFound route
+    // example-client returns NotFound route
     const route3 = getCurrentRoute({
       url: "/barrrrrr/test-id",
       base: "/",

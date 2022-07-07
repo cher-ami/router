@@ -117,7 +117,7 @@ const FooPage = forwardRef((props, handleRef) => {
   const componentName = "FooPage";
   const rootRef = useRef(null);
 
-  // create custom page transitions (example with GSAP)
+  // create custom page transitions (example-client with GSAP)
   const playIn = () => {
     return new Promise((resolve) => {
       gsap.from(rootRef.current, { autoAlpha: 0, onComplete: resolve });
