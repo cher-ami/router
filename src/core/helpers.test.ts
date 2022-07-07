@@ -20,6 +20,11 @@ const routesList = [
       de: "/uber",
     },
     name: "aboutPage",
+    getStaticProps: async (props) => {
+      const res = await fetch("https://worldtimeapi.org/api/ip");
+      const time = await res.json();
+      return { time };
+    },
   },
   {
     path: "/hello",
@@ -106,6 +111,7 @@ describe("createUrl", () => {
 
 describe("getSubRouterBase", () => {});
 describe("getSubRouterRoutes", () => {});
+describe("getStaticPropsFromRoute", () => {});
 
 // ------------------------------------------------------------ UTILS
 

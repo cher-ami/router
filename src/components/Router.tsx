@@ -2,7 +2,7 @@ import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { formatRoutes, isSSR } from "../core/helpers";
+import { formatRoutes } from "../core/helpers";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
@@ -128,8 +128,8 @@ function Router(props: {
   const routes = React.useMemo(() => {
     const routesList = formatRoutes(
       props.routes,
-      props.middlewares,
       langService,
+      props.middlewares,
       props.id
     );
 

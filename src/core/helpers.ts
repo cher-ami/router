@@ -162,8 +162,8 @@ export function openRoute(args: string | TOpenRouteParams, history = Routers?.hi
  */
 export function formatRoutes(
   routes: TRoute[],
-  middlewares?: ((routes: TRoute[]) => TRoute[])[],
   langService?: LangService,
+  middlewares?: ((routes: TRoute[]) => TRoute[])[],
   id?: number | string
 ): TRoute[] {
   if (!routes) {
@@ -186,7 +186,7 @@ export function formatRoutes(
   return routesList;
 }
 
-export async function getStaticPropsFromRoute(currentRoute: TRoute): Promise<any> {
+export async function requestStaticPropsFromRoute(currentRoute: TRoute): Promise<any> {
   if (!currentRoute) {
     console.error("No currentRoute, return");
     return;
@@ -206,32 +206,7 @@ export async function getStaticPropsFromRoute(currentRoute: TRoute): Promise<any
   return SSR_STATIC_PROPS;
 }
 
-/**
- * Get current Route
- * @param url
- * @param routes
- * @param base
- * @param langService
- */
-export function getCurrentRoute(
-  url: string,
-  routes: TRoute[],
-  base: string,
-  langService?: LangService
-) {
-  const matchingRoute = getRouteFromUrl({
-    pUrl: url,
-    pBase: base,
-    pRoutes: formatRoutes(routes, null, langService),
-  });
 
-  const notFoundRoute = getNotFoundRoute(routes);
-  if (!matchingRoute && !notFoundRoute) {
-    console.error("matchingRoute not found & 'notFoundRoute' not found, return.");
-    return;
-  }
-  return matchingRoute || notFoundRoute;
-}
 
 // ----------------------------------------------------------------------------- URLS
 

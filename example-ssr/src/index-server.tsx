@@ -3,18 +3,25 @@ import * as React from "react";
 import ReactDOMServer from "react-dom/server";
 import { routes } from "./routes";
 import { App } from "./components/App";
-import { getCurrentRoute, getStaticPropsFromRoute, LangService, Router } from "../../src";
+import {
+  getCurrentRoute,
+  requestStaticPropsFromRoute,
+  LangService,
+  Router,
+} from "../../src";
 import { GlobalDataContext } from "./GlobalDataContext";
 import languages from "./languages";
+import { formatRoutes } from "../../src/core/helpers";
 
 export async function render(url: string) {
   // Prepare common
   const base = process.env.VITE_APP_BASE;
   const langService = new LangService({ staticLocation: url, languages });
+  const formattedRoutes =  formatRoutes(routes, langService, null)
 
-  // Request static PROPS
-  const SSR_STATIC_PROPS = await getStaticPropsFromRoute(
-    getCurrentRoute(url, routes, base, langService)
+  // Request static props
+  const SSR_STATIC_PROPS = await requestStaticPropsFromRoute(
+    getCurrentRoute({ url, base, routes: formattedRoutes })
   );
 
   // Request Global data example
