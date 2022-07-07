@@ -250,8 +250,6 @@ function Router(props: {
       return;
     }
 
-//        const newRoute: TRoute = matchingRoute || notFoundRoute;
-
     // if no newRoute, do not continue
     if (!newRoute) return;
 
