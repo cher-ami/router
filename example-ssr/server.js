@@ -48,7 +48,7 @@ async function createDevServer()
       // 4. render the app HTML. This assumes entry-server.js's exported `render`
       //    function calls appropriate framework SSR APIs,
       //    e.g. ReactDOMServer.renderToString()
-      const {renderToString, ssrStaticProps, globalData } = await render(url)
+      const { renderToString, ssrStaticProps, globalData } = await render(url)
 
       log({url, renderToString, ssrStaticProps, globalData})
 

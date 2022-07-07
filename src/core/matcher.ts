@@ -1,8 +1,7 @@
 import { compile, match } from "path-to-regexp";
-import { formatRoutes, joinPaths, removeLastCharFromString } from "./helpers";
+import { joinPaths, removeLastCharFromString } from "./helpers";
 import { TRoute } from "../components/Router";
 import debug from "@wbe/debug";
-import LangService from "./LangService";
 const log = debug(`router:matcher`);
 
 /**
@@ -120,25 +119,24 @@ export const getRouteFromUrl = ({
 export function getCurrentRoute({
   url,
   routes,
+  notFoundRoute,
   base,
 }: {
   url: string;
   routes: TRoute[];
+  notFoundRoute: TRoute;
   base: string;
 }): TRoute {
-
   const matchingRoute = getRouteFromUrl({
     pUrl: url,
     pBase: base,
     pRoutes: routes,
   });
 
-  const notFoundRoute = getNotFoundRoute(routes);
   if (!matchingRoute && !notFoundRoute) {
-    console.error("matchingRoute not found & 'notFoundRoute' not found, return.");
+    log("matchingRoute not found & 'notFoundRoute' not found, return.");
     return;
   }
-
 
   return matchingRoute || notFoundRoute;
 }

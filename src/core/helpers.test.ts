@@ -6,6 +6,7 @@ import {
   joinPaths,
   preventSlashes,
   removeLastCharFromString,
+  requestStaticPropsFromRoute,
 } from "./helpers";
 import { createUrl } from "./helpers";
 
@@ -20,15 +21,16 @@ const routesList = [
       de: "/uber",
     },
     name: "aboutPage",
-    getStaticProps: async (props) => {
-      const res = await fetch("https://worldtimeapi.org/api/ip");
-      const time = await res.json();
-      return { time };
-    },
   },
   {
     path: "/hello",
     name: "helloPage",
+    getStaticProps: async (props) =>
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve({ fetchData: {} });
+        }, 100);
+      }),
     children: [
       { path: "/bar", name: "barPage" },
       {
@@ -43,7 +45,12 @@ const routesList = [
             children: [
               { path: "/", name: "firstLevelRoute-2" },
               { path: "/yes", name: "yesPage" },
-              { path: "/no", name: "noPage" },
+              { path: "/no", name: "noPage", getStaticProps: async (props) =>
+                  new Promise((resolve) => {
+                    setTimeout(() => {
+                      resolve({ fetchData: {} });
+                    }, 100);
+                  }), },
             ],
           },
         ],
@@ -53,8 +60,10 @@ const routesList = [
   {
     path: "/end",
     name: "endPage",
-  }
+  },
 ];
+
+// ----------------------------------------------------------- TESTS
 
 describe("get path by route name", () => {
   it("should return the right path with name", () => {
@@ -68,7 +77,6 @@ describe("get path by route name", () => {
     expect(getPathByRouteName(routesList, "endPage")).toEqual("/end");
     // FIXME: this is not working
     // expect(getPathByRouteName(routesList, "zooPage")).toEqual("/hello/foo/zoo/:id?");
-
   });
 });
 
@@ -111,7 +119,19 @@ describe("createUrl", () => {
 
 describe("getSubRouterBase", () => {});
 describe("getSubRouterRoutes", () => {});
-describe("getStaticPropsFromRoute", () => {});
+
+describe("getStaticPropsFromRoute", () => {
+  it("should return promise result", async () => {
+    // Request static props
+    const ssrStaticProps = await requestStaticPropsFromRoute({
+      url: "/hello",
+      base: "/",
+      routes: routesList,
+    });
+    console.log("ssrStaticProps", ssrStaticProps);
+    expect(ssrStaticProps).toEqual({ props: { fetchData: {} }, name: "helloPage" });
+  });
+});
 
 // ------------------------------------------------------------ UTILS
 
