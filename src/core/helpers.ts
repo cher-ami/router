@@ -3,6 +3,7 @@ import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { TRoute } from "../components/Router";
 import LangService from "./LangService";
+import { getNotFoundRoute, getRouteFromUrl } from "./matcher";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -183,6 +184,53 @@ export function formatRoutes(
   }
 
   return routesList;
+}
+
+export async function getStaticPropsFromRoute(currentRoute: TRoute): Promise<any> {
+  if (!currentRoute) {
+    console.error("No currentRoute, return");
+    return;
+  }
+  const SSR_STATIC_PROPS = {
+    props: null,
+    name: currentRoute.name,
+  };
+
+  if (currentRoute?.getStaticProps) {
+    try {
+      SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(currentRoute.props);
+    } catch (e) {
+      console.error("fetch getStatic Props data error");
+    }
+  }
+  return SSR_STATIC_PROPS;
+}
+
+/**
+ * Get current Route
+ * @param url
+ * @param routes
+ * @param base
+ * @param langService
+ */
+export function getCurrentRoute(
+  url: string,
+  routes: TRoute[],
+  base: string,
+  langService?: LangService
+) {
+  const matchingRoute = getRouteFromUrl({
+    pUrl: url,
+    pBase: base,
+    pRoutes: formatRoutes(routes, null, langService),
+  });
+
+  const notFoundRoute = getNotFoundRoute(routes);
+  if (!matchingRoute && !notFoundRoute) {
+    console.error("matchingRoute not found & 'notFoundRoute' not found, return.");
+    return;
+  }
+  return matchingRoute || notFoundRoute;
 }
 
 // ----------------------------------------------------------------------------- URLS
@@ -510,6 +558,8 @@ export function removeBaseToUrl(path: string, base: string): string {
   let baseStartIndex = path.indexOf(base);
   return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
 }
+
+// ----------------------------------------------------------------------------- ENV
 
 /**
  * Check if we are in SRR context

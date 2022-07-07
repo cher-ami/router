@@ -8,6 +8,8 @@ export {
   getSubRouterBase,
   getSubRouterRoutes,
   getPathByRouteName,
+  getStaticPropsFromRoute,
+  getCurrentRoute
 } from "./core/helpers";
 export type { TOpenRouteParams } from "./core/helpers";
 
