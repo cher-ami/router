@@ -1,11 +1,11 @@
 import { TRoute } from "../components/Router";
-import { preventSlashes } from "./helpers";
-import { getRouteFromUrl } from "./matcher";
+import { formatRoutes, preventSlashes } from "./helpers";
+import { getCurrentRoute, getNotFoundRoute, getRouteFromUrl } from "./matcher";
 
-// prettier-ignore
 const routesList: TRoute[] = [
-  { 
-    path: "/", name: "HomePage" ,
+  {
+    path: "/",
+    name: "HomePage",
     children: [
       {
         path: "/hello",
@@ -14,24 +14,35 @@ const routesList: TRoute[] = [
       {
         path: "/hello-2",
         name: "Hello2Page",
-      }
-    ]
-},
-  { path: "/bar/:id", name: "BarPage", props: { color: "blue" } },
+        getStaticProps: async (props) => {
+          const res = await fetch("https://worldtimeapi.org/api/ip");
+          const time = await res.json();
+          return { time };
+        },
+      },
+    ],
+  },
+  {
+    path: "/bar/:id",
+    name: "BarPage",
+    props: {
+      color: "blue",
+    },
+  },
   {
     path: "/about",
     children: [
       {
         path: "/route2",
+        name: "Route2Page",
         children: [
           {
             path: "/:testParam?",
             children: [
               {
-                 path: "/foo4" ,
-                 props: { color: "red" },
-
-              }
+                path: "/foo4",
+                props: { color: "red" },
+              },
             ],
           },
         ],
@@ -39,10 +50,11 @@ const routesList: TRoute[] = [
     ],
   },
   { path: "/end", name: "EndPage" },
+  { path: "/:rest", name: "NotFoundPage" },
 ];
 const base = "/custom/base";
 
-describe("Get route from URL", () => {
+describe("matcher", () => {
   it("should get right route from URL", () => {
     // exemple 1
     const getRoute = getRouteFromUrl({
@@ -93,5 +105,26 @@ describe("Get route from URL", () => {
       pBase: base,
     });
     expect(getRoute).toBeUndefined();
+  });
+
+  it("should get current route (matching route or notFound route)", () => {
+    // example returns right route
+    const route2 = getCurrentRoute({
+      url: "/bar/test-id",
+      base: "/",
+      routes: formatRoutes(routesList),
+      notFoundRoute: getNotFoundRoute(routesList),
+    });
+    expect(route2.name).toBe("BarPage");
+
+    // example returns NotFound route
+    const route3 = getCurrentRoute({
+      url: "/barrrrrr/test-id",
+      base: "/",
+      routes: formatRoutes(routesList),
+      notFoundRoute: getNotFoundRoute(routesList),
+    });
+
+    expect(route3.name).toBe("NotFoundPage");
   });
 });

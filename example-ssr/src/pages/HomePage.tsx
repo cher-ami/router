@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from "react";
+import React, { useState, useRef, useContext } from "react";
 import { useStack } from "../../../src";
 import { transitionsHelper } from "../helpers/transitionsHelper";
 import { GlobalDataContext } from "../GlobalDataContext";
@@ -19,14 +19,15 @@ function HomePage(props, handleRef) {
 
   return (
     <div className={componentName} ref={rootRef}>
-      HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME
-      HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME
-      HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME
-      HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME HOME
+      {componentName}
+      <br />
       <br />
       <button onClick={() => setN(n + 1)}>+ {n}</button>
+      <br />
+      <br />
+      <p>"globalData" request result:</p>
       {globalData.users.map((user, i) => (
-        <p key={i}>{user.name}</p>
+        <div key={i}>{user.name}</div>
       ))}
     </div>
   );

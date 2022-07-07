@@ -3,6 +3,7 @@ import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { TRoute } from "../components/Router";
 import LangService from "./LangService";
+import { getCurrentRoute, getNotFoundRoute } from "./matcher";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -155,14 +156,11 @@ export function openRoute(args: string | TOpenRouteParams, history = Routers?.hi
  * Format and return routes list
  * If is the first Router instance, register routes in 'Routers' store.
  * In other case, return current props.routes
- *
- *  const { routes } = useRouter();
- *  return current Router instance routes list, not all routes given to the first instance.
  */
 export function formatRoutes(
   routes: TRoute[],
-  middlewares?: ((routes: TRoute[]) => TRoute[])[],
   langService?: LangService,
+  middlewares?: ((routes: TRoute[]) => TRoute[])[],
   id?: number | string
 ): TRoute[] {
   if (!routes) {
@@ -183,6 +181,58 @@ export function formatRoutes(
   }
 
   return routesList;
+}
+
+/**
+ * Request static props route
+ * - find current route by URL
+ * - await the promise from getStaticProps of current route
+ * - return result
+ */
+export async function requestStaticPropsFromRoute({
+  url,
+  base,
+  routes,
+  langService,
+  middlewares,
+  id,
+}: {
+  url: string;
+  base: string;
+  routes: TRoute[];
+  langService?: LangService;
+  middlewares?: ((routes: TRoute[]) => TRoute[])[];
+  id?: string | number;
+}): Promise<{ props: any; name: string }> {
+  // get current route
+  const currentRoute = getCurrentRoute({
+    url,
+    base,
+    routes: formatRoutes(routes, langService, middlewares, id),
+    notFoundRoute: getNotFoundRoute(routes),
+  });
+
+  // get out
+  if (!currentRoute) {
+    console.error("No currentRoute, return");
+    return;
+  }
+
+  // prepare returned obj
+  const SSR_STATIC_PROPS = {
+    props: null,
+    name: currentRoute.name,
+  };
+
+  // await promise from getStaticProps
+  if (currentRoute?.getStaticProps) {
+    try {
+      SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(currentRoute.props);
+    } catch (e) {
+      console.error("fetch getStatic Props data error");
+    }
+  }
+  return SSR_STATIC_PROPS;
 }
 
 // ----------------------------------------------------------------------------- URLS
@@ -510,6 +560,8 @@ export function removeBaseToUrl(path: string, base: string): string {
   let baseStartIndex = path.indexOf(base);
   return baseStartIndex == 0 ? path.substr(base.length, path.length) : path;
 }
+
+// ----------------------------------------------------------------------------- ENV
 
 /**
  * Check if we are in SRR context

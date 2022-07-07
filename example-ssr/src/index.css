@@ -8,9 +8,7 @@ body {
 button {
   background-color: transparent;
   cursor: pointer;
-
   color: white;
-  border: 1px solid white;
 }
 
 nav {
@@ -26,6 +24,6 @@ a:hover {
   color: white;
 }
 
-.Stack > * { 
+.Stack > * {
   position: absolute;
 }

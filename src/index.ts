@@ -8,7 +8,9 @@ export {
   getSubRouterBase,
   getSubRouterRoutes,
   getPathByRouteName,
+  requestStaticPropsFromRoute,
 } from "./core/helpers";
+export { getCurrentRoute } from "./core/matcher";
 export type { TOpenRouteParams } from "./core/helpers";
 
 export { Stack } from "./components/Stack";

@@ -3,75 +3,49 @@ import * as React from "react";
 import ReactDOMServer from "react-dom/server";
 import { routes } from "./routes";
 import { App } from "./components/App";
-import { LangService, Router, TRoute } from "../../src";
-import { getNotFoundRoute, getRouteFromUrl } from "../../src/core/matcher";
-import { formatRoutes } from "../../src/core/helpers";
+import { requestStaticPropsFromRoute, LangService, Router } from "../../src";
 import { GlobalDataContext } from "./GlobalDataContext";
 import languages from "./languages";
 
-export async function render(url) {
-  /**
-   * 1. savoir quel composant je dois rendre dans mon router
-   */
-  const langService = new LangService({
-    staticLocation: url,
-    languages,
+export async function render(url: string) {
+  // Prepare common
+  const base = process.env.VITE_APP_BASE;
+  const langService = new LangService({ staticLocation: url, languages });
+
+  // Request static props
+  const ssrStaticProps = await requestStaticPropsFromRoute({
+    url,
+    base,
+    routes,
+    langService,
   });
 
-  const matchingRoute = getRouteFromUrl({
-    pUrl: url,
-    pBase: "/",
-    pRoutes: formatRoutes(routes, null, langService),
-  });
-
-  const notFoundRoute = getNotFoundRoute(routes);
-  if (!matchingRoute && !notFoundRoute) {
-    console.error("matchingRoute not found & 'notFoundRoute' not found, return.");
-    return;
-  }
-  const route: TRoute = matchingRoute || notFoundRoute;
-  /**
-   * 2. executer cette action async
-   */
-  let SSR_STATIC_PROPS = {
-    props: null,
-    name: route.name,
-  };
-
-  if (route?.getStaticProps) {
-    try {
-      SSR_STATIC_PROPS.props = await route.getStaticProps(route.props);
-    } catch (e) {
-      console.error("fetch action data error");
-    }
-  }
-
-  // Get Global data
-  const requestGlobal = async () => {
+  // Request Global data example
+  const requestGlobalData = async () => {
     const res = await fetch("https://jsonplaceholder.typicode.com/users");
     const users = await res.json();
     return { users };
   };
-  const GLOBAL_DATA = await requestGlobal();
+  let globalData = await requestGlobalData();
 
-  /**
-   * 3. Retourner la réponse (dans le template)
-   */
+  // Template for server
+  const renderToString = ReactDOMServer.renderToString(
+    <Router
+      base={base}
+      routes={routes}
+      staticLocation={url}
+      initialStaticProps={ssrStaticProps}
+      langService={langService}
+    >
+      <GlobalDataContext.Provider value={{ globalData }}>
+        <App />
+      </GlobalDataContext.Provider>
+    </Router>
+  );
+
   return {
-    renderToString: ReactDOMServer.renderToString(
-      <Router
-        routes={routes}
-        staticLocation={url}
-        initialStaticProps={SSR_STATIC_PROPS}
-        langService={langService}
-      >
-        {/* Provide Global data */}
-        <GlobalDataContext.Provider value={{ globalData: GLOBAL_DATA }}>
-          <App />
-        </GlobalDataContext.Provider>
-      </Router>
-    ),
-    ssrStaticProps: SSR_STATIC_PROPS,
-    globalData: GLOBAL_DATA,
+    renderToString,
+    ssrStaticProps,
+    globalData,
   };
 }

@@ -1,7 +1,10 @@
 import React from "react";
-import { Link, Stack } from "../../../src";
+import { Link, Stack, useLang } from "../../../src";
+import languages from "../languages";
 
 export function App() {
+  const [lang, setLang] = useLang();
+
   const crossedTransitions = ({
     previousPage,
     currentPage,
@@ -25,6 +28,17 @@ export function App() {
 
   return (
     <div className={"App"}>
+      {languages.map((el, i) => (
+        <button
+          key={i}
+          children={el.key}
+          onClick={() => {
+            setLang(el, true);
+          }}
+        />
+      ))}
+      <br/>
+      <br/>
       <nav>
         <Link to={{ name: "Home" }}>Home</Link> |{" "}
         <Link to={{ name: "About" }}>About</Link> |{" "}
