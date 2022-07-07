@@ -3,7 +3,7 @@ import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
 import { formatRoutes } from "../core/helpers";
-import { getCurrentRoute, getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
+import { getCurrentRoute, getNotFoundRoute } from "../core/matcher";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
 import { staticPropsCache } from "../core/staticPropsCache";
