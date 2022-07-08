@@ -1,9 +1,8 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./",
-    "module": "commonjs",
-    "target": "ES5",
+
+    "module": "esnext",
+    "target": "esnext",
     "lib": ["es2015.promise", "es6", "dom", "esnext"],
     "jsx": "react",
     "moduleResolution": "node",
