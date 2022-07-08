@@ -128,7 +128,6 @@ describe("getStaticPropsFromRoute", () => {
       base: "/",
       routes: routesList,
     });
-    console.log("ssrStaticProps", ssrStaticProps);
     expect(ssrStaticProps).toEqual({ props: { fetchData: {} }, name: "helloPage" });
   });
 });

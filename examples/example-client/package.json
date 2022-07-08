@@ -1,0 +1,21 @@
+{
+  "name": "example-client",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@cher-ami/router": "^3.0.0-beta.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
+    "@vitejs/plugin-react": "^1.3.2",
+    "gsap": "^3.10.4",
+    "typescript": "^4.7.4",
+    "vite": "^2.9.13"
+  }
+}
