@@ -1,6 +1,6 @@
 import { TRoute } from "../components/Router";
 import { formatRoutes, preventSlashes } from "./helpers";
-import { getCurrentRoute, getNotFoundRoute, getRouteFromUrl } from "./matcher";
+import { getNotFoundRoute, getRouteFromUrl } from "./matcher";
 
 const routesList: TRoute[] = [
   {
@@ -105,26 +105,5 @@ describe("matcher", () => {
       pBase: base,
     });
     expect(getRoute).toBeUndefined();
-  });
-
-  it("should get current route (matching route or notFound route)", () => {
-    // example-client returns right route
-    const route2 = getCurrentRoute({
-      url: "/bar/test-id",
-      base: "/",
-      routes: formatRoutes(routesList),
-      notFoundRoute: getNotFoundRoute(routesList),
-    });
-    expect(route2.name).toBe("BarPage");
-
-    // example-client returns NotFound route
-    const route3 = getCurrentRoute({
-      url: "/barrrrrr/test-id",
-      base: "/",
-      routes: formatRoutes(routesList),
-      notFoundRoute: getNotFoundRoute(routesList),
-    });
-
-    expect(route3.name).toBe("NotFoundPage");
   });
 });

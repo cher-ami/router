@@ -27,13 +27,13 @@ type TGetRouteFromUrl = {
  * Get current route from URL, using path-to-regex
  * @doc https://github.com/pillarjs/path-to-regexp
  */
-export const getRouteFromUrl = ({
+export function getRouteFromUrl({
   pUrl,
   pRoutes,
   pBase,
   pMatcher,
   id,
-}: TGetRouteFromUrl): TRoute => {
+}: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return;
 
   // keep first level current route.
@@ -106,37 +106,4 @@ export const getRouteFromUrl = ({
   }
 
   return next({ pUrl, pRoutes, pBase, pMatcher, id });
-};
-
-/**
- * Get current Route
- * Will get route from URL and return notFound if exist
- * @param url
- * @param routes
- * @param base
- * @param langService
- */
-export function getCurrentRoute({
-  url,
-  routes,
-  notFoundRoute,
-  base,
-}: {
-  url: string;
-  routes: TRoute[];
-  notFoundRoute: TRoute;
-  base: string;
-}): TRoute {
-  const matchingRoute = getRouteFromUrl({
-    pUrl: url,
-    pBase: base,
-    pRoutes: routes,
-  });
-
-  if (!matchingRoute && !notFoundRoute) {
-    log("matchingRoute not found & 'notFoundRoute' not found, return.");
-    return;
-  }
-
-  return matchingRoute || notFoundRoute;
 }
