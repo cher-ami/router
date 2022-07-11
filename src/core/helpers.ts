@@ -3,7 +3,7 @@ import debug from "@wbe/debug";
 import { compile } from "path-to-regexp";
 import { TRoute } from "../components/Router";
 import LangService from "./LangService";
-import { getCurrentRoute, getNotFoundRoute } from "./matcher";
+import { getNotFoundRoute, getRouteFromUrl } from "./matcher";
 
 const componentName: string = "helpers";
 const log = debug(`router:${componentName}`);
@@ -204,13 +204,20 @@ export async function requestStaticPropsFromRoute({
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   id?: string | number;
 }): Promise<{ props: any; name: string }> {
-  // get current route
-  const currentRoute = getCurrentRoute({
-    url,
-    base,
-    routes: formatRoutes(routes, langService, middlewares, id),
-    notFoundRoute: getNotFoundRoute(routes),
+
+  const currentRoute = getRouteFromUrl({
+    pUrl: url,
+    pBase: base,
+    pRoutes: formatRoutes(routes, langService, middlewares, id),
+    id,
   });
+
+  const notFoundRoute = getNotFoundRoute(routes);
+
+  if (!currentRoute && !notFoundRoute) {
+    log(id, "currentRoute not found & 'notFoundRoute' not found, return.");
+    return;
+  }
 
   // get out
   if (!currentRoute) {

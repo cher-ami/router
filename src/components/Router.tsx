@@ -3,7 +3,7 @@ import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
 import { formatRoutes } from "../core/helpers";
-import { getCurrentRoute, getNotFoundRoute } from "../core/matcher";
+import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
 import { staticPropsCache } from "../core/staticPropsCache";
@@ -237,18 +237,26 @@ function Router(props: {
       return;
     }
 
-    const newRoute = getCurrentRoute({
-      url: exactUrl,
-      base: props.base,
-      routes: routes,
-      notFoundRoute: getNotFoundRoute(props.routes),
+    const matchingRoute = getRouteFromUrl({
+      pUrl: exactUrl,
+      pRoutes: routes,
+      pBase: props.base,
+      id: props.id,
     });
 
+    const notFoundRoute = getNotFoundRoute(props.routes);
+    if (!matchingRoute && !notFoundRoute) {
+      log(props.id, "matchingRoute not found & 'notFoundRoute' not found, return.");
+      return;
+    }
+
     const currentRouteUrl = currentRouteRef.current?.url;
-    if (currentRouteUrl != null && currentRouteUrl === newRoute?.url) {
+    if (currentRouteUrl != null && currentRouteUrl === matchingRoute?.url) {
       log(props.id, "this is the same route 'url', return.");
       return;
     }
+
+    const newRoute: TRoute = matchingRoute || notFoundRoute;
 
     // if no newRoute, do not continue
     if (!newRoute) return;
