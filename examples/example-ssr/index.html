@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>SSR</title>
+    <meta http-equiv="imagetoolbar" content="no" />
+    <meta http-equiv="x-ua-compatible" content="IE=Edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+
+  <body>
+    <div id="root"><!--app-html--></div>
+    <script type="module" src="/src/index.tsx"></script>
+    <script type="text/javascript">
+      window.__SSR_STATIC_PROPS__ = "<!--ssr-static-props-->";
+      window.__GLOBAL_DATA__ = "<!--ssr-global-data-->"
+    </script>
+  </body>
+</html>

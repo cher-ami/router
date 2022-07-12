@@ -1,13 +1,8 @@
-import { Routers } from "../core/Routers";
-import {
-  compileUrl,
-  createUrl,
-  joinPaths,
-  removeLastCharFromString,
-} from "../core/helpers";
-import debug from "@wbe/debug";
+import { Routers } from "./Routers";
+import { compileUrl, createUrl } from "./core";
+import { isSSR, joinPaths, removeLastCharFromString } from "./helpers";
 import { TRoute } from "../components/Router";
-import { getLangPathByLang } from "../core/helpers";
+import debug from "@wbe/debug";
 
 const log = debug(`router:LangService`);
 
@@ -49,19 +44,27 @@ class LangService<TLang = any> {
   public base: string;
 
   /**
+   * Static Location used for SSR context
+   */
+  public staticLocation: string;
+
+  /**
    * Init languages service
    * @param languages
    * @param showDefaultLangInUrl
    * @param base
+   * @param staticLocation
    */
   public constructor({
     languages,
     showDefaultLangInUrl = true,
     base = "/",
+    staticLocation,
   }: {
     languages: TLanguage<TLang>[];
     showDefaultLangInUrl?: boolean;
     base?: string;
+    staticLocation?: string;
   }) {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.");
@@ -69,6 +72,7 @@ class LangService<TLang = any> {
     this.languages = languages;
     // remove extract / at the end, if exist
     this.base = removeLastCharFromString(base, "/", true);
+    this.staticLocation = staticLocation;
     this.defaultLang = this.getDefaultLang(languages);
     this.currentLang = this.getLangFromUrl() || this.defaultLang;
     this.showDefaultLangInUrl = showDefaultLangInUrl;
@@ -232,7 +236,12 @@ class LangService<TLang = any> {
     routes: TRoute[],
     showLangInUrl = this.showLangInUrl()
   ): TRoute[] {
-    if (!this.isInit) return routes;
+    if (routes?.some((el) => !!el.langPath)) {
+      log(
+        "Routes have already been formatted by 'addLangParamToRoutes()', return routes."
+      );
+      return routes;
+    }
 
     /**
      * Add :lang param on path
@@ -262,7 +271,7 @@ class LangService<TLang = any> {
      */
     const patchRoutes = (pRoutes, children = false) => {
       return pRoutes.map((route: TRoute) => {
-        const path = getLangPathByLang(route);
+        const path = this.getLangPathByLang(route);
         const hasChildren = route.children?.length > 0;
         const showLang = !children && showLangInUrl;
 
@@ -296,6 +305,31 @@ class LangService<TLang = any> {
   // --------------------------------------------------------------------------- LOCAL
 
   /**
+   * Get current lang path by Lang
+   * ex:
+   * const route = {
+   *     component: ...,
+   *     path: { en: "/about", fr: "/a-propos", de: "uber", name: "about" },
+   * }
+   *
+   * selectLangPathByLang(route, "fr") // will return  "/a-propos"
+   *
+   * @param route
+   * @param lang
+   */
+  protected getLangPathByLang(route: TRoute, lang = this.currentLang.key): string {
+    let selectedPath: string;
+    if (typeof route.path === "string") {
+      selectedPath = route.path;
+    } else if (typeof route.path === "object") {
+      Object.keys(route.path).find((el) => {
+        if (el === lang) selectedPath = route.path?.[el];
+      });
+    }
+    return selectedPath;
+  }
+
+  /**
    * Returns default language of the list
    * If no default language exist, it returns the first language object of the languages array
    * @param languages
@@ -308,7 +342,9 @@ class LangService<TLang = any> {
    * Get current language from URL
    * @param pathname
    */
-  protected getLangFromUrl(pathname = window.location.pathname): TLanguage<TLang> {
+  protected getLangFromUrl(
+    pathname = this.staticLocation ?? window.location.pathname
+  ): TLanguage<TLang> {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
 
@@ -335,6 +371,7 @@ class LangService<TLang = any> {
    * @protected
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
+    if (isSSR()) return;
     forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl);
   }
 }

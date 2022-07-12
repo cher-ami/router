@@ -2,29 +2,34 @@ import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React from "react";
-import { applyMiddlewares, patchMissingRootRoute } from "../core/helpers";
-import { getNotFoundRoute, getRouteFromUrl } from "../core/matcher";
+import { formatRoutes } from "../core/core";
+import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
+import { staticPropsCache } from "../core/staticPropsCache";
 
 // -------------------------------------------------------------------------------- TYPES
 
-export type TRoute = {
-  path: string | { [x: string]: string };
-  component?: React.ComponentType<any>;
-  base?: string;
-  name?: string;
-  parser?: Match;
-  props?: {
-    params?: { [x: string]: any };
-    [x: string]: any;
-  };
-  children?: TRoute[];
-  url?: string;
-  fullUrl?: string; // full URL who not depend of current instance
-  fullPath?: string; // full Path /base/:lang/foo/second-foo
-  langPath?: { [x: string]: string } | null;
+export type TRouteProps = {
+  params?: { [x: string]: any };
+  [x: string]: any;
 };
+
+export type TRoute = Partial<{
+  path: string | { [x: string]: string };
+  component: React.ComponentType<any>;
+  base: string;
+  name: string;
+  parser: Match;
+  props: TRouteProps;
+  children: TRoute[];
+  url: string;
+  fullUrl: string; // full URL who not depend of current instance
+  fullPath: string; // full Path /base/:lang/foo/second-foo
+  langPath: { [x: string]: string } | null;
+  action?: () => any;
+  getStaticProps?: (props: TRouteProps) => Promise<any>;
+}>;
 
 export interface IRouterContextStackStates {
   unmountPreviousPage?: () => void;
@@ -101,6 +106,7 @@ function Router(props: {
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   langService?: LangService;
   id?: number | string;
+  initialStaticProps?: { props: any; name: string };
 }): JSX.Element {
   /**
    * 0. LangService
@@ -120,22 +126,17 @@ function Router(props: {
    *  return current Router instance routes list, not all routes given to the first instance.
    */
   const routes = React.useMemo(() => {
-    if (!props.routes) {
-      console.error(props.id, "props.routes is missing or empty, return.", props);
-      return;
-    }
-    // For each instances
-    let routesList = patchMissingRootRoute(props.routes);
+    const routesList = formatRoutes(
+      props.routes,
+      langService,
+      props.middlewares,
+      props.id
+    );
 
-    // Only for first instance
-    if (!Routers.routes) {
-      routesList = applyMiddlewares(routesList, props.middlewares);
-      if (langService) routesList = langService.addLangParamToRoutes(routesList);
-      Routers.routes = routesList;
-    }
-    log(props.id, "routesList", routesList);
+    // if is first instance, register result in Routers
+    if (!Routers.routes) Routers.routes = routesList;
     return routesList;
-  }, [props.routes, langService]);
+  }, [props.routes, langService, props.middlewares, props.id]);
 
   /**
    * 2. base
@@ -223,7 +224,7 @@ function Router(props: {
    * Dispatch new routes via RouterContext
    */
 
-  const handleHistory = (url: string = "", hash: string = ""): void => {
+  const handleHistory = async (url: string = "", hash: string = ""): Promise<void> => {
     // because we can get #" in hash history context, we need define current URL
     // as the URL part after the "#"
     let exactUrl: string = url;
@@ -256,13 +257,54 @@ function Router(props: {
     }
 
     const newRoute: TRoute = matchingRoute || notFoundRoute;
-    if (newRoute) {
-      // Final process: update context currentRoute from dispatch method \o/ !
-      dispatch({ type: "update-current-route", value: newRoute });
-      // & register this new route as currentRoute in local and in Routers store
-      currentRouteRef.current = newRoute;
-      Routers.currentRoute = newRoute;
+
+    // if no newRoute, do not continue
+    if (!newRoute) return;
+
+    if (props.initialStaticProps) {
+      const cache = staticPropsCache();
+
+      // check if new route data as been store in cache
+      const dataFromCache = cache.get(newRoute.fullUrl);
+
+      // first route visited (server & client)
+      const isFirstRouteVisited = newRoute.name === props.initialStaticProps.name;
+
+      // In SSR context, we have to manage getStaticProps route properties from server and client
+      if (isFirstRouteVisited) {
+        if (newRoute.props) {
+          Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
+        }
+        if (!dataFromCache) {
+          cache.set(newRoute.fullUrl, props.initialStaticProps?.props ?? {});
+        }
+      }
+      // if NOT first route (client)
+      else {
+        // if cache exist for this route, assign it
+        if (dataFromCache) {
+          Object.assign(newRoute.props, dataFromCache);
+        }
+        // Continue only if getStaticProps is not undefined
+        else if (newRoute.getStaticProps) {
+          try {
+            const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
+            Object.assign(newRoute.props, requestStaticProps);
+            cache.set(newRoute.fullUrl, requestStaticProps);
+          } catch (e) {
+            console.error("requestStaticProps failed");
+          }
+        }
+      }
     }
+
+    // Final process: update context currentRoute from dispatch method \o/ !
+    dispatch({ type: "update-current-route", value: newRoute });
+
+    // & register this new route as currentRoute in local and in Routers store
+    currentRouteRef.current = newRoute;
+    Routers.currentRoute = newRoute;
+    Routers.isFirstRoute = false;
   };
 
   /**

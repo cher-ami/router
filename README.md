@@ -35,7 +35,7 @@ and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 - [Manage Transitions](#ManageTransitions)
   - [Default sequential transitions](#DefaultSequentialTransitions)
   - [Custom transitions](#CustomTransitions)
-- [SSR support](#SSRSupport)  
+- [SSR support](#SSRSupport)
 - [Debug](#Debug)
 - [Example](#Example)
 
@@ -117,7 +117,7 @@ const FooPage = forwardRef((props, handleRef) => {
   const componentName = "FooPage";
   const rootRef = useRef(null);
 
-  // create custom page transitions (example with GSAP)
+  // create custom page transitions (example-client with GSAP)
   const playIn = () => {
     return new Promise((resolve) => {
       gsap.from(rootRef.current, { autoAlpha: 0, onComplete: resolve });
@@ -349,14 +349,44 @@ This router is compatible with SSR due to using `staticLocation` props instead o
 In this case, the router will match only with `staticLocation` props value and render the appropiate route without invoking the browser history. (Because `window` is not available on the server).
 
 ```jsx
-    <Router 
-      routes={routesList} 
-      staticLocation={"/foo"}
-      // history={createBrowserHistory()}  
-      >
-      // ...
-    </Router>
+<Router
+  routes={routesList}
+  staticLocation={"/foo"}
+  // history={createBrowserHistory()}
+>
+  // ...
+</Router>
 ```
+
+In order to use this router on server side, we need to be able to request API on the server side too.
+In this case, request will be print as javascript window object on the renderToString html server response.
+The client will got this response.
+
+To be able to request on server side (and on client side too), `getStaticProps` route property is available:
+
+```jsx
+   {
+    path: "/article/:slug",
+    component: ArticlePage,
+    name: "Article",
+    getStaticProps: async (props) => {
+      // props contains route props and params (ex: slug: "article-1")
+      const res = await fetch(`https://api.com/posts/${props.params.slug}`);
+      const api = await res.json();
+      return { api };
+    },
+  },
+```
+
+Then, get the response data populated in page component props:
+
+```tsx
+function HomePage({ api }) {
+  return <div>{api.title}</div>;
+}
+```
+
+For larger example, check the [example-ssr folder](./examples/example-ssr/).
 
 ## <a name="Example"></a>Example
 
@@ -399,9 +429,9 @@ Router component creates a new router instance.
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
   the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
-- **staticLocation** `string` _(optional)_  use static URL location matching instead of history
-- **middlewares** `[]`  _(optional)_ add routes middleware function to patch each routes)
-- **id** `?number | string`  _(optional)_ id of the router instance - default : `1`
+- **staticLocation** `string` _(optional)_ use static URL location matching instead of history
+- **middlewares** `[]` _(optional)_ add routes middleware function to patch each routes)
+- **id** `?number | string` _(optional)_ id of the router instance - default : `1`
 
 ### <a name="Link"></a>Link
 

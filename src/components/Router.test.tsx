@@ -4,12 +4,12 @@ import { render } from "@testing-library/react";
 import { TRoute } from "./Router";
 import { createBrowserHistory } from "history";
 
-
 describe("Router", () => {
   const routesList: TRoute[] = [
     {
       path: "/",
       component: null,
+      name: "Home",
     },
   ];
 

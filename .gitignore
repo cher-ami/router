@@ -5,6 +5,5 @@ node_modules
 tsconfig.tsbuildinfo
 .cache
 dist
-example/dist
+example-client/dist
 .parcel-cache
-example-node

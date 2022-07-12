@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "lib": ["es6", "dom", "esnext"],
+    "jsx": "react",
+    "moduleResolution": "node",
+    "types": ["node", "jest"],
+    "declaration": true,
+    "isolatedModules": false,
+    "noImplicitAny": false,
+    "esModuleInterop": true,
+    "preserveConstEnums": true,
+    "strictNullChecks": false
+  },
+  "include": ["./"],
+  "exclude": ["node_modules", "dist", "test"]
+}
