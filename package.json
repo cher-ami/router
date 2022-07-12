@@ -24,8 +24,8 @@
   },
   "scripts": {
     "clean": "rm -rf dist",
-  "watch": "microbundle watch --no-sourcemap --format esm --jsx React.createElement",
     "build": "npm run clean && microbundle --jsx React.createElement",
+    "build:watch": "microbundle watch --no-sourcemap --format esm --jsx React.createElement",
     "example-client:dev": "pnpm --filter ./examples/example-client run dev",
     "example-client:build": "pnpm --filter ./examples/example-client run build",
     "example-ssr:dev": "pnpm --filter ./examples/example-ssr run dev",
