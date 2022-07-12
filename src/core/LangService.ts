@@ -4,9 +4,8 @@ import {
   createUrl,
   joinPaths,
   removeLastCharFromString,
-  getLangPathByLang,
   isSSR,
-} from "./helpers";
+} from "./core";
 import { TRoute } from "../components/Router";
 import debug from "@wbe/debug";
 
@@ -277,7 +276,7 @@ class LangService<TLang = any> {
      */
     const patchRoutes = (pRoutes, children = false) => {
       return pRoutes.map((route: TRoute) => {
-        const path = getLangPathByLang(route);
+        const path = this.getLangPathByLang(route);
         const hasChildren = route.children?.length > 0;
         const showLang = !children && showLangInUrl;
 
@@ -309,6 +308,31 @@ class LangService<TLang = any> {
   }
 
   // --------------------------------------------------------------------------- LOCAL
+
+  /**
+   * Get current lang path by Lang
+   * ex:
+   * const route = {
+   *     component: ...,
+   *     path: { en: "/about", fr: "/a-propos", de: "uber", name: "about" },
+   * }
+   *
+   * selectLangPathByLang(route, "fr") // will return  "/a-propos"
+   *
+   * @param route
+   * @param lang
+   */
+  protected getLangPathByLang(route: TRoute, lang = this.currentLang.key): string {
+    let selectedPath: string;
+    if (typeof route.path === "string") {
+      selectedPath = route.path;
+    } else if (typeof route.path === "object") {
+      Object.keys(route.path).find((el) => {
+        if (el === lang) selectedPath = route.path?.[el];
+      });
+    }
+    return selectedPath;
+  }
 
   /**
    * Returns default language of the list

@@ -5,7 +5,7 @@ import { Router } from "./Router";
 import { render, fireEvent } from "@testing-library/react";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
-import { TOpenRouteParams } from "../core/helpers";
+import { TOpenRouteParams } from "../core/core";
 import { TRoute } from "./Router";
 import { createBrowserHistory } from "history";
 

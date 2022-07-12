@@ -46,6 +46,8 @@ afterEach(() => {
 
 /**
  * redirect
+ *
+ *
  */
 it("should redirect to default lang", () => {
   const langService = new LangService({ languages: locales, base: "/" });
@@ -80,28 +82,15 @@ it("should not redirect to default lang if showDefaultLangInUrl is set to false"
   expect(window.open).toHaveBeenCalledTimes(0);
 });
 
-/**
- * setLang
- * FIXME can't test because setLang use "prepareFullUrl()" which use Routers property not setted
- */
-// it("should set lang properly", () => {
-//   const langService = new LangService({ languages: locales, base: "/" });
-//   render(<App langService={langService} />);
-//   act(() => {
-//     console.log("Routers", Routers.currentRoutes);
-//     Routers.langService.setLang(locales[1]);
-//   });
-//   expect(window.open).toHaveBeenCalledWith(`/${locales[1].key}`, "_self");
-// });
-
-// -------------------------------------------------------------------------------------
 
 /**
  * Add lang path param allows to test the same array before and after middleware
  * The method added langPath param even if it doesn't patch all routes
  * @param addLangPath
+ *
+ *
+ *
  */
-
 const routesListLang: TRoute[] = [
   {
     path: "/",

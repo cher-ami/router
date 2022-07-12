@@ -10,7 +10,7 @@ import {
   joinPaths,
   removeLastCharFromString,
   TOpenRouteParams,
-} from "../core/helpers";
+} from "../core/core";
 import { useRouter } from "../hooks/useRouter";
 import { useLocation } from "../hooks/useLocation";
 import debug from "@wbe/debug";
