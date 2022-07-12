@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useHistory } from "../hooks/useHistory";
-import { createUrl, TOpenRouteParams } from "../core/helpers";
+import { createUrl, TOpenRouteParams } from "../core/core";
 import debug from "@wbe/debug";
 import { useRouter } from "./useRouter";
 const log = debug("router:useLocation");
@@ -10,7 +10,7 @@ const log = debug("router:useLocation");
  */
 export const useLocation = (): [string, (param: string | TOpenRouteParams) => void] => {
   const { staticLocation } = useRouter();
-  
+
   const history = useHistory((event) => {
     setPathname(event.location.pathname);
   }, []);

@@ -5,12 +5,8 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import {
-  createUrl,
-  joinPaths,
-  removeLastCharFromString,
-  TOpenRouteParams,
-} from "../core/helpers";
+import { createUrl, TOpenRouteParams } from "../core/core";
+import { joinPaths, removeLastCharFromString } from "../core/helpers";
 import { useRouter } from "../hooks/useRouter";
 import { useLocation } from "../hooks/useLocation";
 import debug from "@wbe/debug";
