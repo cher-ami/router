@@ -3,9 +3,6 @@ import {
   getPathByRouteName,
   getFullPathByPath,
   getUrlByRouteName,
-  joinPaths,
-  preventSlashes,
-  removeLastCharFromString,
   requestStaticPropsFromRoute,
   getRouteFromUrl,
   createUrl,
@@ -14,6 +11,7 @@ import {
   getLangPath,
   addLangToUrl,
 } from "./core";
+import { preventSlashes } from "./helpers";
 
 import { TRoute } from "../components/Router";
 
@@ -326,47 +324,5 @@ describe("addLangToUrl", () => {
     const url = "/foo/en/bar";
     expect(addLangToUrl(url, "en", true)).toBe(`/en${url}`);
     expect(addLangToUrl(url, "en", false)).toBe(`${url}`);
-  });
-});
-
-/**
- * Helpers
- *
- *
- *
- */
-describe("joinPaths", () => {
-  it("should join paths without error", () => {
-    expect(joinPaths(["/foo", "/bar"])).toBe("/foo/bar");
-  });
-  it("should join paths and remove multi slash", () => {
-    expect(joinPaths(["////foo/////////", "///bar//////////"])).toBe("/foo/bar/");
-  });
-});
-
-describe("preventSlashes", () => {
-  it("should remove multi slashes", () => {
-    expect(preventSlashes("///foo/")).toBe("/foo/");
-    expect(preventSlashes("///foo/bar/////zoo")).toBe("/foo/bar/zoo");
-  });
-});
-
-describe("removeLastCharFromString", () => {
-  it("should not remove last character if string === lastChar", () => {
-    const entry = "/";
-    const result = removeLastCharFromString("/", "/", true);
-    expect(result).toEqual(entry);
-  });
-
-  it("should remove last character if string is not lastChar", () => {
-    const entry = "/";
-    const result = removeLastCharFromString(entry, "/", false);
-    expect(result).toEqual("");
-  });
-
-  it("should remove last charater from string", () => {
-    const entry = "/master/";
-    const result = removeLastCharFromString(entry, "/");
-    expect(result).toEqual("/master");
   });
 });

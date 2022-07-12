@@ -1,11 +1,6 @@
 import { Routers } from "./Routers";
-import {
-  compileUrl,
-  createUrl,
-  joinPaths,
-  removeLastCharFromString,
-  isSSR,
-} from "./core";
+import { compileUrl, createUrl } from "./core";
+import { isSSR, joinPaths, removeLastCharFromString } from "./helpers";
 import { TRoute } from "../components/Router";
 import debug from "@wbe/debug";
 
