@@ -239,14 +239,9 @@ export function getRouteFromUrl({
   pRoutes,
   pBase,
   pMatcher,
-  pParent,
   id,
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return;
-
-  // keep first level current route.
-  // this route object is obj to return even if URL match
-  let firstLevelCurrentRoute = undefined;
 
   function next({
     pUrl,
@@ -268,16 +263,14 @@ export function getRouteFromUrl({
 
       // if current route path match with the param url
       if (matcher) {
-        const route = firstLevelCurrentRoute || currentRoute;
         const params = pMatcher?.params || matcher?.params;
 
-        const routeObj = {
+        const formatRouteObj = (route) => ({
           fullPath: currentRoutePath,
           path: route?.path,
           fullUrl: pUrl,
-          url: compile(route.path)(params),
+          url: compile(route.path as string)(params),
           base: pBase,
-          parent: pParent,
           component: route?.component,
           children: route?.children,
           parser: pMatcher || matcher,
@@ -289,6 +282,11 @@ export function getRouteFromUrl({
             params,
             ...(route?.props || {}),
           },
+        });
+
+        const routeObj = {
+          ...formatRouteObj(currentRoute),
+          _context: pParent && formatRouteObj(pParent),
         };
 
         log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
@@ -297,26 +295,19 @@ export function getRouteFromUrl({
 
       // if not match
       else if (currentRoute?.children) {
-        if (!firstLevelCurrentRoute) {
-          // firstLevelCurrentRoute = currentRoute;
-        }
-
         // else, call recursively this same method with new params
         const matchingChildren = next({
           pUrl,
           id,
           pRoutes: currentRoute?.children,
-          pParent: currentRoute,
+          pParent: pParent || currentRoute,
           pBase: currentRoutePath, // parent base
-          pCurrentRoute: firstLevelCurrentRoute || currentRoute,
           pMatcher: matcher,
         });
 
         // only if matching, return this match, else continue to next iteration
         if (matchingChildren) {
           return matchingChildren;
-        } else {
-          firstLevelCurrentRoute = undefined;
         }
       }
     }

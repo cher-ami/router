@@ -74,8 +74,8 @@ function Stack(props: IProps): JSX.Element {
 
 
   const [PrevRoute, CurrRoute] = [
-    previousRoute?.parent ?? previousRoute,
-    currentRoute?.parent ?? currentRoute,
+    previousRoute?._context ?? previousRoute,
+    currentRoute?._context ?? currentRoute,
   ];
 
   return (

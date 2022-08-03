@@ -220,8 +220,6 @@ describe("matcher", () => {
         pBase: "/",
       });
 
-      console.log("getRoute", getRoute);
-
       expect(getRoute.fullPath).toBe(`/about/route2/:testParam?/foo4`);
       expect(getRoute.path).toBe("/foo4");
       expect(getRoute.fullUrl).toBe(`/about/route2/super-param/foo4`);

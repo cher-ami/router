@@ -10,8 +10,7 @@ import {
   useStack,
 } from "@cher-ami/router";
 import { transitionsHelper } from "../helper/transitionsHelper";
-import {routesList} from "../routes"
-
+import { routesList } from "../routes";
 
 const componentName: string = "AboutPage";
 
@@ -29,12 +28,6 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
   // prepare routes & base for subRouter
   const router = useRouter();
   const path = getPathByRouteName(routesList, "AboutPage");
-
-  console.log(
-    "getSubRouterRoutes(path, router.routes)",
-    "/base/about",
-    getSubRouterRoutes(path, router.routes)
-  );
 
   return (
     <div className={componentName} ref={rootRef}>

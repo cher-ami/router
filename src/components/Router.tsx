@@ -23,13 +23,13 @@ export type TRoute = Partial<{
   parser: Match;
   props: TRouteProps;
   children: TRoute[];
-  parent: TRoute
   url: string;
   fullUrl: string; // full URL who not depend of current instance
   fullPath: string; // full Path /base/:lang/foo/second-foo
   langPath: { [x: string]: string } | null;
   action?: () => any;
   getStaticProps?: (props: TRouteProps) => Promise<any>;
+  _context: TRoute;
 }>;
 
 export interface IRouterContextStackStates {
@@ -251,8 +251,11 @@ function Router(props: {
       return;
     }
 
-    const currentRouteUrl = currentRouteRef.current?.url;
-    if (currentRouteUrl != null && currentRouteUrl === matchingRoute?.url) {
+    const currentRouteUrl =
+      currentRouteRef.current?._context?.url ?? currentRouteRef.current?.url;
+    const matchingRouteUrl = matchingRoute?._context?.url ?? matchingRoute?.url;
+
+    if (currentRouteUrl === matchingRouteUrl) {
       log(props.id, "this is the same route 'url', return.");
       return;
     }
