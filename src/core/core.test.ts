@@ -158,6 +158,7 @@ describe("matcher", () => {
     },
     {
       path: "/about",
+      name: "AboutPage",
       children: [
         {
           path: "/route2",
@@ -169,6 +170,7 @@ describe("matcher", () => {
                 {
                   path: "/foo4",
                   props: { color: "red" },
+                  name: "Foo4Page",
                 },
               ],
             },
@@ -213,17 +215,23 @@ describe("matcher", () => {
 
     it("should get right route from URL with subRoute", () => {
       const getRoute = getRouteFromUrl({
-        pUrl: "/about/route2/super/foo4",
+        pUrl: "/about/route2/super-param/foo4",
         pRoutes: routesList,
         pBase: "/",
       });
 
-      expect(getRoute.fullUrl).toBe(`/about/route2/super/foo4`);
+      console.log("getRoute", getRoute);
+
       expect(getRoute.fullPath).toBe(`/about/route2/:testParam?/foo4`);
-      // this is the component we need to render at this level
-      expect(getRoute.path).toBe("/about");
-      expect(getRoute.url).toBe("/about");
-      expect(getRoute.props).toEqual({ params: { testParam: "super" } });
+      expect(getRoute.path).toBe("/foo4");
+      expect(getRoute.fullUrl).toBe(`/about/route2/super-param/foo4`);
+      expect(getRoute.url).toBe("/foo4");
+      expect(getRoute.base).toBe("/about/route2/:testParam?");
+      expect(getRoute.name).toBe("Foo4Page");
+      expect(getRoute.props).toEqual({
+        color: "red",
+        params: { testParam: "super-param" },
+      });
     });
 
     it("should not get route from bad URL and return undefined", () => {

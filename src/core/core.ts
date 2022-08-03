@@ -226,6 +226,7 @@ type TGetRouteFromUrl = {
   pBase?: string;
   pCurrentRoute?: TRoute;
   pMatcher?: any;
+  pParent?: TRoute;
   id?: number | string;
 };
 
@@ -238,6 +239,7 @@ export function getRouteFromUrl({
   pRoutes,
   pBase,
   pMatcher,
+  pParent,
   id,
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return;
@@ -246,7 +248,14 @@ export function getRouteFromUrl({
   // this route object is obj to return even if URL match
   let firstLevelCurrentRoute = undefined;
 
-  function next({ pUrl, pRoutes, pBase, pMatcher, id }: TGetRouteFromUrl): TRoute {
+  function next({
+    pUrl,
+    pRoutes,
+    pBase,
+    pMatcher,
+    pParent,
+    id,
+  }: TGetRouteFromUrl): TRoute {
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
@@ -268,6 +277,7 @@ export function getRouteFromUrl({
           fullUrl: pUrl,
           url: compile(route.path)(params),
           base: pBase,
+          parent: pParent,
           component: route?.component,
           children: route?.children,
           parser: pMatcher || matcher,
@@ -288,7 +298,7 @@ export function getRouteFromUrl({
       // if not match
       else if (currentRoute?.children) {
         if (!firstLevelCurrentRoute) {
-          firstLevelCurrentRoute = currentRoute;
+          // firstLevelCurrentRoute = currentRoute;
         }
 
         // else, call recursively this same method with new params
@@ -296,6 +306,7 @@ export function getRouteFromUrl({
           pUrl,
           id,
           pRoutes: currentRoute?.children,
+          pParent: currentRoute,
           pBase: currentRoutePath, // parent base
           pCurrentRoute: firstLevelCurrentRoute || currentRoute,
           pMatcher: matcher,

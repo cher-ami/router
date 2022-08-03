@@ -35,7 +35,7 @@ export const routesList: TRoute[] = [
           {
             path: "/hello",
             component: HelloPage,
-          }
+          },
         ],
       },
     ],
@@ -52,10 +52,10 @@ export const routesList: TRoute[] = [
       {
         path: "/our",
         component: OurPage,
-      }
+      },
     ],
   },
-   {
+  {
     // path: "/blog/:id",
     path: { en: "/blog/:id", fr: "/blog-fr/:id", de: "/blog-de/:id" },
     component: ArticlePage,

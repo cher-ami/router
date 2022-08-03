@@ -23,6 +23,7 @@ export type TRoute = Partial<{
   parser: Match;
   props: TRouteProps;
   children: TRoute[];
+  parent: TRoute
   url: string;
   fullUrl: string; // full URL who not depend of current instance
   fullPath: string; // full Path /base/:lang/foo/second-foo
