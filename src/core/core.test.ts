@@ -1,7 +1,7 @@
 import {
   compileUrl,
   getPathByRouteName,
-  getFullPathByPath,
+  get_fullPathByPath,
   getUrlByRouteName,
   requestStaticPropsFromRoute,
   getRouteFromUrl,
@@ -158,6 +158,7 @@ describe("matcher", () => {
     },
     {
       path: "/about",
+      name: "AboutPage",
       children: [
         {
           path: "/route2",
@@ -169,6 +170,7 @@ describe("matcher", () => {
                 {
                   path: "/foo4",
                   props: { color: "red" },
+                  name: "Foo4Page",
                 },
               ],
             },
@@ -190,8 +192,8 @@ describe("matcher", () => {
         pBase: base,
       });
 
-      expect(getRoute.fullUrl).toBe(`${base}/bar/my-id`);
-      expect(getRoute.fullPath).toBe(`${base}/bar/:id`);
+      expect(getRoute._fullUrl).toBe(`${base}/bar/my-id`);
+      expect(getRoute._fullPath).toBe(`${base}/bar/:id`);
       expect(getRoute.path).toBe("/bar/:id");
       expect(getRoute.url).toBe("/bar/my-id");
       expect(getRoute.name).toBe(`BarPage`);
@@ -200,7 +202,7 @@ describe("matcher", () => {
       // example-client 2
       // prettier-ignore
       const getRoute3 = getRouteFromUrl({ pUrl: "/hello-2", pRoutes: routesList, pBase: "/" });
-      expect(getRoute3.fullPath).toBe(`/hello-2`);
+      expect(getRoute3._fullPath).toBe(`/hello-2`);
 
       // example-client 3
       const getRoute2 = getRouteFromUrl({
@@ -213,17 +215,21 @@ describe("matcher", () => {
 
     it("should get right route from URL with subRoute", () => {
       const getRoute = getRouteFromUrl({
-        pUrl: "/about/route2/super/foo4",
+        pUrl: "/about/route2/super-param/foo4",
         pRoutes: routesList,
         pBase: "/",
       });
 
-      expect(getRoute.fullUrl).toBe(`/about/route2/super/foo4`);
-      expect(getRoute.fullPath).toBe(`/about/route2/:testParam?/foo4`);
-      // this is the component we need to render at this level
-      expect(getRoute.path).toBe("/about");
-      expect(getRoute.url).toBe("/about");
-      expect(getRoute.props).toEqual({ params: { testParam: "super" } });
+      expect(getRoute._fullPath).toBe(`/about/route2/:testParam?/foo4`);
+      expect(getRoute.path).toBe("/foo4");
+      expect(getRoute._fullUrl).toBe(`/about/route2/super-param/foo4`);
+      expect(getRoute.url).toBe("/foo4");
+      expect(getRoute.base).toBe("/about/route2/:testParam?");
+      expect(getRoute.name).toBe("Foo4Page");
+      expect(getRoute.props).toEqual({
+        color: "red",
+        params: { testParam: "super-param" },
+      });
     });
 
     it("should not get route from bad URL and return undefined", () => {
@@ -285,14 +291,14 @@ describe("compileUrl", () => {
   });
 });
 
-describe("getFullPathByPath", () => {
+describe("get_fullPathByPath", () => {
   it("should return the full path", () => {
-    expect(getFullPathByPath(routesList, "/foo", "fooPage")).toBe("/hello/foo");
-    expect(getFullPathByPath(routesList, "/yes", "yesPage")).toBe("/hello/foo/bla/yes");
-    expect(getFullPathByPath(routesList, "/", "firstLevelRoute-2")).toBe(
+    expect(get_fullPathByPath(routesList, "/foo", "fooPage")).toBe("/hello/foo");
+    expect(get_fullPathByPath(routesList, "/yes", "yesPage")).toBe("/hello/foo/bla/yes");
+    expect(get_fullPathByPath(routesList, "/", "firstLevelRoute-2")).toBe(
       "/hello/foo/bla/"
     );
-    expect(getFullPathByPath(routesList, "/no", "noPage")).toBe("/hello/foo/bla/no");
+    expect(get_fullPathByPath(routesList, "/no", "noPage")).toBe("/hello/foo/bla/no");
   });
 });
 

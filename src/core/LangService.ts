@@ -81,7 +81,7 @@ class LangService<TLang = any> {
 
   /**
    * Set new lang to URL
-   * Use fullUrl of last router instance (and not path), to manage lang as needed
+   * Use _fullUrl of last router instance (and not path), to manage lang as needed
    *
    *    ex:
    *      -> /base/lang/path     (with lang)
@@ -236,7 +236,7 @@ class LangService<TLang = any> {
     routes: TRoute[],
     showLangInUrl = this.showLangInUrl()
   ): TRoute[] {
-    if (routes?.some((el) => !!el.langPath)) {
+    if (routes?.some((el) => !!el._langPath)) {
       log(
         "Routes have already been formatted by 'addLangParamToRoutes()', return routes."
       );
@@ -265,7 +265,7 @@ class LangService<TLang = any> {
      *  return:
      *    {
      *      path: "/:lang/home",
-     *      langPath: { en: "/:lang/home", fr: "/:lang/accueil" },
+     *      _langPath: { en: "/:lang/home", fr: "/:lang/accueil" },
      *    }
      *
      */
@@ -294,7 +294,7 @@ class LangService<TLang = any> {
         return {
           ...route,
           path: patchLangParam(path, showLang),
-          langPath: Object.entries(langPath).length !== 0 ? langPath : null,
+          _langPath: Object.entries(langPath).length !== 0 ? langPath : null,
           ...(hasChildren ? { children: patchRoutes(route.children, true) } : {}),
         };
       });

@@ -3,7 +3,6 @@ import {
   getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
-  openRoute,
   useStack,
   Link,
   Router,
@@ -30,17 +29,19 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
 
   const router = useRouter();
   const path = getPathByRouteName(routesList, "BarPage");
+  console.log("getPathByRouteName", path);
+
+  console.log(
+    "getSubRouterRoutes(path, router.routes)",
+    getSubRouterRoutes(path, router.routes)
+  );
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <br />
-      <Link to={{ name: "OurPage" }}>Our</Link>
-      <br />
-      <button onClick={() => openRoute({ name: "OurPage" })}>OurPage</button>
       <Router
         id={3}
-        base={getSubRouterBase(path, router.base, false)}
+        base={getSubRouterBase(path, router.base, true)}
         routes={getSubRouterRoutes(path, router.routes)}
       >
         <div className={componentName}>
@@ -50,7 +51,7 @@ export const BarPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) 
                 <Link to={{ name: "YoloPage" }}>Yolo</Link>
               </li>
               <li>
-                <Link to={{ name: "HelloPage" }}>Hello (has sub router)</Link>
+                <Link to={{ name: "HelloPage" }}>Hello</Link>
               </li>
             </ul>
           </nav>

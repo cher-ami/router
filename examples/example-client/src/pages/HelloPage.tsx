@@ -1,9 +1,6 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { useRouter } from "@cher-ami/router";
 import { useStack } from "@cher-ami/router";
-import { getPathByRouteName } from "@cher-ami/router";
 import { transitionsHelper } from "../helper/transitionsHelper";
-import { routesList } from "../routes";
 
 const componentName: string = "HelloPage";
 
@@ -20,8 +17,6 @@ export const HelloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>
     playOut: () => transitionsHelper(rootRef.current, false),
   });
 
-  const router = useRouter();
-  const path = getPathByRouteName(routesList, "HelloPage");
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}

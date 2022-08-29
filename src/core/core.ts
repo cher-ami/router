@@ -226,6 +226,7 @@ type TGetRouteFromUrl = {
   pBase?: string;
   pCurrentRoute?: TRoute;
   pMatcher?: any;
+  pParent?: TRoute;
   id?: number | string;
 };
 
@@ -242,11 +243,14 @@ export function getRouteFromUrl({
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return;
 
-  // keep first level current route.
-  // this route object is obj to return even if URL match
-  let firstLevelCurrentRoute = undefined;
-
-  function next({ pUrl, pRoutes, pBase, pMatcher, id }: TGetRouteFromUrl): TRoute {
+  function next({
+    pUrl,
+    pRoutes,
+    pBase,
+    pMatcher,
+    pParent,
+    id,
+  }: TGetRouteFromUrl): TRoute {
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
@@ -259,26 +263,29 @@ export function getRouteFromUrl({
 
       // if current route path match with the param url
       if (matcher) {
-        const route = firstLevelCurrentRoute || currentRoute;
         const params = pMatcher?.params || matcher?.params;
 
-        const routeObj = {
-          fullPath: currentRoutePath,
+        const formatRouteObj = (route) => ({
           path: route?.path,
-          fullUrl: pUrl,
-          url: compile(route.path)(params),
+          url: compile(route.path as string)(params),
           base: pBase,
           component: route?.component,
           children: route?.children,
           parser: pMatcher || matcher,
-          langPath: route?.langPath,
           name: route?.name || route?.component?.displayName,
-          action: route?.action,
           getStaticProps: route?.getStaticProps,
           props: {
             params,
             ...(route?.props || {}),
           },
+          _fullPath: currentRoutePath,
+          _fullUrl: pUrl,
+          _langPath: route?._langPath,
+        });
+
+        const routeObj = {
+          ...formatRouteObj(currentRoute),
+          _context: formatRouteObj(pParent || currentRoute),
         };
 
         log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
@@ -287,25 +294,19 @@ export function getRouteFromUrl({
 
       // if not match
       else if (currentRoute?.children) {
-        if (!firstLevelCurrentRoute) {
-          firstLevelCurrentRoute = currentRoute;
-        }
-
         // else, call recursively this same method with new params
         const matchingChildren = next({
           pUrl,
           id,
           pRoutes: currentRoute?.children,
+          pParent: pParent || currentRoute,
           pBase: currentRoutePath, // parent base
-          pCurrentRoute: firstLevelCurrentRoute || currentRoute,
           pMatcher: matcher,
         });
 
         // only if matching, return this match, else continue to next iteration
         if (matchingChildren) {
           return matchingChildren;
-        } else {
-          firstLevelCurrentRoute = undefined;
         }
       }
     }
@@ -360,7 +361,7 @@ export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute
     routes.unshift({
       path: "/",
       component: null,
-      name: `1stLevelRoute-${Math.random()}`,
+      name: `auto-generate-slash-route-${Math.random()}`,
     });
   }
   return routes;
@@ -432,7 +433,7 @@ export function compileUrl(path: string, params?: TParams): string {
  *  With the second URL part "/foo", this function will returns "/bar/foo"
  * @returns string
  */
-export function getFullPathByPath(
+export function get_fullPathByPath(
   routes: TRoute[],
   path: string | { [x: string]: string },
   routeName: string,
@@ -442,7 +443,7 @@ export function getFullPathByPath(
   let localPath: string[] = [basePath];
 
   for (let route of routes) {
-    const langPath = route.langPath?.[lang];
+    const langPath = route._langPath?.[lang];
     const routePath = route.path as string;
 
     const pathMatch =
@@ -457,7 +458,7 @@ export function getFullPathByPath(
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = getFullPathByPath(
+      const matchChildrenPath = get_fullPathByPath(
         route.children,
         path,
         routeName,
@@ -469,7 +470,7 @@ export function getFullPathByPath(
         // keep path in local array
         localPath.push(langPath || routePath);
         // Return the function after localPath push
-        return getFullPathByPath(
+        return get_fullPathByPath(
           route.children,
           path,
           routeName,
@@ -504,15 +505,15 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
             : route.path;
 
         // get full path
-        const fullPath = getFullPathByPath(
+        const _fullPath = get_fullPathByPath(
           pRoutes,
           path,
           route.name,
           pParams?.params?.lang
         );
         // build URL
-        // console.log("fullPath", fullPath, params);
-        return compileUrl(fullPath, params.params);
+        // console.log("_fullPath", _fullPath, params);
+        return compileUrl(_fullPath, params.params);
       }
 
       // if route has children

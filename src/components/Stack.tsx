@@ -72,20 +72,26 @@ function Stack(props: IProps): JSX.Element {
     });
   }, [routeIndex]);
 
+
+  const [PrevRoute, CurrRoute] = [
+    previousRoute?._context ?? previousRoute,
+    currentRoute?._context ?? currentRoute,
+  ];
+
   return (
     <div className={["Stack", props.className].filter((e) => e).join(" ")}>
-      {previousPageIsMount && previousRoute?.component && (
-        <previousRoute.component
+      {previousPageIsMount && PrevRoute?.component && (
+        <PrevRoute.component
           ref={prevRef}
-          key={`${previousRoute?.fullUrl || ""}_${routeIndex - 1}`}
-          {...(previousRoute.props || {})}
+          key={`${PrevRoute._fullUrl || ""}_${routeIndex - 1}`}
+          {...(PrevRoute.props || {})}
         />
       )}
-      {currentRoute?.component && (
-        <currentRoute.component
+      {CurrRoute?.component && (
+        <CurrRoute.component
           ref={currentRef}
-          key={`${currentRoute?.fullUrl || ""}_${routeIndex}`}
-          {...(currentRoute.props || {})}
+          key={`${CurrRoute?._fullUrl || ""}_${routeIndex}`}
+          {...(CurrRoute.props || {})}
         />
       )}
     </div>
