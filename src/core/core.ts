@@ -286,7 +286,7 @@ export function getRouteFromUrl({
 
         const routeObj = {
           ...formatRouteObj(currentRoute),
-          _context: pParent && formatRouteObj(pParent),
+          _context: pParent && formatRouteObj(pParent || currentRoute),
         };
 
         log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
