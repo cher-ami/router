@@ -361,7 +361,7 @@ export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute
     routes.unshift({
       path: "/",
       component: null,
-      name: `1stLevelRoute-${Math.random()}`,
+      name: `auto-generate-slash-route-${Math.random()}`,
     });
   }
   return routes;
