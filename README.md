@@ -504,13 +504,19 @@ const router = useRouter();
 ```ts
 // previousRoute and currentRoute
 type TRoute = {
-  path: string;
+  path: string | { [x: string]: string };
+  langPath: { [x: string]: string } | null;
   component: React.ComponentType<any>;
-  props?: { [x: string]: any };
-  parser?: Path;
-  children?: TRoute[];
-  matchUrl?: string;
-  fullUrl?: string;
+  base: string;
+  name: string;
+  parser: Match;
+  props: TRouteProps;
+  children: TRoute[];
+  url: string;
+  getStaticProps: (props: TRouteProps) => Promise<any>;
+  _fullUrl: string; // full URL who not depend of current instance
+  _fullPath: string; // full Path /base/:lang/foo/second-foo
+  _context: TRoute;
 };
 ```
 

@@ -83,14 +83,14 @@ function Stack(props: IProps): JSX.Element {
       {previousPageIsMount && PrevRoute?.component && (
         <PrevRoute.component
           ref={prevRef}
-          key={`${PrevRoute.fullUrl || ""}_${routeIndex - 1}`}
+          key={`${PrevRoute._fullUrl || ""}_${routeIndex - 1}`}
           {...(PrevRoute.props || {})}
         />
       )}
       {CurrRoute?.component && (
         <CurrRoute.component
           ref={currentRef}
-          key={`${CurrRoute?.fullUrl || ""}_${routeIndex}`}
+          key={`${CurrRoute?._fullUrl || ""}_${routeIndex}`}
           {...(CurrRoute.props || {})}
         />
       )}

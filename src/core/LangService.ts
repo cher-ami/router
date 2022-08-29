@@ -81,7 +81,7 @@ class LangService<TLang = any> {
 
   /**
    * Set new lang to URL
-   * Use fullUrl of last router instance (and not path), to manage lang as needed
+   * Use _fullUrl of last router instance (and not path), to manage lang as needed
    *
    *    ex:
    *      -> /base/lang/path     (with lang)

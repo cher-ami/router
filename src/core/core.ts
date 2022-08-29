@@ -266,9 +266,7 @@ export function getRouteFromUrl({
         const params = pMatcher?.params || matcher?.params;
 
         const formatRouteObj = (route) => ({
-          fullPath: currentRoutePath,
           path: route?.path,
-          fullUrl: pUrl,
           url: compile(route.path as string)(params),
           base: pBase,
           component: route?.component,
@@ -276,12 +274,13 @@ export function getRouteFromUrl({
           parser: pMatcher || matcher,
           langPath: route?.langPath,
           name: route?.name || route?.component?.displayName,
-          action: route?.action,
           getStaticProps: route?.getStaticProps,
           props: {
             params,
             ...(route?.props || {}),
           },
+          _fullPath: currentRoutePath,
+          _fullUrl: pUrl,
         });
 
         const routeObj = {
@@ -434,7 +433,7 @@ export function compileUrl(path: string, params?: TParams): string {
  *  With the second URL part "/foo", this function will returns "/bar/foo"
  * @returns string
  */
-export function getFullPathByPath(
+export function get_fullPathByPath(
   routes: TRoute[],
   path: string | { [x: string]: string },
   routeName: string,
@@ -459,7 +458,7 @@ export function getFullPathByPath(
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = getFullPathByPath(
+      const matchChildrenPath = get_fullPathByPath(
         route.children,
         path,
         routeName,
@@ -471,7 +470,7 @@ export function getFullPathByPath(
         // keep path in local array
         localPath.push(langPath || routePath);
         // Return the function after localPath push
-        return getFullPathByPath(
+        return get_fullPathByPath(
           route.children,
           path,
           routeName,
@@ -506,15 +505,15 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
             : route.path;
 
         // get full path
-        const fullPath = getFullPathByPath(
+        const _fullPath = get_fullPathByPath(
           pRoutes,
           path,
           route.name,
           pParams?.params?.lang
         );
         // build URL
-        // console.log("fullPath", fullPath, params);
-        return compileUrl(fullPath, params.params);
+        // console.log("_fullPath", _fullPath, params);
+        return compileUrl(_fullPath, params.params);
       }
 
       // if route has children
