@@ -272,7 +272,6 @@ export function getRouteFromUrl({
           component: route?.component,
           children: route?.children,
           parser: pMatcher || matcher,
-          langPath: route?.langPath,
           name: route?.name || route?.component?.displayName,
           getStaticProps: route?.getStaticProps,
           props: {
@@ -281,6 +280,7 @@ export function getRouteFromUrl({
           },
           _fullPath: currentRoutePath,
           _fullUrl: pUrl,
+          _langPath: route?._langPath,
         });
 
         const routeObj = {
@@ -443,7 +443,7 @@ export function get_fullPathByPath(
   let localPath: string[] = [basePath];
 
   for (let route of routes) {
-    const langPath = route.langPath?.[lang];
+    const langPath = route._langPath?.[lang];
     const routePath = route.path as string;
 
     const pathMatch =

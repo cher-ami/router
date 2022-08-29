@@ -94,14 +94,12 @@ it("should not redirect to default lang if showDefaultLangInUrl is set to false"
 const routesListLang: TRoute[] = [
   {
     path: "/",
-    langPath: null,
   },
   {
     path: "/hello",
-    langPath: null,
     children: [
-      { path: { en: "/zoo-en", fr: "/zoo-fr", de: "zoo-de" }, langPath: null },
-      { path: "/:id", langPath: null },
+      { path: { en: "/zoo-en", fr: "/zoo-fr", de: "zoo-de" }, _langPath: null },
+      { path: "/:id", },
     ],
   },
 ];
@@ -109,17 +107,17 @@ const routesListLang: TRoute[] = [
 const patchedRoutesListLang: TRoute[] = [
   {
     path: "/:lang",
-    langPath: { en: "/:lang", fr: "/:lang", de: "/:lang" },
+    _langPath: { en: "/:lang", fr: "/:lang", de: "/:lang" },
   },
   {
     path: "/:lang/hello",
-    langPath: { en: "/:lang/hello", fr: "/:lang/hello", de: "/:lang/hello" },
+    _langPath: { en: "/:lang/hello", fr: "/:lang/hello", de: "/:lang/hello" },
     children: [
       {
         path: "/zoo-en",
-        langPath: { en: "/zoo-en", fr: "/zoo-fr", de: "zoo-de" },
+        _langPath: { en: "/zoo-en", fr: "/zoo-fr", de: "zoo-de" },
       },
-      { path: "/:id", langPath: { en: "/:id", fr: "/:id", de: "/:id" } },
+      { path: "/:id", _langPath: { en: "/:id", fr: "/:id", de: "/:id" } },
     ],
   },
 ];

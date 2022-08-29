@@ -17,7 +17,6 @@ export type TRouteProps = {
 
 export type TRoute = Partial<{
   path: string | { [x: string]: string };
-  langPath: { [x: string]: string } | null;
   component: React.ComponentType<any>;
   base: string;
   name: string;
@@ -28,6 +27,7 @@ export type TRoute = Partial<{
   getStaticProps: (props: TRouteProps) => Promise<any>;
   _fullUrl: string; // full URL who not depend of current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo
+  _langPath: { [x: string]: string } | null;
   _context: TRoute;
 }>;
 

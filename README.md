@@ -505,7 +505,6 @@ const router = useRouter();
 // previousRoute and currentRoute
 type TRoute = {
   path: string | { [x: string]: string };
-  langPath: { [x: string]: string } | null;
   component: React.ComponentType<any>;
   base: string;
   name: string;
@@ -516,6 +515,7 @@ type TRoute = {
   getStaticProps: (props: TRouteProps) => Promise<any>;
   _fullUrl: string; // full URL who not depend of current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo
+  _langPath: { [x: string]: string } | null;
   _context: TRoute;
 };
 ```
