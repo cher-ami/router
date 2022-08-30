@@ -120,7 +120,7 @@ export function getSubRouterRoutes(
 /**
  * Get current route path by route name. (or component name)
  * (ex: "foo/bla" => if page is BlaPage, return "/bla")
- * This is just path of the route, not "fullParh" /foo/bla
+ * This is just path of the route, not "fullPath" /foo/bla
  * @param routes
  * @param name
  * @returns
@@ -130,7 +130,7 @@ export function getPathByRouteName(
   name: string
 ): string | { [x: string]: string } {
   for (let route of routes) {
-    if (route.name === name || route.component?.displayName === name) {
+    if (route.name === name || route?.component?.displayName === name) {
       // specific case, we want to retrieve path of route with "/" route and langService is used,
       // we need to patch it with lang param
       if (route.path === "/" && Routers.langService) {
@@ -433,7 +433,7 @@ export function compileUrl(path: string, params?: TParams): string {
  *  With the second URL part "/foo", this function will returns "/bar/foo"
  * @returns string
  */
-export function get_fullPathByPath(
+export function getFullPathByPath(
   routes: TRoute[],
   path: string | { [x: string]: string },
   routeName: string,
@@ -458,7 +458,7 @@ export function get_fullPathByPath(
     // if not matching but as children, return it
     else if (route?.children?.length > 0) {
       // no match, recall recursively on children
-      const matchChildrenPath = get_fullPathByPath(
+      const matchChildrenPath = getFullPathByPath(
         route.children,
         path,
         routeName,
@@ -470,7 +470,7 @@ export function get_fullPathByPath(
         // keep path in local array
         localPath.push(langPath || routePath);
         // Return the function after localPath push
-        return get_fullPathByPath(
+        return getFullPathByPath(
           route.children,
           path,
           routeName,
@@ -505,7 +505,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
             : route.path;
 
         // get full path
-        const _fullPath = get_fullPathByPath(
+        const _fullPath = getFullPathByPath(
           pRoutes,
           path,
           route.name,
