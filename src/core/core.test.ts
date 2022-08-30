@@ -51,7 +51,9 @@ describe("getSubRouterBase", () => {
 });
 
 describe("getSubRouterRoutes", () => {
-  // TODO
+  it("should return subrouter route list", () => {
+    
+  })
 });
 
 describe("getPathByRouteName", () => {
