@@ -68,7 +68,6 @@ describe("matcher", () => {
 
   describe("getRouteFromUrl", () => {
     it("should get right route from URL", () => {
-      // exemple 1
       const getRoute = getRouteFromUrl({
         pUrl: preventSlashes(`${base}/bar/my-id`),
         pRoutes: routeList,
@@ -82,7 +81,6 @@ describe("matcher", () => {
       expect(getRoute.name).toBe(`BarPage`);
       expect(getRoute.props).toEqual({ params: { id: "my-id" }, color: "blue" });
 
-      // example-client 2
       const getRoute3 = getRouteFromUrl({
         pUrl: "/hello-2",
         pRoutes: routeList,
@@ -90,7 +88,6 @@ describe("matcher", () => {
       });
       expect(getRoute3._fullPath).toBe(`/hello-2`);
 
-      // example-client 3
       const getRoute2 = getRouteFromUrl({
         pUrl: "/end",
         pRoutes: routeList,
