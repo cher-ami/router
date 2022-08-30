@@ -11,6 +11,7 @@ import {
   getLangPath,
   addLangToUrl,
   getSubRouterBase,
+  getSubRouterRoutes,
 } from "./core";
 import { preventSlashes } from "./helpers";
 import { routeList } from "../_fixtures/routeList";
@@ -52,8 +53,15 @@ describe("getSubRouterBase", () => {
 
 describe("getSubRouterRoutes", () => {
   it("should return subrouter route list", () => {
-    
-  })
+    getSubRouterRoutes("/", routeList.find((e) => e.name === "HomePage").children);
+    getSubRouterRoutes("/:testParam?", [
+      {
+        path: "/foo4",
+        props: { color: "red" },
+        name: "Foo4Page",
+      },
+    ]);
+  });
 });
 
 describe("getPathByRouteName", () => {
