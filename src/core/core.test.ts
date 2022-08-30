@@ -1,3 +1,4 @@
+import LangService from "./LangService";
 import {
   compileUrl,
   getPathByRouteName,
@@ -9,9 +10,11 @@ import {
   getNotFoundRoute,
   getLangPath,
   addLangToUrl,
+  getSubRouterBase,
 } from "./core";
 import { preventSlashes } from "./helpers";
 import { routeList } from "../_fixtures/routeList";
+import { Routers } from "./Routers";
 
 /**
  * Public
@@ -30,7 +33,21 @@ describe("createUrl", () => {
 });
 
 describe("getSubRouterBase", () => {
-  // TODO
+  it("should return subrouter base URL", () => {
+    expect(getSubRouterBase("/foo", "")).toBe("/foo");
+    expect(getSubRouterBase("/foo", "/")).toBe("/foo");
+    expect(getSubRouterBase("/foo", "/hello/")).toBe("/hello/foo");
+    expect(getSubRouterBase("/foo", "/hello")).toBe("/hello/foo");
+    expect(getSubRouterBase("/foo", "/custom/base/hello/")).toBe(
+      "/custom/base/hello/foo"
+    );
+
+    Routers.langService = new LangService({ languages: [{ key: "en" }, { key: "fr" }] });
+    const langPathTest = { en: "/foo-en", fr: "/foo-fr" };
+    expect(getSubRouterBase(langPathTest, "/base/", true)).toBe("/base/:lang/foo-en");
+    expect(getSubRouterBase(langPathTest, "/base/", false)).toBe("/base/foo-en");
+    Routers.langService = undefined;
+  });
 });
 
 describe("getSubRouterRoutes", () => {
