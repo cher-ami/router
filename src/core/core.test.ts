@@ -12,10 +12,12 @@ import {
   addLangToUrl,
   getSubRouterBase,
   getSubRouterRoutes,
+  patchMissingRootRoute,
 } from "./core";
 import { preventSlashes } from "./helpers";
 import { routeList } from "../_fixtures/routeList";
 import { Routers } from "./Routers";
+import { Children } from "react";
 
 /**
  * Public
@@ -171,7 +173,17 @@ describe("matcher", () => {
 
 describe("patchMissingRootRoute", () => {
   it("should patch missing route", () => {
-    // TODO
+    const pathchedRoutes = patchMissingRootRoute(routeList[0].children);
+    const firstRouteAdded = pathchedRoutes[0];
+    expect(firstRouteAdded.path).toBe("/");
+    expect(firstRouteAdded.name).toContain("auto-generate-slash-route");
+  });
+
+  it("should not patch missing route if '/' route exist", () => {
+    const pathchedRoutes = patchMissingRootRoute(routeList);
+    const firstRouteAdded = pathchedRoutes[0];
+    expect(firstRouteAdded.path).toBe("/");
+    expect(firstRouteAdded.name).toBe("HomePage");
   });
 });
 

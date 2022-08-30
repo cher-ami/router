@@ -330,13 +330,15 @@ export function getNotFoundRoute(routes: TRoute[]): TRoute {
 
 /**
  * Add missing route with "/" on children routes if doesn't exist.
+ * 
+ * this is not a recursive function, "/" route will be insert only on first level.
  *
- * children: [
+ * [
  *     { path: "/foo", component: FooPage },
  *     { path: "/bar", component: BarPage },
  * ]
  * become:
- *  children: [
+ *  [
  *     { path: "/", component: null },
  *     { path: "/foo", component: FooPage },
  *     { path: "/bar", component: BarPage },
