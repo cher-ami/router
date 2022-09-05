@@ -111,7 +111,10 @@ describe("matcher", () => {
       expect(getRoute.path).toBe("/bar/:id");
       expect(getRoute.url).toBe("/bar/my-id");
       expect(getRoute.name).toBe(`BarPage`);
-      expect(getRoute.props).toEqual({ params: { id: "my-id" }, color: "blue" });
+      const routeProps = { params: { id: "my-id" }, color: "blue" };
+      expect(getRoute.props).toEqual(routeProps);
+      // no parent route, so context object need to return same route information
+      expect(getRoute._context.props).toEqual(routeProps);
 
       getRoute = getRouteFromUrl({
         pUrl: "/hello-2",
