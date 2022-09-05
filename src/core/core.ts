@@ -265,27 +265,31 @@ export function getRouteFromUrl({
       if (matcher) {
         const params = pMatcher?.params || matcher?.params;
 
-        const formatRouteObj = (route) => ({
-          path: route?.path,
-          url: compile(route.path as string)(params),
-          base: pBase,
-          component: route?.component,
-          children: route?.children,
-          parser: pMatcher || matcher,
-          name: route?.name || route?.component?.displayName,
-          getStaticProps: route?.getStaticProps,
-          props: {
-            params,
-            ...(route?.props || {}),
-          },
-          _fullPath: currentRoutePath,
-          _fullUrl: pUrl,
-          _langPath: route?._langPath,
-        });
+        const formatRouteObj = (route) => {
+          if (!route) return;
+          return {
+            path: route?.path,
+            url: compile(route.path as string)(params),
+            base: pBase,
+            component: route?.component,
+            children: route?.children,
+            parser: pMatcher || matcher,
+            name: route?.name || route?.component?.displayName,
+            getStaticProps: route?.getStaticProps,
+            props: {
+              params,
+              ...(route?.props || {}),
+            },
+            _fullPath: currentRoutePath,
+            _fullUrl: pUrl,
+            _langPath: route?._langPath,
+          };
+        };
 
+        const formattedCurrentRoute = formatRouteObj(currentRoute);
         const routeObj = {
-          ...formatRouteObj(currentRoute),
-          _context: formatRouteObj(pParent || currentRoute),
+          ...formattedCurrentRoute,
+          _context: pParent ? formatRouteObj(pParent) : formattedCurrentRoute,
         };
 
         log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
@@ -330,7 +334,7 @@ export function getNotFoundRoute(routes: TRoute[]): TRoute {
 
 /**
  * Add missing route with "/" on children routes if doesn't exist.
- * 
+ *
  * this is not a recursive function, "/" route will be insert only on first level.
  *
  * [
