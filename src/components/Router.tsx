@@ -106,7 +106,7 @@ function Router(props: {
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   langService?: LangService;
   id?: number | string;
-  initialStaticProps?: { props: any; name: string };
+  initialStaticProps?: { props: any; name: string, url: string };
 }): JSX.Element {
   /**
    * 0. LangService
@@ -271,15 +271,17 @@ function Router(props: {
       const dataFromCache = cache.get(newRoute._fullUrl);
 
       // first route visited (server & client)
-      const isFirstRouteVisited = newRoute.name === props.initialStaticProps.name;
+      const isFirstRouteVisited = newRoute._fullUrl === props.initialStaticProps.url;
+      log("is first route visited?",isFirstRouteVisited)
 
       // In SSR context, we have to manage getStaticProps route properties from server and client
       if (isFirstRouteVisited) {
+        log("newRoute.props",newRoute.props)
         if (newRoute.props) {
           Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
         }
         if (!dataFromCache) {
-          cache.set(newRoute._fullUrl, props.initialStaticProps?.props ?? {});
+          cache.set(newRoute._fullUrl, newRoute.props ?? {});
         }
       }
       // if NOT first route (client)

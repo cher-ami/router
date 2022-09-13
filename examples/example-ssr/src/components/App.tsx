@@ -43,6 +43,7 @@ export function App() {
         <Link to={{ name: "Home" }}>Home</Link> |{" "}
         <Link to={{ name: "About" }}>About</Link> |{" "}
         <Link to={{ name: "Article", params: { slug: "article-1" } }}>Article 1</Link> |{" "}
+        <Link to={{ name: "Article", params: { slug: "article-2" } }}>Article 2</Link> |{" "}
         <Link to={{ name: "Contact" }}>Contact</Link>
       </nav>
       <Stack manageTransitions={crossedTransitions} />

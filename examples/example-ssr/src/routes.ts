@@ -36,7 +36,10 @@ export const routes: TRoute[] = [
     getStaticProps: async (props) => {
       const res = await fetch("https://jsonplaceholder.typicode.com/todos");
       const todo = await res.json();
-      return { todo };
+
+      const mySlug = props.params.slug
+
+      return { todo, mySlug };
     },
   },
   {

@@ -85,7 +85,11 @@ describe("public", () => {
         base: "/",
         routes: routeList,
       });
-      expect(ssrStaticProps).toEqual({ props: { fetchData: {} }, name: "HelloPage" });
+      expect(ssrStaticProps).toEqual({
+        props: { fetchData: {} },
+        name: "HelloPage",
+        url: "/hello",
+      });
     });
   });
 });
