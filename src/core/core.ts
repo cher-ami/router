@@ -180,7 +180,7 @@ export async function requestStaticPropsFromRoute({
   langService?: LangService;
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   id?: string | number;
-}): Promise<{ props: any; name: string }> {
+}): Promise<{ props: any; name: string; url: string }> {
   const currentRoute = getRouteFromUrl({
     pUrl: url,
     pBase: base,
@@ -205,6 +205,7 @@ export async function requestStaticPropsFromRoute({
   const SSR_STATIC_PROPS = {
     props: null,
     name: currentRoute.name,
+    url,
   };
 
   // await promise from getStaticProps
