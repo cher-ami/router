@@ -1,8 +1,14 @@
 import React, { useRef } from "react";
-import { useStack } from "@cher-ami/router";
+import {
+  useStack,
+  getSubRouterBase,
+  getSubRouterRoutes,
+  Link,
+  Router,
+  Stack,
+  useRouter,
+} from "@cher-ami/router";
 import { transitionsHelper } from "../helpers/transitionsHelper";
-import pic from "../assets/pic.png";
-
 
 const componentName = "AboutPage";
 function AboutPage(props, handleRef) {
@@ -16,17 +22,25 @@ function AboutPage(props, handleRef) {
     playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   });
 
+  // Get parent router context
+  const { base, routes } = useRouter();
+
+  // Parsed routes list and get path by route name
+  const path = "/about";
+  const subRouterBase = getSubRouterBase(path, base, true);
+  const surRouterRoutes = getSubRouterRoutes(path, routes);
+
   return (
-    <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
+    <div className={componentName} ref={rootRef}>
       {componentName}
       <br />
+      <Link to={"/about/foo"}>Foo</Link>
       <br />
-      <img src={pic} alt="pic" width={150} />
-
-      <p>`staticProps` result:</p>
-      {props.todo?.map((e, i) => (
-        i < 10 && <div key={i}>{e.title}</div>
-      ))}
+      <Link to={"/about/bar"}>Bar</Link>
+      <br />
+      <Router id={2} base={subRouterBase} routes={surRouterRoutes}>
+        <Stack />
+      </Router>
     </div>
   );
 }

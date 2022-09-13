@@ -1,9 +1,11 @@
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import NotFoundPage from "./pages/NotFoundPage"
+import NotFoundPage from "./pages/NotFoundPage";
 import { TRoute } from "@cher-ami/router";
-import ArticlePage from "./pages/ArticlePage"
+import ArticlePage from "./pages/ArticlePage";
+import FooPage from "./pages/FooPage";
+import BarPage from "./pages/BarPage";
 
 export const routes: TRoute[] = [
   {
@@ -25,6 +27,18 @@ export const routes: TRoute[] = [
       const todo = await res.json();
       return { todo };
     },
+    children: [
+      {
+        path: "/foo",
+        component: FooPage,
+        name: "Foo",
+      },
+      {
+        path: "/bar",
+        component: BarPage,
+        name: "Bar",
+      },
+    ],
   },
   {
     path: "/article/:slug",
@@ -37,7 +51,7 @@ export const routes: TRoute[] = [
       const res = await fetch("https://jsonplaceholder.typicode.com/todos");
       const todo = await res.json();
 
-      const mySlug = props.params.slug
+      const mySlug = props.params.slug;
 
       return { todo, mySlug };
     },
