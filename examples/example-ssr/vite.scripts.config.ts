@@ -16,9 +16,10 @@ export default defineConfig(({ command, mode }) => {
 
       rollupOptions: {
         input: [
-          resolve("prerender.ts"),
           resolve("server.js"),
-          resolve("exe-server.js"),
+          resolve("prerender/prerender.ts"),
+          resolve("prerender/exe-prerender-server.ts"),
+          resolve("prerender/exe-prerender.ts"),
         ],
         output: {
           manualChunks: undefined,

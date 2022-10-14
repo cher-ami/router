@@ -74,7 +74,7 @@ class LangService<TLang = any> {
     this.base = removeLastCharFromString(base, "/", true);
     this.staticLocation = staticLocation;
     this.defaultLang = this.getDefaultLang(languages);
-    this.currentLang = this.getLangFromUrl() || this.defaultLang;
+    this.currentLang = this.getLangFromString() || this.defaultLang;
     this.showDefaultLangInUrl = showDefaultLangInUrl;
     this.isInit = true;
   }
@@ -179,7 +179,7 @@ class LangService<TLang = any> {
       log("redirect: URLs have a lang param or language is valid, don't redirect.");
       return;
     }
-    if (this.langIsAvailable(this.getLangFromUrl())) {
+    if (this.langIsAvailable(this.getLangFromString())) {
       log("redirect: lang from URL is valid, don't redirect");
       return;
     }
@@ -257,7 +257,7 @@ class LangService<TLang = any> {
     /**
      * Patch routes
      *  - Add "/:lang" param on each 1st level route
-     *  - format path recurcively (on children if exist)
+     *  - format path recursively (on children if exist)
      * ex:
      *     {
      *      path: { en: "/home", fr: "/accueil" }
@@ -317,7 +317,10 @@ class LangService<TLang = any> {
    * @param route
    * @param lang
    */
-  protected getLangPathByLang(route: TRoute, lang = this.currentLang.key): string {
+  protected getLangPathByLang(
+    route: TRoute,
+    lang = this.getLangFromString(this.staticLocation || window.location.pathname)?.key || this.defaultLang.key
+  ): string {
     let selectedPath: string;
     if (typeof route.path === "string") {
       selectedPath = route.path;
@@ -342,15 +345,16 @@ class LangService<TLang = any> {
    * Get current language from URL
    * @param pathname
    */
-  protected getLangFromUrl(
-    pathname = this.staticLocation ?? window.location.pathname
+  public getLangFromString(
+    pathname = this.staticLocation || window.location.pathname
   ): TLanguage<TLang> {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
-
-    return this.languages.find((language) => {
+    const foundLang = this.languages.find((language) => {
       return firstPart === language.key;
     });
+    log("getLangFromString > foundLang", foundLang);
+    return foundLang;
   }
 
   /**

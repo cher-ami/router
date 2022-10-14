@@ -48,8 +48,7 @@ async function createDevServer()
       //    function calls appropriate framework SSR APIs,
       //    e.g. ReactDOMServer.renderToString()
       const { renderToString, ssrStaticProps, globalData } = await render(url)
-
-      log({url, renderToString, ssrStaticProps, globalData})
+      // log({url, renderToString, ssrStaticProps, globalData})
 
       // 5. Inject the app-rendered HTML into the template.
       let html = template

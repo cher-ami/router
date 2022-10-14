@@ -6,13 +6,6 @@ const componentName = "ArticlePage"
 function ArticlePage(props, handleRef) {
   const rootRef = useRef(null)
 
-
-  useEffect(()=>
-  {
-    console.log("mySlug",props.mySlug)
-  }, [props.mySlug])
-
-
   useStack({
     componentName,
     handleRef,

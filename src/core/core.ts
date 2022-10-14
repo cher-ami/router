@@ -49,13 +49,17 @@ export function createUrl(
       urlToPush = addLangToUrl(urlToPush);
     }
   }
-  // in case we recieve an object
+  // in case we receive an object
   else if (typeof args === "object" && args?.name) {
     // add lang to params if no exist
     if (langService && !args.params?.lang) {
       args.params = {
         ...args.params,
-        ...{ lang: langService.currentLang.key },
+        ...{
+          lang: langService.getLangFromString(
+            Routers.staticLocation || window.location.pathname
+          )?.key,
+        },
       };
     }
     // Get URL by the route name
@@ -197,7 +201,7 @@ export async function requestStaticPropsFromRoute({
 
   // get out
   if (!currentRoute) {
-    console.error("No currentRoute, return");
+    log("No currentRoute, return");
     return;
   }
 
@@ -213,7 +217,7 @@ export async function requestStaticPropsFromRoute({
     try {
       SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(currentRoute.props);
     } catch (e) {
-      console.error("fetch getStatic Props data error");
+      log("fetch getStatic Props data error");
     }
   }
   return SSR_STATIC_PROPS;
@@ -583,6 +587,7 @@ export function addLangToUrl(
   lang: string = Routers.langService?.currentLang.key,
   enable = Routers.langService?.showLangInUrl()
 ): string {
+  log("addLangToUrl > lang", lang);
   if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
   return url;
