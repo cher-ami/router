@@ -10,7 +10,12 @@ import languages from "./languages";
 export async function render(url: string) {
   // Prepare common
   const base = process.env.VITE_APP_BASE;
-  const langService = new LangService({ staticLocation: url, languages });
+  const langService = new LangService({
+    showDefaultLangInUrl: true,
+    staticLocation: url,
+    languages,
+    base,
+  });
 
   // Request static props
   const ssrStaticProps = await requestStaticPropsFromRoute({
@@ -47,5 +52,6 @@ export async function render(url: string) {
     renderToString,
     ssrStaticProps,
     globalData,
+    languages: langService.languages,
   };
 }

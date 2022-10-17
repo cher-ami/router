@@ -9,6 +9,7 @@ import { GlobalDataContext } from "./GlobalDataContext";
 import languages from "./languages";
 
 const langService = new LangService({
+  showDefaultLangInUrl: true,
   languages,
 });
 

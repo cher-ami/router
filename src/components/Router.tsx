@@ -7,6 +7,7 @@ import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
 import { staticPropsCache } from "../core/staticPropsCache";
+import { isSSR } from "../core/helpers";
 
 // -------------------------------------------------------------------------------- TYPES
 
@@ -25,7 +26,7 @@ export type TRoute = Partial<{
   children: TRoute[];
   url: string;
   getStaticProps: (props: TRouteProps) => Promise<any>;
-  _fullUrl: string; // full URL who not depend of current instance
+  _fullUrl: string; // full URL who not depends on current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo
   _langPath: { [x: string]: string } | null;
   _context: TRoute;
@@ -62,12 +63,12 @@ export type TRouteReducerState = {
 
 const componentName = "Router";
 const log = debug(`router:${componentName}`);
-
+const isServer = isSSR();
 /**
  * Router Context
  * Router instance will be keep on this context
  * Big thing is you can access this context from the closest provider in the tree.
- * This allow to manage easily nested stack instances.
+ * This allows to manage easily nested stack instances.
  */
 export const RouterContext = React.createContext<IRouterContext>({
   base: "/",
@@ -106,14 +107,17 @@ function Router(props: {
   middlewares?: ((routes: TRoute[]) => TRoute[])[];
   langService?: LangService;
   id?: number | string;
-  initialStaticProps?: { props: any; name: string, url: string };
+  initialStaticProps?: { props: any; name: string; url: string };
 }): JSX.Element {
   /**
    * 0. LangService
    * Check if langService props exist.
    * If props exist, store langService instance in Routers store.
    */
-  if (!Routers.langService) Routers.langService = props.langService;
+
+  if (!Routers.langService || (!!Routers.langService && isServer)) {
+    Routers.langService = props.langService;
+  }
   const langService = Routers.langService;
 
   /**
@@ -272,11 +276,11 @@ function Router(props: {
 
       // first route visited (server & client)
       const isFirstRouteVisited = newRoute._fullUrl === props.initialStaticProps.url;
-      log("is first route visited?",isFirstRouteVisited)
+      log("is first route visited?", isFirstRouteVisited);
 
       // In SSR context, we have to manage getStaticProps route properties from server and client
       if (isFirstRouteVisited) {
-        log("newRoute.props",newRoute.props)
+        log("newRoute.props", newRoute.props);
         if (newRoute.props) {
           Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
         }
