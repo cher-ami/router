@@ -56,9 +56,7 @@ export function createUrl(
       args.params = {
         ...args.params,
         ...{
-          lang: langService.getLangFromString(
-            Routers.staticLocation || window.location.pathname
-          )?.key,
+          lang: langService.currentLang.key,
         },
       };
     }
@@ -587,7 +585,6 @@ export function addLangToUrl(
   lang: string = Routers.langService?.currentLang.key,
   enable = Routers.langService?.showLangInUrl()
 ): string {
-  log("addLangToUrl > lang", lang);
   if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
   return url;
