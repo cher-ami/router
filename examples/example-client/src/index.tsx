@@ -11,7 +11,7 @@ type TLang = "en" | "fr" | "de";
 
 const langService = new LangService<TLang>({
   languages: [{ key: "en" }, { key: "fr" }, { key: "de" }],
-  showDefaultLangInUrl: true,
+  showDefaultLangInUrl: false,
   base,
 });
 

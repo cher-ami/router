@@ -115,7 +115,7 @@ function Router(props: {
    * If props exist, store langService instance in Routers store.
    */
 
-  if (!Routers.langService || (!!Routers.langService && isServer)) {
+  if (!Routers.langService) {
     Routers.langService = props.langService;
   }
   const langService = Routers.langService;

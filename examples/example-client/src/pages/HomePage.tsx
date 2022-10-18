@@ -34,16 +34,17 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   });
 
   const router = useRouter();
-  const path = getPathByRouteName(routesList, "HomePage");
+  const path = getPathByRouteName(router.routes, "HomePage");
+  log("path", path);
+  const subBase = getSubRouterBase(path, router.base);
+  log("subBase", subBase);
+  const subRoutes = getSubRouterRoutes(path, router.routes);
+  log({ path, subBase, subRoutes });
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <Router
-        id={2}
-        base={getSubRouterBase(path, router.base)}
-        routes={getSubRouterRoutes(path, router.routes)}
-      >
+      <Router id={2} base={subBase} routes={subRoutes}>
         <div className={componentName}>
           <nav>
             <ul>

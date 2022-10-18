@@ -97,11 +97,10 @@ export function getSubRouterBase(
   addLangToUrl: boolean = true,
   showLangInUrl: boolean = Routers.langService?.showLangInUrl()
 ): string {
-  return joinPaths([
-    base,
-    showLangInUrl && addLangToUrl ? "/:lang" : "",
-    getLangPath(path),
-  ]);
+  log({ addLangToUrl, showLangInUrl });
+  const addLang = showLangInUrl && addLangToUrl ? "/:lang" : "";
+  const pathAfterLang = path === "/:lang" ? getLangPath("/") : getLangPath(path);
+  return joinPaths([base, addLang, pathAfterLang]);
 }
 
 /**
@@ -114,8 +113,12 @@ export function getSubRouterRoutes(
   path: string | { [x: string]: string },
   routes: TRoute[]
 ): TRoute[] {
+  const formattedPath =
+    Routers.langService?.showLangInUrl() && path === "/:lang" ? path : "/";
+  log('path === "/:lang"', path === "/:lang");
+  log("formattedPath", formattedPath);
   return routes.find((route) => {
-    return getLangPath(route.path) === getLangPath(path);
+    return getLangPath(route.path) === getLangPath(formattedPath);
   })?.children;
 }
 

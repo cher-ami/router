@@ -18,6 +18,7 @@ export const routesList: TRoute[] = [
   {
     path: "/",
     component: HomePage,
+    name: "HomePage",
     children: [
       {
         path: "/foo",

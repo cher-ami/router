@@ -211,10 +211,13 @@ class LangService<TLang = any> {
    * Determine when we need to show current lang in URL
    */
   public showLangInUrl(): boolean {
+    // if option is true, always display lang in URL
     if (this.showDefaultLangInUrl) {
-      return this.isInit;
+      return true;
+      // if this option is false
     } else {
-      return this.isInit && !this.isDefaultLangKey();
+      // show in URL only if whe are not on the default lang
+      return !this.isDefaultLangKey(this.currentLang.key);
     }
   }
 
@@ -319,7 +322,8 @@ class LangService<TLang = any> {
    */
   protected getLangPathByLang(
     route: TRoute,
-    lang = this.getLangFromString(this.staticLocation || window.location.pathname)?.key || this.defaultLang.key
+    lang = this.getLangFromString(this.staticLocation || window.location.pathname)?.key ||
+      this.defaultLang.key
   ): string {
     let selectedPath: string;
     if (typeof route.path === "string") {
