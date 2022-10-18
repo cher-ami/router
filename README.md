@@ -256,7 +256,6 @@ import {
 } from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
-  // Get router context
   const { base, routes } = useRouter();
   // Parsed routes list and get path by route name -> "/foo"
   const path = getPathByRouteName(router.routes, "FooPage");

@@ -87,7 +87,9 @@ export function createUrl(
  * Get sub router base URL
  * @param path
  * @param base
- * @param addLangToUrl
+ * @param addLangToUrl:
+ *  if true, base will be /base/:lang/path/subPath
+ *  if false, base will be /base/path/subPath
  * @returns
  */
 export function getSubRouterBase(
