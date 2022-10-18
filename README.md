@@ -256,20 +256,17 @@ import {
 } from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
-  // Get parent router context
+  // Get router context
   const { base, routes } = useRouter();
-
-  // Parsed routes list and get path by route name
-  const path = getPathByRouteName(routesList, "FooPage"); // "/foo"
-  // ...
+  // Parsed routes list and get path by route name -> "/foo"
+  const path = getPathByRouteName(router.routes, "FooPage");
+  // (if last param is false, '/:lang' will be not added) -> "/base/:lang/foo"
+  const subBase = getSubRouterBase(path, router.base, true);
+  // get subRoutes
+  const subRoutes = getSubRouterRoutes(path, router.routes);
   return (
     <div>
-      <Router
-        // -> "/base/:lang/foo" (if last param is false, ':lang' will be not added)
-        base={getSubRouterBase(path, base, true)}
-        // children routes array of FooPage
-        routes={getSubRouterRoutes(path, routes)}
-      >
+      <Router base={subBase} routes={subRoutes}>
         <Stack />
       </Router>
     </div>

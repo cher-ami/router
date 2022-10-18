@@ -14,11 +14,6 @@ export type TLanguage<T = any> = {
 
 class LangService<TLang = any> {
   /**
-   * Check if singleton is init
-   */
-  public isInit: boolean = false;
-
-  /**
    * contains available languages
    */
   public languages: TLanguage<TLang>[];
@@ -76,7 +71,6 @@ class LangService<TLang = any> {
     this.defaultLang = this.getDefaultLang(languages);
     this.currentLang = this.getLangFromString() || this.defaultLang;
     this.showDefaultLangInUrl = showDefaultLangInUrl;
-    this.isInit = true;
   }
 
   /**
@@ -140,7 +134,7 @@ class LangService<TLang = any> {
       chooseForcePageReload = true;
     }
 
-    // 3. if curent lang is default lang, add /currentLang.key after base
+    // 3. if current lang is default lang, add /currentLang.key after base
     else if (this.isDefaultLangKey(this.currentLang.key)) {
       const newUrlWithoutBase = preparedNewUrl.substr(
         this.base.length,
@@ -158,7 +152,7 @@ class LangService<TLang = any> {
       log("newUrl is no set, do not reload or refresh, return.", newUrl);
       return;
     }
-    // register current langage (not usefull if we reload the app.)
+    // register current language (not useful if we reload the app.)
     this.currentLang = toLang;
     // remove last / if exist and if he is not alone
     newUrl = removeLastCharFromString(newUrl, "/", true);
@@ -171,10 +165,6 @@ class LangService<TLang = any> {
    * @param forcePageReload
    */
   public redirect(forcePageReload: boolean = true): void {
-    if (!this.isInit) {
-      console.warn("redirect: LangService is not init, exit.");
-      return;
-    }
     if (!this.showDefaultLangInUrl) {
       log("redirect: URLs have a lang param or language is valid, don't redirect.");
       return;

@@ -23,7 +23,6 @@ const root = createRoot(document.getElementById("root"));
 root.render(
   <Router
     history={createBrowserHistory()}
-    //staticLocation="/base/en/about"
     langService={langService}
     routes={routesList}
     base={base}

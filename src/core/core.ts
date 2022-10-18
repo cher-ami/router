@@ -88,17 +88,16 @@ export function createUrl(
  * @param path
  * @param base
  * @param addLangToUrl
- * @param showLangInUrl
  * @returns
  */
 export function getSubRouterBase(
   path: string | { [x: string]: string },
   base: string,
-  addLangToUrl: boolean = true,
-  showLangInUrl: boolean = Routers.langService?.showLangInUrl()
+  addLangToUrl: boolean = true
 ): string {
-  log({ addLangToUrl, showLangInUrl });
-  const addLang = showLangInUrl && addLangToUrl ? "/:lang" : "";
+  // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
+  // /:lang is return as path, but we want to get no lang in returned base string
+  const addLang = Routers.langService?.showLangInUrl() && addLangToUrl ? "/:lang" : "";
   const pathAfterLang = path === "/:lang" ? getLangPath("/") : getLangPath(path);
   return joinPaths([base, addLang, pathAfterLang]);
 }
@@ -113,10 +112,11 @@ export function getSubRouterRoutes(
   path: string | { [x: string]: string },
   routes: TRoute[]
 ): TRoute[] {
+  // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
+  // /:lang is return as path, but we want to search path with "/" instead
   const formattedPath =
-    Routers.langService?.showLangInUrl() && path === "/:lang" ? path : "/";
-  log('path === "/:lang"', path === "/:lang");
-  log("formattedPath", formattedPath);
+    !Routers.langService?.showLangInUrl() && path === "/:lang" ? "/" : path;
+
   return routes.find((route) => {
     return getLangPath(route.path) === getLangPath(formattedPath);
   })?.children;
