@@ -11,7 +11,6 @@ import {
 } from "@cher-ami/router";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import debug from "@wbe/debug";
-import { routesList } from "../routes";
 
 const componentName: string = "HomePage";
 const log = debug(`router:${componentName}`);
@@ -34,16 +33,14 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   });
 
   const router = useRouter();
-  const path = getPathByRouteName(routesList, "HomePage");
+  const path = getPathByRouteName(router.routes, "HomePage");
+  const subBase = getSubRouterBase(path, router.base);
+  const subRoutes = getSubRouterRoutes(path, router.routes);
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
-      <Router
-        id={2}
-        base={getSubRouterBase(path, router.base)}
-        routes={getSubRouterRoutes(path, router.routes)}
-      >
+      <Router id={2} base={subBase} routes={subRoutes}>
         <div className={componentName}>
           <nav>
             <ul>

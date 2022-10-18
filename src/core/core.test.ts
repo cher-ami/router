@@ -37,7 +37,7 @@ describe("public", () => {
   });
 
   describe("getSubRouterBase", () => {
-    it("should return subrouter base URL", () => {
+    it("should return subRouter base URL", () => {
       expect(getSubRouterBase("/foo", "")).toBe("/foo");
       expect(getSubRouterBase("/foo", "/")).toBe("/foo");
       expect(getSubRouterBase("/foo", "/hello/")).toBe("/hello/foo");
@@ -54,18 +54,26 @@ describe("public", () => {
       expect(getSubRouterBase(langPathTest, "/base/", false)).toBe("/base/foo-en");
       Routers.langService = undefined;
     });
+
+    it("should return subRouter base URL with 'showDefaultLangInUrl: false' option", () => {
+      Routers.langService = new LangService({
+        languages: [{ key: "en" }, { key: "fr" }],
+        showDefaultLangInUrl: false,
+      });
+      ["/", "/foo", "/foo/bar/biz"].forEach((e) => {
+        expect(getSubRouterBase(e, "/base/", true)).toBe(`/base${e}`);
+        expect(getSubRouterBase(e, "/base/", false)).toBe(`/base${e}`);
+      });
+      Routers.langService = undefined;
+    });
   });
 
   describe("getSubRouterRoutes", () => {
-    it("should return subrouter route list", () => {
-      getSubRouterRoutes("/", routeList.find((e) => e.name === "HomePage").children);
-      getSubRouterRoutes("/:testParam?", [
-        {
-          path: "/foo4",
-          props: { color: "red" },
-          name: "Foo4Page",
-        },
-      ]);
+    it("should return subRouter route list", () => {
+      const homeChildren = getSubRouterRoutes("/", routeList);
+      expect(homeChildren).toEqual(routeList.find((e) => e.name === "HomePage").children);
+      const aboutChildren = getSubRouterRoutes("/about", routeList);
+      expect(aboutChildren).toEqual(routeList.find((e) => e.name === "AboutPage").children);
     });
   });
 

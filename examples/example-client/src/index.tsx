@@ -11,7 +11,7 @@ type TLang = "en" | "fr" | "de";
 
 const langService = new LangService<TLang>({
   languages: [{ key: "en" }, { key: "fr" }, { key: "de" }],
-  showDefaultLangInUrl: true,
+  showDefaultLangInUrl: false,
   base,
 });
 
@@ -23,7 +23,6 @@ const root = createRoot(document.getElementById("root"));
 root.render(
   <Router
     history={createBrowserHistory()}
-    //staticLocation="/base/en/about"
     langService={langService}
     routes={routesList}
     base={base}
