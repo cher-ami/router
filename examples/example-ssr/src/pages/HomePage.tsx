@@ -1,5 +1,5 @@
-import React, { useState, useRef, useContext } from "react";
-import { useLang, useRouter, useStack } from "@cher-ami/router";
+import React, { useState, useRef, useContext, useEffect } from "react";
+import { useLang, useStack } from "@cher-ami/router";
 import { transitionsHelper } from "../helpers/transitionsHelper";
 import { GlobalDataContext } from "../GlobalDataContext";
 
@@ -8,9 +8,7 @@ function HomePage(props, handleRef) {
   const rootRef = useRef(null);
   const [n, setN] = useState(0);
   const { globalData } = useContext(GlobalDataContext);
-  const router = useRouter();
-  const a = useLang();
-  console.log(router);
+  const [lang] = useLang();
 
   useStack({
     componentName,
@@ -22,7 +20,7 @@ function HomePage(props, handleRef) {
 
   return (
     <div className={componentName} ref={rootRef}>
-      {componentName}
+      {componentName} {lang.key}
       <br />
       <br />
       <button onClick={() => setN(n + 1)}>+ {n}</button>

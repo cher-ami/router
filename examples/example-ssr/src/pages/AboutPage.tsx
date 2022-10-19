@@ -11,6 +11,7 @@ import {
 import { transitionsHelper } from "../helpers/transitionsHelper";
 import { getPathByRouteName } from "@cher-ami/router";
 import debug from "@wbe/debug";
+import { useLang } from "@cher-ami/router";
 import { EPages } from "../routes";
 
 const componentName = "AboutPage";
@@ -18,6 +19,8 @@ const log = debug(`front:${componentName}`);
 
 function AboutPage(props, handleRef) {
   const rootRef = useRef(null);
+  const [lang] = useLang();
+
   useStack({
     componentName,
     handleRef,
@@ -34,7 +37,7 @@ function AboutPage(props, handleRef) {
 
   return (
     <div className={componentName} ref={rootRef}>
-      {componentName}
+      {componentName} {lang.key}
       <br />
       <Link to={{ name: EPages.FOO }}>Foo</Link>
       <br />
