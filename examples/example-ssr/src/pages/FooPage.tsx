@@ -7,11 +7,7 @@ const componentName = "FooPage";
 function FooPage(props, handleRef) {
   const rootRef = useRef(null);
   const [lang] = useLang();
-
   const router = useRouter();
-    console.log("router", router);
-  useEffect(() => {
-  }, []);
 
   useStack({
     componentName,
@@ -23,7 +19,8 @@ function FooPage(props, handleRef) {
 
   return (
     <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
-      {componentName} - langKey: {router.langService && router.langService.currentLang.key}
+      {componentName} - langKey:{" "}
+      {router.langService && router.langService.currentLang.key}
     </div>
   );
 }
