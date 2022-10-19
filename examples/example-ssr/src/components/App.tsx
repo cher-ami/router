@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, Stack, useLang } from "@cher-ami/router";
 import languages from "../languages";
+import { EPages } from "../routes";
 
 export function App() {
   const [lang, setLang] = useLang();
@@ -26,6 +27,7 @@ export function App() {
     });
   };
 
+  // prettier-ignore
   return (
     <div className={"App"}>
       {languages.map((el, i) => (
@@ -39,13 +41,17 @@ export function App() {
       ))}
       <br/>
       <br/>
+
+      {/* NAV */}
       <nav>
-        <Link to={{ name: "Home" }}>Home</Link> |{" "}
-        <Link to={{ name: "About" }}>About</Link> |{" "}
-        <Link to={{ name: "Article", params: { slug: "article-1" } }}>Article 1</Link> |{" "}
-        <Link to={{ name: "Article", params: { slug: "article-2" } }}>Article 2</Link> |{" "}
-        <Link to={{ name: "Contact" }}>Contact</Link>
+        <Link to={{ name: EPages.HOME }}>Home</Link> |{" "}
+        <Link to={{ name: EPages.ABOUT }}>About</Link> |{" "}
+        <Link to={{ name: EPages.ARTICLE, params: { slug: "article-1" } }}>Article 1</Link> |{" "}
+        <Link to={{ name: EPages.ARTICLE, params: { slug: "article-2" } }}>Article 2</Link> |{" "}
+        <Link to={{ name: EPages.CONTACT }}>Contact</Link>
       </nav>
+
+      {/* RENDER PAGES */}
       <Stack manageTransitions={crossedTransitions} />
     </div>
   );

@@ -4,14 +4,9 @@ import { App } from "./components/App";
 import { routes } from "./routes";
 import { createBrowserHistory } from "history";
 import "./index.css";
-import { LangService, Router } from "@cher-ami/router";
+import { Router } from "@cher-ami/router";
 import { GlobalDataContext } from "./GlobalDataContext";
-import languages from "./languages";
-
-const langService = new LangService({
-  showDefaultLangInUrl: true,
-  languages,
-});
+import { langServiceInstance } from "./langServiceInstance";
 
 /**
  * Client side
@@ -22,7 +17,7 @@ const root = hydrateRoot(
     routes={routes}
     history={createBrowserHistory()}
     initialStaticProps={window["__SSR_STATIC_PROPS__"]}
-    langService={langService}
+    langService={langServiceInstance()}
   >
     <GlobalDataContext.Provider value={{ globalData: window["__GLOBAL_DATA__"] }}>
       <App />

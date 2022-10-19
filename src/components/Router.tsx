@@ -1,7 +1,7 @@
 import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
-import React from "react";
+import React, { useMemo } from "react";
 import { formatRoutes } from "../core/core";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
@@ -115,10 +115,12 @@ function Router(props: {
    * If props exist, store langService instance in Routers store.
    */
 
-  if (!Routers.langService || (!!Routers.langService && isServer)) {
-    Routers.langService = props.langService;
-  }
-  const langService = Routers.langService;
+  const langService = useMemo(() => {
+    if (!Routers.langService || (props.langService && isServer)) {
+      Routers.langService = props.langService;
+    }
+    return Routers.langService;
+  }, [props.langService]);
 
   /**
    * 1. routes
@@ -137,8 +139,10 @@ function Router(props: {
       props.id
     );
 
-    // if is first instance, register result in Routers
-    if (!Routers.routes) Routers.routes = routesList;
+    // if is the first instance, register routes in Routers
+    if (!Routers.routes || isServer) {
+      Routers.routes = routesList;
+    }
     return routesList;
   }, [props.routes, langService, props.middlewares, props.id]);
 

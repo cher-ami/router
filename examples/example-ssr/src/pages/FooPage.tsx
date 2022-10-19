@@ -1,11 +1,13 @@
-import React, { useRef } from "react";
-import { useStack } from "@cher-ami/router";
+import React, { useEffect, useRef } from "react";
+import { useRouter, useStack } from "@cher-ami/router";
 import { transitionsHelper } from "../helpers/transitionsHelper";
-
+import { useLang } from "@cher-ami/router";
 
 const componentName = "FooPage";
 function FooPage(props, handleRef) {
   const rootRef = useRef(null);
+  const [lang] = useLang();
+  const router = useRouter();
 
   useStack({
     componentName,
@@ -17,7 +19,8 @@ function FooPage(props, handleRef) {
 
   return (
     <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
-      {componentName}
+      {componentName} - langKey:{" "}
+      {router.langService && router.langService.currentLang.key}
     </div>
   );
 }

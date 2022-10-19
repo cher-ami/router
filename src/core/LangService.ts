@@ -123,29 +123,32 @@ class LangService<TLang = any> {
       newUrl = preparedNewUrl;
     }
 
-    // 2. if toLang is default lang, need to hidden lang from URL
-    else if (this.isDefaultLangKey(toLang.key)) {
+    // 2. if toLang is default lang, need to REMOVE lang from URL
+    else if (!this.showDefaultLangInUrl && this.isDefaultLangKey(toLang.key)) {
       const urlPartToRemove = `${this.base}/${toLang.key}`;
-      const newUrlWithoutBaseAndLang = preparedNewUrl.substr(
+      const newUrlWithoutBaseAndLang = preparedNewUrl.substring(
         urlPartToRemove.length,
         preparedNewUrl.length
       );
       newUrl = joinPaths([this.base, newUrlWithoutBaseAndLang]);
       chooseForcePageReload = true;
+      log("2. after remove lang from URL", newUrl);
     }
 
     // 3. if current lang is default lang, add /currentLang.key after base
-    else if (this.isDefaultLangKey(this.currentLang.key)) {
-      const newUrlWithoutBase = preparedNewUrl.substr(
+    else if (!this.showDefaultLangInUrl && this.isDefaultLangKey(this.currentLang.key)) {
+      const newUrlWithoutBase = preparedNewUrl.substring(
         this.base.length,
         preparedNewUrl.length
       );
       newUrl = joinPaths([this.base, "/", toLang.key as string, "/", newUrlWithoutBase]);
+      log("3. after add lang in URL", newUrl);
     }
 
     // 4. other cases
     else {
       newUrl = preparedNewUrl;
+      log("4, other case");
     }
 
     if (!newUrl) {
@@ -344,11 +347,9 @@ class LangService<TLang = any> {
   ): TLanguage<TLang> {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
-    const foundLang = this.languages.find((language) => {
+    return this.languages.find((language) => {
       return firstPart === language.key;
     });
-    log("getLangFromString > foundLang", foundLang);
-    return foundLang;
   }
 
   /**
