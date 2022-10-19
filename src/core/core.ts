@@ -41,10 +41,9 @@ export function createUrl(
     );
   }
 
-  // in case we recieve a string
+  // in case we receive a string
   if (typeof args === "string") {
     urlToPush = args as string;
-
     if (!!langService) {
       urlToPush = addLangToUrl(urlToPush);
     }
@@ -69,17 +68,13 @@ export function createUrl(
     return;
   }
 
-  function addBaseToUrl(url: string, base = Routers.base): string {
-    url = joinPaths([base === "/" ? "" : base, url]);
-    return url;
-  }
-
+  // Add base
+  const addBaseToUrl = (url: string, base = Routers.base): string =>
+    joinPaths([base === "/" ? "" : base, url]);
+  // compile base if contains lang params
+  const newBase = compileUrl(base, { lang: Routers.langService?.currentLang.key });
   // in each case, add base URL
-  urlToPush = addBaseToUrl(
-    urlToPush,
-    // compile base if contains lang params
-    compileUrl(base, { lang: Routers.langService?.currentLang.key })
-  );
+  urlToPush = addBaseToUrl(urlToPush, newBase);
   return urlToPush;
 }
 

@@ -20,16 +20,32 @@ export const fetchAvailableUrls = async () => {
 
   // return static urls
   // prettier-ignore
+
+
   return [
-    "/",
-    "/about",
-    "/contact",
+    // "/",
+    // "/about",
+    // "/about/foo",
+    // "/about/bar",
+    // "/article/article-1",
+    // "/article/article-2",
+    // "/contact",
+
     "/fr",
     "/fr/about",
+    "/fr/about/foo",
+    "/fr/about/bar",
+    "/fr/article/article-1",
+    "/fr/article/article-2",
     "/fr/contact",
-    "/de",
-    "/de/about",
-    "/de/contact",
+
+    "/en",
+    "/en/about",
+    "/en/about/foo",
+    "/en/about/bar",
+    "/en/article/article-1",
+    "/en/article/article-2",
+    "/en/contact",
     "/404"
   ]
-}
+};

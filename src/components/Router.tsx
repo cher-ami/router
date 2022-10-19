@@ -115,7 +115,7 @@ function Router(props: {
    * If props exist, store langService instance in Routers store.
    */
 
-  if (!Routers.langService || (!!Routers.langService && isServer)) {
+  if (!Routers.langService || isServer) {
     Routers.langService = props.langService;
   }
   const langService = Routers.langService;
@@ -137,8 +137,10 @@ function Router(props: {
       props.id
     );
 
-    // if is first instance, register result in Routers
-    if (!Routers.routes) Routers.routes = routesList;
+    // if is the first instance, register routes in Routers
+    if (!Routers.routes || isServer) {
+      Routers.routes = routesList;
+    }
     return routesList;
   }, [props.routes, langService, props.middlewares, props.id]);
 
