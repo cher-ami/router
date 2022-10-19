@@ -1,5 +1,5 @@
 import React, { useState, useRef, useContext } from "react";
-import { useStack } from "@cher-ami/router";
+import { useLang, useRouter, useStack } from "@cher-ami/router";
 import { transitionsHelper } from "../helpers/transitionsHelper";
 import { GlobalDataContext } from "../GlobalDataContext";
 
@@ -8,6 +8,9 @@ function HomePage(props, handleRef) {
   const rootRef = useRef(null);
   const [n, setN] = useState(0);
   const { globalData } = useContext(GlobalDataContext);
+  const router = useRouter();
+  const a = useLang();
+  console.log(router);
 
   useStack({
     componentName,

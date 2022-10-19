@@ -3,19 +3,14 @@ import * as React from "react";
 import ReactDOMServer from "react-dom/server";
 import { routes } from "./routes";
 import { App } from "./components/App";
-import { requestStaticPropsFromRoute, LangService, Router } from "@cher-ami/router";
+import { requestStaticPropsFromRoute, Router } from "@cher-ami/router";
 import { GlobalDataContext } from "./GlobalDataContext";
-import languages from "./languages";
+import { langServiceInstance } from "./langServiceInstance";
 
 export async function render(url: string) {
   // Prepare common
   const base = process.env.VITE_APP_BASE;
-  const langService = new LangService({
-    showDefaultLangInUrl: true,
-    staticLocation: url,
-    languages,
-    base,
-  });
+  const langService = langServiceInstance(base, url);
 
   // Request static props
   const ssrStaticProps = await requestStaticPropsFromRoute({
