@@ -3,6 +3,7 @@ import { IRouterContext } from "./Router";
 import debug from "@wbe/debug";
 import { IRouteStack } from "../hooks/useStack";
 import { useRouter } from "../hooks/useRouter";
+import { isSSR } from "../core/helpers";
 
 export type TManageTransitions = {
   previousPage: IRouteStack;
@@ -23,7 +24,6 @@ const log = debug(`router:${componentName}`);
  */
 function Stack(props: IProps): JSX.Element {
   const {
-    staticLocation,
     routeIndex,
     currentRoute,
     previousRoute,
@@ -61,7 +61,7 @@ function Stack(props: IProps): JSX.Element {
   );
 
   // 2. animate when route state changed
-  React[staticLocation ? "useEffect" : "useLayoutEffect"](() => {
+  React[isSSR() ? "useEffect" : "useLayoutEffect"](() => {
     if (!currentRoute) return;
     (props.manageTransitions || sequencialTransition)({
       previousPage: prevRef.current,
@@ -71,7 +71,6 @@ function Stack(props: IProps): JSX.Element {
       unmountPreviousPage();
     });
   }, [routeIndex]);
-
 
   const [PrevRoute, CurrRoute] = [
     previousRoute?._context ?? previousRoute,
