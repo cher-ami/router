@@ -42,6 +42,11 @@ export const routes: TRoute[] = [
         path: "/foo",
         component: FooPage,
         name: EPages.FOO,
+        getStaticProps: async () => {
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/1");
+          const todo = await res.json();
+          return { todo };
+        },
       },
       {
         path: "/bar",

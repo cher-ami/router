@@ -268,45 +268,49 @@ function Router(props: {
     }
 
     const newRoute: TRoute = matchingRoute || notFoundRoute;
-
     // if no newRoute, do not continue
     if (!newRoute) return;
+    // store cache
+    const cache = staticPropsCache();
+    // check if new route data as been store in cache
+    const dataFromCache = cache.get(newRoute._fullUrl);
+    // first route visited (server & client)
+    const isFirstRouteVisited = newRoute._fullUrl === props.initialStaticProps?.url;
+    log(props.id, "is first route visited?", isFirstRouteVisited);
 
-    if (props.initialStaticProps) {
-      const cache = staticPropsCache();
-
-      // check if new route data as been store in cache
-      const dataFromCache = cache.get(newRoute._fullUrl);
-
-      // first route visited (server & client)
-      const isFirstRouteVisited = newRoute._fullUrl === props.initialStaticProps.url;
-      log("is first route visited?", isFirstRouteVisited);
-
-      // In SSR context, we have to manage getStaticProps route properties from server and client
-      if (isFirstRouteVisited) {
-        log("newRoute.props", newRoute.props);
-        if (newRoute.props) {
-          Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
-        }
-        if (!dataFromCache) {
-          cache.set(newRoute._fullUrl, newRoute.props ?? {});
-        }
+    // Server and client
+    // check if is first route and initial static props exist
+    // in this case, we assign this response to newPage props and cache it
+    if (isFirstRouteVisited && props.initialStaticProps) {
+      log(
+        props.id,
+        "This is the first route & data exist in props.initialStaticProps, we assign and cache it.",
+        newRoute.props
+      );
+      if (newRoute.props) {
+        Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
       }
-      // if NOT first route (client)
-      else {
-        // if cache exist for this route, assign it
-        if (dataFromCache) {
-          Object.assign(newRoute.props, dataFromCache);
-        }
-        // Continue only if getStaticProps is not undefined
-        else if (newRoute.getStaticProps) {
-          try {
-            const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
-            Object.assign(newRoute.props, requestStaticProps);
-            cache.set(newRoute._fullUrl, requestStaticProps);
-          } catch (e) {
-            console.error("requestStaticProps failed");
-          }
+      cache.set(newRoute._fullUrl, newRoute.props ?? {});
+    }
+    // Client only (not the first route, it only can be the client)
+    // Case, is not first route OR no initial static props:
+    // If cache exist for this route, assign it and continue.
+    // else, we request the static props and cache it
+    else {
+      if (dataFromCache) {
+        log(props.id, "Not first route & no initialStaticProps > assign dataFromCache");
+        Object.assign(newRoute.props, dataFromCache);
+      } else if (newRoute.getStaticProps) {
+        log(
+          props.id,
+          "Not first route & no initialStaticProps & no dataFromCache > request getStaticProps"
+        );
+        try {
+          const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
+          Object.assign(newRoute.props, requestStaticProps);
+          cache.set(newRoute._fullUrl, requestStaticProps);
+        } catch (e) {
+          console.error("requestStaticProps failed");
         }
       }
     }
