@@ -256,7 +256,7 @@ import {
 } from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
-  const { base, routes } = useRouter();
+  const router = useRouter();
   // Parsed routes list and get path by route name -> "/foo"
   const path = getPathByRouteName(router.routes, "FooPage");
   // (if last param is false, '/:lang' will be not added) -> "/base/:lang/foo"
