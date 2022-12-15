@@ -29,6 +29,11 @@ class LangService<TLang = any> {
   public defaultLang: TLanguage<TLang>;
 
   /**
+   * Browser language
+   */
+  public browserLang: TLanguage<TLang>;
+
+  /**
    * Show default language in URL
    */
   public showDefaultLangInUrl: boolean;
@@ -70,6 +75,7 @@ class LangService<TLang = any> {
     this.staticLocation = staticLocation;
     this.defaultLang = this.getDefaultLang(languages);
     this.currentLang = this.getLangFromString() || this.defaultLang;
+    this.browserLang = this.getBrowserLang(languages);
     this.showDefaultLangInUrl = showDefaultLangInUrl;
   }
 
@@ -163,11 +169,36 @@ class LangService<TLang = any> {
     this.reloadOrRefresh(newUrl, chooseForcePageReload);
   }
 
+  public redirectToBrowserLang(forcePageReload: boolean = true) {
+    log("browserLang object", this.browserLang);
+    // If browser language doesn't match, redirect to default lang
+    if (!this.browserLang) {
+      log("browserLang is not set, redirect to defaultLang");
+      this.redirectToDefaultLang(forcePageReload);
+      return;
+    }
+    // We want to redirect only in case user is on / or /base/
+    if (
+      location.pathname === this.base ||
+      removeLastCharFromString(location.pathname, "/", true) === this.base
+    ) {
+      // prepare path and build URL
+      const newUrl = compileUrl(joinPaths([this.base, "/:lang"]), {
+        lang: this.browserLang.key,
+      });
+      log("redirect: to browser language >", { newUrl });
+      // reload or refresh all application
+      this.reloadOrRefresh(newUrl, forcePageReload);
+    }
+  }
+
   /**
    * Redirect to default language if no language is set
    * @param forcePageReload
    */
-  public redirect(forcePageReload: boolean = true): void {
+  public redirectToDefaultLang(forcePageReload: boolean = true): void {
+    if (isSSR()) return;
+
     if (!this.showDefaultLangInUrl) {
       log("redirect: URLs have a lang param or language is valid, don't redirect.");
       return;
@@ -176,18 +207,16 @@ class LangService<TLang = any> {
       log("redirect: lang from URL is valid, don't redirect");
       return;
     }
-
+    // We want to redirect only in case user is on / or /base/
     if (
       location.pathname === this.base ||
       removeLastCharFromString(location.pathname, "/", true) === this.base
     ) {
-      // prepare path
-      const path = joinPaths([this.base, "/:lang"]);
-
-      // build new URL
-      let newUrl = compileUrl(path, { lang: this.defaultLang.key });
-
-      log("redirect: to >", { newUrl });
+      // prepare path & build new URL
+      const newUrl = compileUrl(joinPaths([this.base, "/:lang"]), {
+        lang: this.defaultLang.key,
+      });
+      log("redirect to default lang >", { newUrl });
       // reload or refresh all application
       this.reloadOrRefresh(newUrl, forcePageReload);
     }
@@ -215,7 +244,7 @@ class LangService<TLang = any> {
   }
 
   /**
-   * Add Langs to Routes
+   * Add Lang to Routes
    * Patch all first level routes with ":lang" param
    * {
    *    path: "/foo",
@@ -336,6 +365,23 @@ class LangService<TLang = any> {
    */
   protected getDefaultLang(languages: TLanguage<TLang>[]): TLanguage<TLang> {
     return languages.find((el) => el?.default) ?? languages[0];
+  }
+
+  /**
+   * Get Browser language
+   * @protected
+   */
+  protected getBrowserLang(languages: TLanguage[]): TLanguage<TLang> {
+    if (typeof navigator === "undefined") return;
+
+    const browserLanguage = navigator.language;
+    log("Browser language detected", browserLanguage);
+
+    return languages.find((lang) =>
+      lang.key.includes("-")
+        ? (lang.key as string) === browserLanguage.toLowerCase()
+        : (lang.key as string) === browserLanguage.toLowerCase().split("-")[0]
+    );
   }
 
   /**
