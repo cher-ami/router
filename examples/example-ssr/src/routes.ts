@@ -22,7 +22,7 @@ export const routes: TRoute[] = [
     path: "/",
     component: HomePage,
     name: EPages.HOME,
-    getStaticProps: async (props) => {
+    getStaticProps: async (props, currentLang) => {
       const res = await fetch("https://worldtimeapi.org/api/ip");
       const time = await res.json();
       return { time };

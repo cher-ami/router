@@ -73,7 +73,9 @@ describe("public", () => {
       const homeChildren = getSubRouterRoutes("/", routeList);
       expect(homeChildren).toEqual(routeList.find((e) => e.name === "HomePage").children);
       const aboutChildren = getSubRouterRoutes("/about", routeList);
-      expect(aboutChildren).toEqual(routeList.find((e) => e.name === "AboutPage").children);
+      expect(aboutChildren).toEqual(
+        routeList.find((e) => e.name === "AboutPage").children
+      );
     });
   });
 
@@ -94,7 +96,7 @@ describe("public", () => {
         routes: routeList,
       });
       expect(ssrStaticProps).toEqual({
-        props: { fetchData: {} },
+        props: { data: {} },
         name: "HelloPage",
         url: "/hello",
       });

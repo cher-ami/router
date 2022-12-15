@@ -213,7 +213,10 @@ export async function requestStaticPropsFromRoute({
   // await promise from getStaticProps
   if (currentRoute?.getStaticProps) {
     try {
-      SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(currentRoute.props);
+      SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(
+        currentRoute.props,
+        langService?.currentLang
+      );
     } catch (e) {
       log("fetch getStatic Props data error");
     }

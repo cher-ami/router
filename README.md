@@ -360,18 +360,18 @@ The client will got this response.
 
 To be able to request on server side (and on client side too), `getStaticProps` route property is available:
 
-```jsx
+```ts
    {
     path: "/article/:slug",
     component: ArticlePage,
     name: "Article",
-    getStaticProps: async (props) => {
+    getStaticProps: async (props, currentLang) => {
       // props contains route props and params (ex: slug: "article-1")
-      const res = await fetch(`https://api.com/posts/${props.params.slug}`);
+      const res = await fetch(`https://api.com/posts/${currentLang.key}/${props.params.slug}`);
       const api = await res.json();
       return { api };
-    },
-  },
+    }
+  }
 ```
 
 Then, get the response data populated in page component props:
