@@ -829,17 +829,25 @@ component only.
 langService.setLang({ key: "de" });
 ```
 
-#### redirect(forcePageReload = true) `void`
+#### redirectToDefaultLang(forcePageReload = true) `void`
 
 If URL is `/`, `showDefaultLangInUrl` is set to `true` and default lang is 'en',
-it will redirect to `/en`. This method can be called in nested router component
-only.
+it will redirect to `/en`.
 
 - `forcePageReload`: choose if we reload the full application or using the
   internal router stack to change the language
 
-```jsx
-langService.redirect();
+```js
+langService.redirectToDefaultLang();
+```
+
+#### redirectToBrowserLang(forcePageReload = true) `void`
+
+Same than `redirectToDefaultLang` method but redirect to the user `navigator.language`.
+If the browser language doesn't exist in Languages array, we redirect to the default lang. 
+
+```js
+langService.redirectToBrowserLang();
 ```
 
 ### <a name="TranslatePath"></a>Translate Path

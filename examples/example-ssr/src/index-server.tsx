@@ -26,7 +26,7 @@ export async function render(url: string) {
     const users = await res.json();
     return { users };
   };
-  let globalData = await requestGlobalData();
+  const globalData = await requestGlobalData();
 
   // Template for server
   const renderToString = ReactDOMServer.renderToString(

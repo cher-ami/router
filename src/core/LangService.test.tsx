@@ -53,7 +53,7 @@ it("should redirect to default lang", () => {
   const langService = new LangService({ languages: locales, base: "/" });
   render(<App langService={langService} />);
   act(() => {
-    langService.redirect(true);
+    langService.redirectToDefaultLang(true);
   });
   const defaultLangKey = langService.defaultLang.key;
   expect(window.open).toHaveBeenCalledWith(`/${defaultLangKey}`, "_self");
@@ -63,7 +63,7 @@ it("should redirect to default lang with custom base", () => {
   const langService = new LangService({ languages: locales, base: "/" });
   render(<App base={"/foo-base"} langService={langService} />);
   act(() => {
-    langService.redirect(true);
+    langService.redirectToDefaultLang(true);
   });
   const defaultLangKey = langService.defaultLang.key;
   expect(window.open).toHaveBeenCalledWith(`/${defaultLangKey}`, "_self");
@@ -77,7 +77,7 @@ it("should not redirect to default lang if showDefaultLangInUrl is set to false"
   });
   render(<App langService={langService} />);
   act(() => {
-    langService.redirect(true);
+    langService.redirectToDefaultLang(true);
   });
   expect(window.open).toHaveBeenCalledTimes(0);
 });
