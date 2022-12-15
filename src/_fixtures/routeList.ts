@@ -21,10 +21,10 @@ export const routeList: TRoute[] = [
   {
     path: "/hello",
     name: "HelloPage",
-    getStaticProps: async (props) =>
+    getStaticProps: async (props, currentLang) =>
       new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ fetchData: {} });
+          resolve({ data: {} });
         }, 100);
       }),
     children: [

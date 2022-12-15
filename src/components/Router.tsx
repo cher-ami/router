@@ -307,7 +307,7 @@ function Router(props: {
         try {
           const requestStaticProps = await newRoute.getStaticProps(
             newRoute.props,
-            langService.currentLang
+            langService?.currentLang
           );
           Object.assign(newRoute.props, requestStaticProps);
           cache.set(newRoute._fullUrl, requestStaticProps);
