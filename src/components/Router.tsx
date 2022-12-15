@@ -5,7 +5,7 @@ import React, { useMemo } from "react";
 import { formatRoutes } from "../core/core";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
-import LangService from "../core/LangService";
+import LangService, { TLanguage } from "../core/LangService";
 import { staticPropsCache } from "../core/staticPropsCache";
 import { isSSR } from "../core/helpers";
 
@@ -25,7 +25,7 @@ export type TRoute = Partial<{
   props: TRouteProps;
   children: TRoute[];
   url: string;
-  getStaticProps: (props: TRouteProps) => Promise<any>;
+  getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>;
   _fullUrl: string; // full URL who not depends on current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo
   _langPath: { [x: string]: string } | null;
@@ -277,7 +277,6 @@ function Router(props: {
     // first route visited (server & client)
     const isFirstRouteVisited = newRoute._fullUrl === props.initialStaticProps?.url;
     log(props.id, "is first route visited?", isFirstRouteVisited);
-
     // Server and client
     // check if is first route and initial static props exist
     // in this case, we assign this response to newPage props and cache it
@@ -306,7 +305,10 @@ function Router(props: {
           "Not first route & no initialStaticProps & no dataFromCache > request getStaticProps"
         );
         try {
-          const requestStaticProps = await newRoute.getStaticProps(newRoute.props);
+          const requestStaticProps = await newRoute.getStaticProps(
+            newRoute.props,
+            langService.currentLang
+          );
           Object.assign(newRoute.props, requestStaticProps);
           cache.set(newRoute._fullUrl, requestStaticProps);
         } catch (e) {
