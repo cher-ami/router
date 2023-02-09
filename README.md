@@ -35,6 +35,7 @@ and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 - [Manage Transitions](#ManageTransitions)
   - [Default sequential transitions](#DefaultSequentialTransitions)
   - [Custom transitions](#CustomTransitions)
+- [SSR support](#SSRSupport)
 - [Debug](#Debug)
 - [Example](#Example)
 
@@ -116,7 +117,7 @@ const FooPage = forwardRef((props, handleRef) => {
   const componentName = "FooPage";
   const rootRef = useRef(null);
 
-  // create custom page transitions (example with GSAP)
+  // create custom page transitions (example-client with GSAP)
   const playIn = () => {
     return new Promise((resolve) => {
       gsap.from(rootRef.current, { autoAlpha: 0, onComplete: resolve });
@@ -255,20 +256,16 @@ import {
 } from "@cher-ami/router";
 
 const FooPage = forwardRef((props, handleRef) => {
-  // Get parent router context
-  const { base, routes } = useRouter();
-
-  // Parsed routes list and get path by route name
-  const path = getPathByRouteName(routesList, "FooPage"); // "/foo"
-  // ...
+  const router = useRouter();
+  // Parsed routes list and get path by route name -> "/foo"
+  const path = getPathByRouteName(router.routes, "FooPage");
+  // (if last param is false, '/:lang' will be not added) -> "/base/:lang/foo"
+  const subBase = getSubRouterBase(path, router.base, true);
+  // get subRoutes
+  const subRoutes = getSubRouterRoutes(path, router.routes);
   return (
     <div>
-      <Router
-        // -> "/base/:lang/foo" (if last param is false, ':lang' will be not added)
-        base={getSubRouterBase(path, base, true)}
-        // children routes array of FooPage
-        routes={getSubRouterRoutes(path, routes)}
-      >
+      <Router base={subBase} routes={subRoutes}>
         <Stack />
       </Router>
     </div>
@@ -342,16 +339,50 @@ const App = (props, handleRef) => {
 
 **[Demo codesandbox: custom manage transitions](https://codesandbox.io/s/inspiring-thompson-tw4qn)**
 
-## <a name="Debug"></a>Debug
+## <a name="SSRSupport"></a>SSR Support
 
-[@wbe/debug](https://github.com/willybrauner/debug) is used on this project. It allows
-to easily get logs informations on development and production modes.
+This router is compatible with SSR due to using `staticLocation` props instead of `history` props on Router instance.
+In this case, the router will match only with `staticLocation` props value and render the appropiate route without invoking the browser history. (Because `window` is not available on the server).
 
-To use it, add this line in your browser console:
-
-```shell
-localStorage.debug = "router:*"
+```jsx
+<Router
+  routes={routesList}
+  staticLocation={"/foo"}
+  // history={createBrowserHistory()}
+>
+  // ...
+</Router>
 ```
+
+In order to use this router on server side, we need to be able to request API on the server side too.
+In this case, request will be print as javascript window object on the renderToString html server response.
+The client will got this response.
+
+To be able to request on server side (and on client side too), `getStaticProps` route property is available:
+
+```ts
+   {
+    path: "/article/:slug",
+    component: ArticlePage,
+    name: "Article",
+    getStaticProps: async (props, currentLang) => {
+      // props contains route props and params (ex: slug: "article-1")
+      const res = await fetch(`https://api.com/posts/${currentLang.key}/${props.params.slug}`);
+      const api = await res.json();
+      return { api };
+    }
+  }
+```
+
+Then, get the response data populated in page component props:
+
+```tsx
+function HomePage({ api }) {
+  return <div>{api.title}</div>;
+}
+```
+
+For larger example, check the [example-ssr folder](./examples/example-ssr/).
 
 ## <a name="Example"></a>Example
 
@@ -376,7 +407,7 @@ $ npm run dev
 Router component creates a new router instance.
 
 ```jsx
-<Router routes={} base={} history={} middlewares={} id={}>
+<Router routes={} base={} history={} staticLocation={} middlewares={} id={}>
   {/* can now use <Link /> and <Stack /> component */}
 </Router>
 ```
@@ -394,8 +425,9 @@ Router component creates a new router instance.
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
   the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
-- **middlewares** `[]` add routes middleware function to patch each routes)
-- **id** `?number | string`
+- **staticLocation** `string` _(optional)_ use static URL location matching instead of history
+- **middlewares** `[]` _(optional)_ add routes middleware function to patch each routes)
+- **id** `?number | string` _(optional)_ id of the router instance - default : `1`
 
 ### <a name="Link"></a>Link
 
@@ -468,13 +500,19 @@ const router = useRouter();
 ```ts
 // previousRoute and currentRoute
 type TRoute = {
-  path: string;
+  path: string | { [x: string]: string };
   component: React.ComponentType<any>;
-  props?: { [x: string]: any };
-  parser?: Path;
-  children?: TRoute[];
-  matchUrl?: string;
-  fullUrl?: string;
+  base: string;
+  name: string;
+  parser: Match;
+  props: TRouteProps;
+  children: TRoute[];
+  url: string;
+  getStaticProps: (props: TRouteProps) => Promise<any>;
+  _fullUrl: string; // full URL who not depend of current instance
+  _fullPath: string; // full Path /base/:lang/foo/second-foo
+  _langPath: { [x: string]: string } | null;
+  _context: TRoute;
 };
 ```
 
@@ -791,17 +829,25 @@ component only.
 langService.setLang({ key: "de" });
 ```
 
-#### redirect(forcePageReload = true) `void`
+#### redirectToDefaultLang(forcePageReload = true) `void`
 
 If URL is `/`, `showDefaultLangInUrl` is set to `true` and default lang is 'en',
-it will redirect to `/en`. This method can be called in nested router component
-only.
+it will redirect to `/en`.
 
 - `forcePageReload`: choose if we reload the full application or using the
   internal router stack to change the language
 
-```jsx
-langService.redirect();
+```js
+langService.redirectToDefaultLang();
+```
+
+#### redirectToBrowserLang(forcePageReload = true) `void`
+
+Same than `redirectToDefaultLang` method but redirect to the user `navigator.language`.
+If the browser language doesn't exist in Languages array, we redirect to the default lang. 
+
+```js
+langService.redirectToBrowserLang();
 ```
 
 ### <a name="TranslatePath"></a>Translate Path

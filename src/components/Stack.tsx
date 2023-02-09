@@ -3,6 +3,7 @@ import { IRouterContext } from "./Router";
 import debug from "@wbe/debug";
 import { IRouteStack } from "../hooks/useStack";
 import { useRouter } from "../hooks/useRouter";
+import { isSSR } from "../core/helpers";
 
 export type TManageTransitions = {
   previousPage: IRouteStack;
@@ -60,10 +61,8 @@ function Stack(props: IProps): JSX.Element {
   );
 
   // 2. animate when route state changed
-  // need to be "layoutEffect" to play transitions before render, to avoid screen "clip"
-  React.useLayoutEffect(() => {
+  React[isSSR() ? "useEffect" : "useLayoutEffect"](() => {
     if (!currentRoute) return;
-
     (props.manageTransitions || sequencialTransition)({
       previousPage: prevRef.current,
       currentPage: currentRef.current,
@@ -73,20 +72,25 @@ function Stack(props: IProps): JSX.Element {
     });
   }, [routeIndex]);
 
+  const [PrevRoute, CurrRoute] = [
+    previousRoute?._context ?? previousRoute,
+    currentRoute?._context ?? currentRoute,
+  ];
+
   return (
     <div className={["Stack", props.className].filter((e) => e).join(" ")}>
-      {previousPageIsMount && previousRoute?.component && (
-        <previousRoute.component
+      {previousPageIsMount && PrevRoute?.component && (
+        <PrevRoute.component
           ref={prevRef}
-          key={`${previousRoute?.fullUrl || ""}_${routeIndex - 1}`}
-          {...(previousRoute.props || {})}
+          key={`${PrevRoute._fullUrl || ""}_${routeIndex - 1}`}
+          {...(PrevRoute.props || {})}
         />
       )}
-      {currentRoute?.component && (
-        <currentRoute.component
+      {CurrRoute?.component && (
+        <CurrRoute.component
           ref={currentRef}
-          key={`${currentRoute?.fullUrl || ""}_${routeIndex}`}
-          {...(currentRoute.props || {})}
+          key={`${CurrRoute?._fullUrl || ""}_${routeIndex}`}
+          {...(CurrRoute.props || {})}
         />
       )}
     </div>

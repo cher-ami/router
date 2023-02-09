@@ -16,6 +16,10 @@ export type TRouters = {
    */
   history: HashHistory | MemoryHistory | BrowserHistory;
   /**
+   * Global static location
+   */
+  staticLocation: string;
+  /**
    * Global route counter increment on each history push
    */
   routeCounter: number;
@@ -24,17 +28,20 @@ export type TRouters = {
    * Is first route is true if routerCounter === 1
    */
   isFirstRoute: boolean;
-
   /**
    * Store current route
    * Allows to always know what is last currentRoute path (for LangSerivce)
    */
   currentRoute: TRoute;
-
   /**
    * LangService instance (stored in Router)
    */
   langService: LangService;
+
+  /**
+   * Cache of getStaticProps Promise results
+   */
+  staticPropsCache: { [x:string]: any }
 };
 
 /**
@@ -45,8 +52,10 @@ export const Routers: TRouters = {
   base: undefined,
   routes: undefined,
   history: undefined,
+  staticLocation: undefined,
   routeCounter: 1,
   isFirstRoute: true,
   currentRoute: undefined,
   langService: undefined,
+  staticPropsCache: {}
 };

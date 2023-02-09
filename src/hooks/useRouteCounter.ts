@@ -23,7 +23,7 @@ export const useRouteCounter = (): {
     setIsFirstRoute(false);
   }, [routeCounter, isFirstRoute]);
 
-  // allow to reset counter if needed (after first redirection for example)
+  // allow to reset counter if needed (after first redirection for example-client)
   const resetCounter = () => {
     setRouteCounter(1);
     setIsFirstRoute(true);

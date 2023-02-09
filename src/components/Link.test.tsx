@@ -5,8 +5,9 @@ import { Router } from "./Router";
 import { render, fireEvent } from "@testing-library/react";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
-import { TOpenRouteParams } from "../core/helpers";
+import { TOpenRouteParams } from "../core/core";
 import { TRoute } from "./Router";
+import { createBrowserHistory } from "history";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
@@ -24,7 +25,8 @@ const App = ({ base = "/", to }: { base: string; to: string | TOpenRouteParams }
   });
 
   return (
-    <Router langService={langService} base={base} routes={routesList}>
+    <Router langService={langService} base={base} routes={routesList} history={createBrowserHistory()}
+    >
       <Link to={to} className={"containerLink"} onClick={mockClickHandler}>
         Foo
       </Link>

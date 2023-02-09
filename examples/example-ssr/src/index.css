@@ -1,0 +1,29 @@
+body {
+  background-color: rgb(31, 31, 31);
+  color: white;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 1.5rem;
+}
+
+button {
+  background-color: transparent;
+  cursor: pointer;
+  color: white;
+}
+
+nav {
+  margin-bottom: 20px;
+}
+a {
+  color: grey;
+}
+a.active {
+  color: white;
+}
+a:hover {
+  color: white;
+}
+
+.Stack > * {
+  position: absolute;
+}

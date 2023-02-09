@@ -8,8 +8,9 @@ export {
   getSubRouterBase,
   getSubRouterRoutes,
   getPathByRouteName,
-} from "./core/helpers";
-export type { TOpenRouteParams } from "./core/helpers";
+  requestStaticPropsFromRoute,
+} from "./core/core";
+export type { TOpenRouteParams } from "./core/core";
 
 export { Stack } from "./components/Stack";
 export type { TManageTransitions } from "./components/Stack";
