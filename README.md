@@ -677,7 +677,7 @@ const history = useHistory((e) => {
 
 **Returns:**
 
-- **history** `location[]` : global history object. (`Routers.history`)
+- **history** `History` : global history object. (`Routers.history`)
 
 ### <a name="useLang"></a>useLang
 
