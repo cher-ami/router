@@ -172,6 +172,15 @@ describe("matcher", () => {
       });
       expect(getRoute).toBeUndefined();
     });
+
+    it("should get route with #", () => {
+      const getRoute = getRouteFromUrl({
+        pUrl: preventSlashes(`${base}/test-hash#foo`),
+        pRoutes: routeList,
+        pBase: base,
+      });
+      expect(getRoute.name).toBe("HashPage")
+    });
   });
 
   describe("getNotFoundRoute", () => {

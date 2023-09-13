@@ -18,6 +18,7 @@ export const routeList: TRoute[] = [
       color: "blue",
     },
   },
+
   {
     path: "/hello",
     name: "HelloPage",
@@ -97,6 +98,10 @@ export const routeList: TRoute[] = [
   {
     path: "/end",
     name: "EndPage",
+  },
+  {
+    path: "/test-hash#:hash?",
+    name: "HashPage",
   },
   {
     path: "/:rest",
