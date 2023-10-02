@@ -18,7 +18,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@cher-ami/router": "^3.0.0-beta.9",
+    "@cher-ami/router": "latest",
     "gsap": "^3.10.4",
     "isomorphic-unfetch": "^3.1.0",
     "path-to-regexp": "^6.2.1",

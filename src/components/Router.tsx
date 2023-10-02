@@ -7,7 +7,7 @@ import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
 import LangService, { TLanguage } from "../core/LangService";
 import { staticPropsCache } from "../core/staticPropsCache";
-import { isSSR } from "../core/helpers";
+import {isSSR, removeLastCharFromString} from "../core/helpers"
 
 // -------------------------------------------------------------------------------- TYPES
 
@@ -273,9 +273,19 @@ function Router(props: {
     // store cache
     const cache = staticPropsCache();
     // check if new route data as been store in cache
-    const dataFromCache = cache.get(newRoute._fullUrl);
+
+
+    // the matcher will match even if the URL ends with a slash,
+    // so we need to remove it to get the right cache key
+    const cacheKey = newRoute._fullUrl.endsWith("/")
+      ? removeLastCharFromString(newRoute._fullUrl, "/")
+      : newRoute._fullUrl
+
+    log('cache key', cacheKey)
+    const dataFromCache = cache.get(cacheKey)
+
     // first route visited (server & client)
-    const isFirstRouteVisited = newRoute._fullUrl === props.initialStaticProps?.url;
+    const isFirstRouteVisited = cacheKey === props.initialStaticProps?.url;
     log(props.id, "is first route visited?", isFirstRouteVisited);
     // Server and client
     // check if is first route and initial static props exist
