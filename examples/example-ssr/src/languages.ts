@@ -1,1 +1,1 @@
-export default [{ key: "fr" }, { key: "en", default: true }]
+export default [{ key: "fr", default: true }, { key: "en" }]
