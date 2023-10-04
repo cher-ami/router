@@ -6,7 +6,7 @@ const port = "1234";
 const app = express();
 
 app.get("/generate", async (req, res) => {
-  console.log("req.queryParams", req.query);
+  console.log("req.query", req.query);
 
   let urlsArray;
   if (req.query?.url) {

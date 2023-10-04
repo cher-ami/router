@@ -12,11 +12,11 @@ export const useLocation = (): [string, (param: string | TOpenRouteParams) => vo
   const { staticLocation } = useRouter();
 
   const history = useHistory((event) => {
-    setPathname(event.location.pathname);
+    setPathname(event.location.pathname + event.location.search + event.location.hash);
   }, []);
 
   // Get dynamic current location
-  const [pathname, setPathname] = useState(staticLocation || history?.location.pathname);
+  const [pathname, setPathname] = useState(staticLocation || history?.location.pathname + history?.location.search + history?.location.hash);
 
   // Prepare setLocation function, who push in history
   function setLocation(args: string & TOpenRouteParams): void {
