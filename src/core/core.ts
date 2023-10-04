@@ -4,7 +4,6 @@ import { compile, match } from "path-to-regexp";
 import { TRoute } from "../components/Router";
 import LangService from "./LangService";
 import { joinPaths, removeLastCharFromString } from "./helpers";
-import {queries} from "@testing-library/react"
 
 const componentName: string = "core";
 const log = debug(`router:${componentName}`);
