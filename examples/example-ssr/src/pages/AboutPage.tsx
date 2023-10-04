@@ -41,7 +41,7 @@ function AboutPage(props, handleRef) {
       <br />
       <Link to={{ name: EPages.FOO }}>Foo</Link>
       <br />
-      <Link to={{ name: EPages.BAR }}>Bar</Link>
+      <Link to={{ name: EPages.BAR, queryParams: {"hello": "you"}, hash: "my-hash" }}>Bar</Link>
       <br />
       <Router id={2} base={subRouterBase} routes={surRouterRoutes}>
         <Stack />

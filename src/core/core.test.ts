@@ -42,11 +42,11 @@ describe("public", () => {
         { path: "/b", name:"b-page", children: [{ path: "/c", name:"c-page" }, { path: "/d" }] }
       ]
       // test single param
-      expect(createUrl({ name: "b-page", query: {foo: "bar"} }, base, routes))
+      expect(createUrl({ name: "b-page", queryParams: {foo: "bar"} }, base, routes))
         .toBe(`${base}b?foo=bar`);
 
       // test multiple params
-      expect(createUrl({ name: "b-page", query: {foo: "bar", "zoo": "a,b"} }, base, routes))
+      expect(createUrl({ name: "b-page", queryParams: {foo: "bar", "zoo": "a,b"} }, base, routes))
         .toBe(`${base}b?foo=bar&zoo=a,b`);
 
       // test hash
@@ -56,7 +56,7 @@ describe("public", () => {
         .toBe(`${base}b/c#hello`);
 
       // test both
-      expect(createUrl({ name: "c-page", hash: "hello", query: {foo: "bar"} }, base, routes))
+      expect(createUrl({ name: "c-page", hash: "hello", queryParams: {foo: "bar"} }, base, routes))
         .toBe(`${base}b/c?foo=bar#hello`);
 
     });

@@ -14,7 +14,7 @@ export type TQueryParams = { [x: string]: string };
 export type TOpenRouteParams = {
   name: string;
   params?: TParams;
-  query?: TQueryParams;
+  queryParams?: TQueryParams;
   hash?: string;
 };
 
@@ -64,11 +64,11 @@ export function createUrl(
 
 
     // add params to URL if exist
-    let queries = ""
-    if (args?.query) {
-        queries = "?"
-        queries += Object.keys(args.query)
-          .map((key) => `${key}=${args?.query[key]}`).join("&")
+    let queryParams = ""
+    if (args?.queryParams) {
+        queryParams = "?"
+        queryParams += Object.keys(args.queryParams)
+          .map((key) => `${key}=${args?.queryParams[key]}`).join("&")
     }
     // add hash to URL if exist
     let hash = ""
@@ -77,7 +77,7 @@ export function createUrl(
     }
 
     // Get URL by the route name
-    urlToPush = getUrlByRouteName(allRoutes, args) + queries + hash;
+    urlToPush = getUrlByRouteName(allRoutes, args) + queryParams + hash;
 
     // in other case return.
   } else {
@@ -267,7 +267,7 @@ export function getRouteFromUrl({
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return;
 
-  // extract query params and hash
+  // extract queryParams params and hash
   const {queryParams, hash, urlWithoutHashAndQuery} = extractQueryParamsAndHash(pUrl)
 
   function next({
@@ -381,13 +381,13 @@ export const extractQueryParamsAndHash = (url: string): {
   if (hashIndex !== -1) {
     hash = url.slice(hashIndex + 1)
   }
-  // Extract query parameters
+  // Extract queryParams parameters
   if (queryIndex !== -1) {
     const queryString = url.slice(queryIndex + 1, hashIndex !== -1 ? hashIndex : undefined)
     const searchParams = new URLSearchParams(queryString)
     searchParams.forEach((value, key) => (queryParams[key] = value))
   }
-  // finally remove query and hash from pathname
+  // finally remove queryParams and hash from pathname
   for (let e of ["?", "#"]) {
     url = url.includes(e) ? url.split(e)[0] : url
   }
