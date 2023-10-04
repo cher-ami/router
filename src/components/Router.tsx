@@ -25,6 +25,8 @@ export type TRoute = Partial<{
   props: TRouteProps;
   children: TRoute[];
   url: string;
+  queryParams: { [x:string]: string },
+  hash: string,
   getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>;
   _fullUrl: string; // full URL who not depends on current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo

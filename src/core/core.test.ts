@@ -172,6 +172,39 @@ describe("matcher", () => {
       });
       expect(getRoute).toBeUndefined();
     });
+
+    it("should get route from URL with params and hash", () => {
+      const pRoutes = [
+        { path: "/a" },
+        {
+          path: "/b",
+          children: [
+            { path: "/c" },
+            { path: "/d" }
+          ]
+        }
+      ]
+      // only params
+      let getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b?foo=bar&lang=en" });
+      expect(getRoute.queryParams).toEqual({ foo: "bar", lang: "en" });
+      expect(getRoute._fullPath).toEqual("/b");
+
+      // only hash
+      getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b/c#hash" });
+      expect(getRoute._fullPath).toEqual("/b/c");
+      expect(getRoute.queryParams).toEqual({});
+      expect(getRoute.hash).toEqual("hash");
+
+      // params and hash
+      getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b/c?foo=bar#hash" });
+      expect(getRoute.queryParams).toEqual({ foo: "bar" });
+      expect(getRoute.hash).toEqual("hash");
+
+      // not hash and params
+      getRoute = getRouteFromUrl({ pRoutes, pUrl: "/a" });
+      expect(getRoute.queryParams).toEqual({});
+      expect(getRoute.hash).toEqual(null);
+    });
   });
 
   describe("getNotFoundRoute", () => {

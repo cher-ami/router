@@ -357,7 +357,6 @@ export const extractQueryParamsAndHash = (url: string): {
   const hashIndex = url.indexOf("#")
 
   if (queryIndex === -1 && hashIndex === -1) {
-    console.log('passs icicici')
     return {queryParams, hash, urlWithoutHashAndQuery: url}
   }
 
