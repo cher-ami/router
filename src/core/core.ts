@@ -4,15 +4,19 @@ import { compile, match } from "path-to-regexp";
 import { TRoute } from "../components/Router";
 import LangService from "./LangService";
 import { joinPaths, removeLastCharFromString } from "./helpers";
+import {queries} from "@testing-library/react"
 
 const componentName: string = "core";
 const log = debug(`router:${componentName}`);
 
 export type TParams = { [x: string]: any };
+export type TQueryParams = { [x: string]: string };
 
 export type TOpenRouteParams = {
   name: string;
   params?: TParams;
+  query?: TQueryParams;
+  hash?: string;
 };
 
 // ----------------------------------------------------------------------------- PUBLIC
@@ -48,19 +52,33 @@ export function createUrl(
       urlToPush = addLangToUrl(urlToPush);
     }
   }
+
   // in case we receive an object
+  // add lang to params if no exist
   else if (typeof args === "object" && args?.name) {
-    // add lang to params if no exist
     if (langService && !args.params?.lang) {
       args.params = {
         ...args.params,
-        ...{
-          lang: langService.currentLang.key,
-        },
+        lang: langService.currentLang.key,
       };
     }
+
+
+    // add params to URL if exist
+    let queries = ""
+    if (args?.query) {
+        queries = "?"
+        queries += Object.keys(args.query)
+          .map((key) => `${key}=${args?.query[key]}`).join("&")
+    }
+    // add hash to URL if exist
+    let hash = ""
+    if (args?.hash) {
+      hash = "#" + args.hash
+    }
+
     // Get URL by the route name
-    urlToPush = getUrlByRouteName(allRoutes, args);
+    urlToPush = getUrlByRouteName(allRoutes, args) + queries + hash;
 
     // in other case return.
   } else {
