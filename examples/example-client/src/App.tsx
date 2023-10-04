@@ -46,7 +46,7 @@ export default function App() {
             <Link to={{ name: "HomePage" }}>Home</Link>
           </li>
           <li>
-            <Link to={{ name: "AboutPage" }}>About</Link>
+            <Link to={{ name: "AboutPage", queryParams:{"foo": "bar", "zoo": "hello"} }}>About</Link>
           </li>
           <li>
             <Link to={{ name: "ArticlePage", params: { id: "article-1" } }}>

@@ -34,6 +34,32 @@ describe("public", () => {
       expect(createUrl("/foo", base, routeList)).toBe("/foo");
       expect(createUrl({ name: "ZooPage" }, base, routeList)).toBe("/hello/foo/zoo");
     });
+
+    it("should create URL with params and hash", () => {
+      const base = "/custom-base/";
+      const routes = [
+        { path: "/a" },
+        { path: "/b", name:"b-page", children: [{ path: "/c", name:"c-page" }, { path: "/d" }] }
+      ]
+      // test single param
+      expect(createUrl({ name: "b-page", queryParams: {foo: "bar"} }, base, routes))
+        .toBe(`${base}b?foo=bar`);
+
+      // test multiple params
+      expect(createUrl({ name: "b-page", queryParams: {foo: "bar", "zoo": "a,b"} }, base, routes))
+        .toBe(`${base}b?foo=bar&zoo=a,b`);
+
+      // test hash
+      expect(createUrl({ name: "b-page", hash: "hello" }, base, routes))
+        .toBe(`${base}b#hello`);
+      expect(createUrl({ name: "c-page", hash: "hello" }, base, routes))
+        .toBe(`${base}b/c#hello`);
+
+      // test both
+      expect(createUrl({ name: "c-page", hash: "hello", queryParams: {foo: "bar"} }, base, routes))
+        .toBe(`${base}b/c?foo=bar#hello`);
+
+    });
   });
 
   describe("getSubRouterBase", () => {
@@ -171,6 +197,39 @@ describe("matcher", () => {
         pBase: base,
       });
       expect(getRoute).toBeUndefined();
+    });
+
+    it("should get route from URL with params and hash", () => {
+      const pRoutes = [
+        { path: "/a" },
+        {
+          path: "/b",
+          children: [
+            { path: "/c" },
+            { path: "/d" }
+          ]
+        }
+      ]
+      // only params
+      let getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b?foo=bar&lang=en" });
+      expect(getRoute.queryParams).toEqual({ foo: "bar", lang: "en" });
+      expect(getRoute._fullPath).toEqual("/b");
+
+      // only hash
+      getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b/c#hash" });
+      expect(getRoute._fullPath).toEqual("/b/c");
+      expect(getRoute.queryParams).toEqual({});
+      expect(getRoute.hash).toEqual("hash");
+
+      // params and hash
+      getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b/c?foo=bar#hash" });
+      expect(getRoute.queryParams).toEqual({ foo: "bar" });
+      expect(getRoute.hash).toEqual("hash");
+
+      // not hash and params
+      getRoute = getRouteFromUrl({ pRoutes, pUrl: "/a" });
+      expect(getRoute.queryParams).toEqual({});
+      expect(getRoute.hash).toEqual(null);
     });
   });
 

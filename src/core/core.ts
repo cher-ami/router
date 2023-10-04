@@ -9,10 +9,13 @@ const componentName: string = "core";
 const log = debug(`router:${componentName}`);
 
 export type TParams = { [x: string]: any };
+export type TQueryParams = { [x: string]: string };
 
 export type TOpenRouteParams = {
   name: string;
   params?: TParams;
+  queryParams?: TQueryParams;
+  hash?: string;
 };
 
 // ----------------------------------------------------------------------------- PUBLIC
@@ -48,19 +51,33 @@ export function createUrl(
       urlToPush = addLangToUrl(urlToPush);
     }
   }
+
   // in case we receive an object
+  // add lang to params if no exist
   else if (typeof args === "object" && args?.name) {
-    // add lang to params if no exist
     if (langService && !args.params?.lang) {
       args.params = {
         ...args.params,
-        ...{
-          lang: langService.currentLang.key,
-        },
+        lang: langService.currentLang.key,
       };
     }
+
+
+    // add params to URL if exist
+    let queryParams = ""
+    if (args?.queryParams) {
+        queryParams = "?"
+        queryParams += Object.keys(args.queryParams)
+          .map((key) => `${key}=${args?.queryParams[key]}`).join("&")
+    }
+    // add hash to URL if exist
+    let hash = ""
+    if (args?.hash) {
+      hash = "#" + args.hash
+    }
+
     // Get URL by the route name
-    urlToPush = getUrlByRouteName(allRoutes, args);
+    urlToPush = getUrlByRouteName(allRoutes, args) + queryParams + hash;
 
     // in other case return.
   } else {
@@ -234,6 +251,7 @@ type TGetRouteFromUrl = {
   pMatcher?: any;
   pParent?: TRoute;
   id?: number | string;
+  urlWithoutHashAndQuery?: string
 };
 
 /**
@@ -249,14 +267,19 @@ export function getRouteFromUrl({
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return;
 
+  // extract queryParams params and hash
+  const {queryParams, hash, urlWithoutHashAndQuery} = extractQueryParamsAndHash(pUrl)
+
   function next({
     pUrl,
+    urlWithoutHashAndQuery,
     pRoutes,
     pBase,
     pMatcher,
     pParent,
     id,
   }: TGetRouteFromUrl): TRoute {
+
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
@@ -264,8 +287,8 @@ export function getRouteFromUrl({
         joinPaths([pBase, currentRoute.path as string]),
         "/"
       );
-      const matcher = match(currentRoutePath)(pUrl);
-      log(id, `"${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
+      const matcher = match(currentRoutePath)(urlWithoutHashAndQuery);
+      log(id, `"${urlWithoutHashAndQuery}" match with "${currentRoutePath}"?`, !!matcher);
 
       // if current route path match with the param url
       if (matcher) {
@@ -282,6 +305,8 @@ export function getRouteFromUrl({
             parser: pMatcher || matcher,
             name: route?.name || route?.component?.displayName,
             getStaticProps: route?.getStaticProps,
+            queryParams,
+            hash,
             props: {
               params,
               ...(route?.props || {}),
@@ -307,6 +332,7 @@ export function getRouteFromUrl({
         // else, call recursively this same method with new params
         const matchingChildren = next({
           pUrl,
+          urlWithoutHashAndQuery,
           id,
           pRoutes: currentRoute?.children,
           pParent: pParent || currentRoute,
@@ -322,7 +348,7 @@ export function getRouteFromUrl({
     }
   }
 
-  return next({ pUrl, pRoutes, pBase, pMatcher, id });
+  return next({ pUrl, urlWithoutHashAndQuery, pRoutes, pBase, pMatcher, id });
 }
 
 /**
@@ -334,6 +360,38 @@ export function getNotFoundRoute(routes: TRoute[]): TRoute {
   return routes?.find(
     (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage"
   );
+}
+
+
+export const extractQueryParamsAndHash = (url: string): {
+  queryParams: {[x:string]: string},
+  hash:string,
+  urlWithoutHashAndQuery :string
+} => {
+  let queryParams = {}
+  let hash = null
+  const queryIndex = url.indexOf("?")
+  const hashIndex = url.indexOf("#")
+
+  if (queryIndex === -1 && hashIndex === -1) {
+    return {queryParams, hash, urlWithoutHashAndQuery: url}
+  }
+
+  // Extract hash
+  if (hashIndex !== -1) {
+    hash = url.slice(hashIndex + 1)
+  }
+  // Extract queryParams parameters
+  if (queryIndex !== -1) {
+    const queryString = url.slice(queryIndex + 1, hashIndex !== -1 ? hashIndex : undefined)
+    const searchParams = new URLSearchParams(queryString)
+    searchParams.forEach((value, key) => (queryParams[key] = value))
+  }
+  // finally remove queryParams and hash from pathname
+  for (let e of ["?", "#"]) {
+    url = url.includes(e) ? url.split(e)[0] : url
+  }
+  return { queryParams, hash, urlWithoutHashAndQuery: url}
 }
 
 // ----------------------------------------------------------------------------- ROUTES
