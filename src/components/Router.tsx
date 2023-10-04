@@ -2,7 +2,7 @@ import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React, { useMemo } from "react";
-import {extractQueryParamsAndHash, formatRoutes} from "../core/core"
+import {formatRoutes, TQueryParams} from "../core/core"
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
 import LangService, { TLanguage } from "../core/LangService";
@@ -25,7 +25,7 @@ export type TRoute = Partial<{
   props: TRouteProps;
   children: TRoute[];
   url: string;
-  queryParams: { [x:string]: string },
+  queryParams: TQueryParams,
   hash: string,
   getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>;
   _fullUrl: string; // full URL who not depends on current instance
