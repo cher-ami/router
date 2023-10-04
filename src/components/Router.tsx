@@ -2,7 +2,7 @@ import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React, { useMemo } from "react";
-import { formatRoutes } from "../core/core";
+import {extractQueryParamsAndHash, formatRoutes} from "../core/core"
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
 import LangService, { TLanguage } from "../core/LangService";
@@ -232,21 +232,14 @@ function Router(props: {
    * Dispatch new routes via RouterContext
    */
 
-  const handleHistory = async (url: string = "", hash: string = ""): Promise<void> => {
-    // because we can get #" in hash history context, we need define current URL
-    // as the URL part after the "#"
-    let exactUrl: string = url;
-    if (hash?.length > 0) {
-      exactUrl = hash.replace("#", "");
-    }
-
+  const handleHistory = async (url = ""): Promise<void> => {
     if (_paused.current) {
-      _waitingUrl.current = exactUrl;
+      _waitingUrl.current = url;
       return;
     }
 
     const matchingRoute = getRouteFromUrl({
-      pUrl: exactUrl,
+      pUrl: url,
       pRoutes: routes,
       pBase: props.base,
       id: props.id,
@@ -272,12 +265,11 @@ function Router(props: {
     if (!newRoute) return;
     // store cache
     const cache = staticPropsCache();
+
     // check if new route data as been store in cache
-
-
     // the matcher will match even if the URL ends with a slash,
     // so we need to remove it to get the right cache key
-    const cacheKey = newRoute._fullUrl.endsWith("/")
+    const cacheKey = newRoute._fullUrl?.endsWith("/")
       ? removeLastCharFromString(newRoute._fullUrl, "/")
       : newRoute._fullUrl
 
@@ -357,9 +349,9 @@ function Router(props: {
         return;
         // client
       } else if (history) {
-        handleHistory(window.location.pathname, window.location.hash);
+        handleHistory(window.location.pathname + window.location.search + window.location.hash);
         return history?.listen(({ location }) => {
-          handleHistory(location.pathname, location.hash);
+          handleHistory(location.pathname + location.search + location.hash);
         });
         // log error
       } else {

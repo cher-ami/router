@@ -234,6 +234,7 @@ type TGetRouteFromUrl = {
   pMatcher?: any;
   pParent?: TRoute;
   id?: number | string;
+  urlWithoutHashAndQuery?: string
 };
 
 /**
@@ -249,14 +250,19 @@ export function getRouteFromUrl({
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return;
 
+  // extract query params and hash
+  const {queryParams, hash, urlWithoutHashAndQuery} = extractQueryParamsAndHash(pUrl)
+
   function next({
     pUrl,
+    urlWithoutHashAndQuery,
     pRoutes,
     pBase,
     pMatcher,
     pParent,
     id,
   }: TGetRouteFromUrl): TRoute {
+
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
@@ -264,8 +270,8 @@ export function getRouteFromUrl({
         joinPaths([pBase, currentRoute.path as string]),
         "/"
       );
-      const matcher = match(currentRoutePath)(pUrl);
-      log(id, `"${pUrl}" match with "${currentRoutePath}"?`, !!matcher);
+      const matcher = match(currentRoutePath)(urlWithoutHashAndQuery);
+      log(id, `"${urlWithoutHashAndQuery}" match with "${currentRoutePath}"?`, !!matcher);
 
       // if current route path match with the param url
       if (matcher) {
@@ -282,6 +288,8 @@ export function getRouteFromUrl({
             parser: pMatcher || matcher,
             name: route?.name || route?.component?.displayName,
             getStaticProps: route?.getStaticProps,
+            queryParams,
+            hash,
             props: {
               params,
               ...(route?.props || {}),
@@ -307,6 +315,7 @@ export function getRouteFromUrl({
         // else, call recursively this same method with new params
         const matchingChildren = next({
           pUrl,
+          urlWithoutHashAndQuery,
           id,
           pRoutes: currentRoute?.children,
           pParent: pParent || currentRoute,
@@ -322,7 +331,7 @@ export function getRouteFromUrl({
     }
   }
 
-  return next({ pUrl, pRoutes, pBase, pMatcher, id });
+  return next({ pUrl, urlWithoutHashAndQuery, pRoutes, pBase, pMatcher, id });
 }
 
 /**
@@ -334,6 +343,39 @@ export function getNotFoundRoute(routes: TRoute[]): TRoute {
   return routes?.find(
     (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage"
   );
+}
+
+
+export const extractQueryParamsAndHash = (url: string): {
+  queryParams: {[x:string]: string},
+  hash:string,
+  urlWithoutHashAndQuery :string
+} => {
+  let queryParams = {}
+  let hash = null
+  const queryIndex = url.indexOf("?")
+  const hashIndex = url.indexOf("#")
+
+  if (queryIndex === -1 && hashIndex === -1) {
+    console.log('passs icicici')
+    return {queryParams, hash, urlWithoutHashAndQuery: url}
+  }
+
+  // Extract hash
+  if (hashIndex !== -1) {
+    hash = url.slice(hashIndex + 1)
+  }
+  // Extract query parameters
+  if (queryIndex !== -1) {
+    const queryString = url.slice(queryIndex + 1, hashIndex !== -1 ? hashIndex : undefined)
+    const searchParams = new URLSearchParams(queryString)
+    searchParams.forEach((value, key) => (queryParams[key] = value))
+  }
+  // finally remove query and hash from pathname
+  for (let e of ["?", "#"]) {
+    url = url.includes(e) ? url.split(e)[0] : url
+  }
+  return { queryParams, hash, urlWithoutHashAndQuery: url}
 }
 
 // ----------------------------------------------------------------------------- ROUTES
