@@ -270,17 +270,19 @@ function Router(props: {
 
     // check if new route data as been store in cache
     // the matcher will match even if the URL ends with a slash,
-    // so we need to remove it to get the right cache key
-    const cacheKey = newRoute._fullUrl?.endsWith("/")
-      ? removeLastCharFromString(newRoute._fullUrl, "/")
-      : newRoute._fullUrl
+    // so we need to remove it to get the right cache key and initialStaticPropsUrl
+    const initialStaticPropsUrl = removeLastCharFromString(props.initialStaticProps?.url, "/")
+    log(props.id,'initialStaticPropsUrl', initialStaticPropsUrl)
 
-    log('cache key', cacheKey)
-    const dataFromCache = cache.get(cacheKey)
+    const fullUrl =  removeLastCharFromString(newRoute._fullUrl, "/")
+    log(props.id,'fullUrl (cache key)', fullUrl)
 
     // first route visited (server & client)
-    const isFirstRouteVisited = cacheKey === props.initialStaticProps?.url;
-    log(props.id, "is first route visited?", isFirstRouteVisited);
+    const isFirstRouteVisited = initialStaticPropsUrl === fullUrl;
+    log(props.id, "initialStaticPropsUrl === fullUrl?", isFirstRouteVisited);
+
+    const dataFromCache = cache.get(fullUrl)
+
     // Server and client
     // check if is first route and initial static props exist
     // in this case, we assign this response to newPage props and cache it
@@ -293,7 +295,7 @@ function Router(props: {
       if (newRoute.props) {
         Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
       }
-      cache.set(newRoute._fullUrl, newRoute.props ?? {});
+      cache.set(fullUrl, newRoute.props ?? {});
     }
     // Client only (not the first route, it only can be the client)
     // Case, is not first route OR no initial static props:
@@ -301,12 +303,12 @@ function Router(props: {
     // else, we request the static props and cache it
     else {
       if (dataFromCache) {
-        log(props.id, "Not first route & no initialStaticProps > assign dataFromCache");
+        log(props.id, "no initialStaticProps > assign dataFromCache");
         Object.assign(newRoute.props, dataFromCache);
       } else if (newRoute.getStaticProps) {
         log(
           props.id,
-          "Not first route & no initialStaticProps & no dataFromCache > request getStaticProps"
+          "no initialStaticProps & no dataFromCache > request getStaticProps"
         );
         try {
           const requestStaticProps = await newRoute.getStaticProps(
@@ -314,7 +316,7 @@ function Router(props: {
             langService?.currentLang
           );
           Object.assign(newRoute.props, requestStaticProps);
-          cache.set(newRoute._fullUrl, requestStaticProps);
+          cache.set(fullUrl, requestStaticProps);
         } catch (e) {
           console.error("requestStaticProps failed");
         }
