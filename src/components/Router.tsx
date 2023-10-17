@@ -1,13 +1,13 @@
 import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
-import React, { useMemo } from "react";
-import {formatRoutes, TQueryParams} from "../core/core"
+import React, { useMemo, useRef } from "react";
+import { formatRoutes, TQueryParams } from "../core/core";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
 import LangService, { TLanguage } from "../core/LangService";
 import { staticPropsCache } from "../core/staticPropsCache";
-import {isSSR, removeLastCharFromString} from "../core/helpers"
+import { isSSR, removeLastCharFromString } from "../core/helpers";
 
 // -------------------------------------------------------------------------------- TYPES
 
@@ -25,8 +25,8 @@ export type TRoute = Partial<{
   props: TRouteProps;
   children: TRoute[];
   url: string;
-  queryParams: TQueryParams,
-  hash: string,
+  queryParams: TQueryParams;
+  hash: string;
   getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>;
   _fullUrl: string; // full URL who not depends on current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo
@@ -53,13 +53,6 @@ export interface IRouterContext extends IRouterContextStackStates {
   getPaused: () => boolean;
   setPaused: (value: boolean) => void;
 }
-
-export type TRouteReducerState = {
-  currentRoute: TRoute;
-  previousRoute: TRoute;
-  previousPageIsMount: boolean;
-  index: number;
-};
 
 // -------------------------------------------------------------------------------- PREPARE / CONTEXT
 
@@ -138,7 +131,7 @@ function Router(props: {
       props.routes,
       langService,
       props.middlewares,
-      props.id
+      props.id,
     );
 
     // if is the first instance, register routes in Routers
@@ -181,6 +174,13 @@ function Router(props: {
   }
   const staticLocation: string | undefined = Routers.staticLocation;
 
+  /**
+   * 5. reset is fist route visited
+   */
+  if (isServer) {
+    Routers.isFirstRoute = true;
+  }
+
   // -------------------------------------------------------------------------------- ROUTE CHANGE
 
   /**
@@ -189,7 +189,7 @@ function Router(props: {
   const [reducerState, dispatch] = React.useReducer(
     (
       state,
-      action: { type: "update-current-route" | "unmount-previous-page"; value?: any }
+      action: { type: "update-current-route" | "unmount-previous-page"; value?: any },
     ) => {
       switch (action.type) {
         case "update-current-route":
@@ -209,7 +209,7 @@ function Router(props: {
       previousRoute: undefined,
       previousPageIsMount: false,
       routeIndex: 0,
-    }
+    },
   );
 
   /**
@@ -256,72 +256,86 @@ function Router(props: {
     const currentRouteUrl =
       currentRouteRef.current?._context?.url ?? currentRouteRef.current?.url;
     const matchingRouteUrl = matchingRoute?._context?.url ?? matchingRoute?.url;
-
     if (currentRouteUrl === matchingRouteUrl) {
       log(props.id, "this is the same route 'url', return.");
       return;
     }
 
+    // new route
     const newRoute: TRoute = matchingRoute || notFoundRoute;
-    // if no newRoute, do not continue
     if (!newRoute) return;
-    // store cache
+
+    // prepare cache for new route data staticProps
     const cache = staticPropsCache();
 
     // check if new route data as been store in cache
     // the matcher will match even if the URL ends with a slash,
     // so we need to remove it to get the right cache key and initialStaticPropsUrl
-    const initialStaticPropsUrl = removeLastCharFromString(props.initialStaticProps?.url, "/")
-    log(props.id,'initialStaticPropsUrl', initialStaticPropsUrl)
+    // prettier-ignore
+    const initialStaticPropsUrl = removeLastCharFromString(props.initialStaticProps?.url, "/");
+    // remove hash from initialStaticPropsUrl and keep it
+    const fullUrl = removeLastCharFromString(newRoute._fullUrl, "/");
+    const [fullUrlWithoutHash, fullUrlHash] = fullUrl.split("#");
 
-    const fullUrl =  removeLastCharFromString(newRoute._fullUrl, "/")
-    log(props.id,'fullUrl (cache key)', fullUrl)
+    log(props.id, {
+      initialStaticPropsUrl,
+      fullUrlWithoutHash,
+      fullUrlHash,
+      isFirstRoute: Routers.isFirstRoute,
+      "initialStaticPropsUrl === fullUrlWithoutHash ?":
+        initialStaticPropsUrl === fullUrlWithoutHash,
+    });
 
-    // first route visited (server & client)
-    const isFirstRouteVisited = initialStaticPropsUrl === fullUrl;
-    log(props.id, "initialStaticPropsUrl === fullUrl?", isFirstRouteVisited);
-
-    const dataFromCache = cache.get(fullUrl)
-
-    // Server and client
-    // check if is first route and initial static props exist
-    // in this case, we assign this response to newPage props and cache it
-    if (isFirstRouteVisited && props.initialStaticProps) {
-      log(
-        props.id,
-        "This is the first route & data exist in props.initialStaticProps, we assign and cache it.",
-        newRoute.props
-      );
-      if (newRoute.props) {
+    // SERVER (first route)
+    // prettier-ignore
+    if (isServer) {
+      if (props.initialStaticProps && newRoute.props) {
+        log("isServer (firstRoute) > assign initial static props to new route props & set cache",);
         Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
       }
-      cache.set(fullUrl, newRoute.props ?? {});
     }
-    // Client only (not the first route, it only can be the client)
-    // Case, is not first route OR no initial static props:
-    // If cache exist for this route, assign it and continue.
-    // else, we request the static props and cache it
+
+    // CLIENT
     else {
-      if (dataFromCache) {
-        log(props.id, "no initialStaticProps > assign dataFromCache");
-        Object.assign(newRoute.props, dataFromCache);
-      } else if (newRoute.getStaticProps) {
-        log(
-          props.id,
-          "no initialStaticProps & no dataFromCache > request getStaticProps"
-        );
-        try {
-          const requestStaticProps = await newRoute.getStaticProps(
-            newRoute.props,
-            langService?.currentLang
-          );
-          Object.assign(newRoute.props, requestStaticProps);
-          cache.set(fullUrl, requestStaticProps);
-        } catch (e) {
-          console.error("requestStaticProps failed");
+      // CLIENT > FIRST ROUTE
+      if (Routers.isFirstRoute) {
+        log("is first route visited");
+        if (props.initialStaticProps && newRoute.props) {
+          // assign initial static props to new route props & set cache
+          log("firstRoute > isClient > assign initial static props to new route props & set cache");
+          Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
+          cache.set(fullUrlWithoutHash, newRoute.props ?? {});
         }
       }
+      // CLIENT > NOT FIRST ROUTE
+      else {
+        log("is not first route visited");
+        const dataFromCache = cache.get(fullUrlWithoutHash);
+
+        // If cache exist for this route, assign it and continue.
+        if (dataFromCache) {
+          log(props.id, "assign dataFromCache to newRoute.props");
+          Object.assign(newRoute.props, dataFromCache);
+        }
+
+        // else, we request the static props and cache it
+        else if (newRoute.getStaticProps) {
+          log(props.id, "request getStaticProps");
+          try {
+            const request = await newRoute.getStaticProps(
+              newRoute.props,
+              langService?.currentLang,
+            );
+            Object.assign(newRoute.props, request);
+            cache.set(fullUrlWithoutHash, request);
+          } catch (e) {
+            console.error("requestStaticProps failed");
+          }
+        }
+
+      }
     }
+
 
     // Final process: update context currentRoute from dispatch method \o/ !
     dispatch({ type: "update-current-route", value: newRoute });
@@ -353,7 +367,9 @@ function Router(props: {
         return;
         // client
       } else if (history) {
-        handleHistory(window.location.pathname + window.location.search + window.location.hash);
+        handleHistory(
+          window.location.pathname + window.location.search + window.location.hash,
+        );
         return history?.listen(({ location }) => {
           handleHistory(location.pathname + location.search + location.hash);
         });
