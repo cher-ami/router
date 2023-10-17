@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "src/index.tsx",
+  "type": "module",
   "scripts": {
     "dev": "nodemon server.js",
     "build:client": "vite build --outDir dist/client",
