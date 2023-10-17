@@ -1,7 +1,7 @@
 import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo } from "react";
 import { formatRoutes, TQueryParams } from "../core/core";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
@@ -335,7 +335,6 @@ function Router(props: {
 
       }
     }
-
 
     // Final process: update context currentRoute from dispatch method \o/ !
     dispatch({ type: "update-current-route", value: newRoute });
