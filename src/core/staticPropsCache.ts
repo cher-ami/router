@@ -15,7 +15,7 @@ export function staticPropsCache(cache = Routers.staticPropsCache) {
     const dataAlreadyExist = Object.keys(cache).some((el) => el === key);
 
     if (!dataAlreadyExist) {
-      log(`"${key}" key doesn't exist in cache, we need to request the API.`);
+      log(`"${key}"page data doesn't exist in cache.`);
       return null;
     }
     const dataCache = cache[key];

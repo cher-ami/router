@@ -311,13 +311,11 @@ function Router(props: {
       else {
         log("is not first route visited");
         const dataFromCache = cache.get(fullUrlWithoutHash);
-
         // If cache exist for this route, assign it and continue.
         if (dataFromCache) {
           log(props.id, "assign dataFromCache to newRoute.props");
           Object.assign(newRoute.props, dataFromCache);
         }
-
         // else, we request the static props and cache it
         else if (newRoute.getStaticProps) {
           log(props.id, "request getStaticProps");
