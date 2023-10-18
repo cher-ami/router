@@ -17,6 +17,12 @@ importers:
       path-to-regexp:
         specifier: ^6.2.1
         version: 6.2.1
+      react:
+        specifier: '>=16.8.0'
+        version: 18.2.0
+      react-dom:
+        specifier: '>=16.8.0'
+        version: 18.2.0(react@18.2.0)
     devDependencies:
       '@babel/core':
         specifier: ^7.23.2
