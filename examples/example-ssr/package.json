@@ -1,5 +1,5 @@
 {
-  "name": "example-ssg",
+  "name": "example-ssr",
   "main": "src/index.tsx",
   "type": "module",
   "scripts": {
