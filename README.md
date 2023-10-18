@@ -1,7 +1,7 @@
 <h1 align="center" style="text-align:center">🚃<br>cher-ami router</h1>
 
 <p align="center">
-A fresh react router designed for flexible route transitions
+A fresh high-level react router designed for flexible route transitions
 <br>
 <br>
 <img alt="npm" src="https://img.shields.io/npm/v/@cher-ami/router">
@@ -13,8 +13,7 @@ A fresh react router designed for flexible route transitions
 cher-ami router API is inspired by [wouter](https://github.com/molefrog/wouter),
 [solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts)
 and
-[vue router](https://router.vuejs.org/) API. This repository started from a copy
-of [willybrauner/react-router](https://github.com/willybrauner/react-router/).
+[vue router](https://router.vuejs.org/) API.
 
 ## Why another react router?
 
@@ -499,7 +498,7 @@ const router = useRouter();
 
 ```ts
 // previousRoute and currentRoute
-type TRoute = {
+type TRoute = Partial<{
   path: string | { [x: string]: string };
   component: React.ComponentType<any>;
   base: string;
@@ -508,12 +507,15 @@ type TRoute = {
   props: TRouteProps;
   children: TRoute[];
   url: string;
-  getStaticProps: (props: TRouteProps) => Promise<any>;
-  _fullUrl: string; // full URL who not depend of current instance
+  params?: TParams;
+  queryParams?: TQueryParams;
+  hash?: string;
+  getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>;
+  _fullUrl: string; // full URL who not depends on current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo
   _langPath: { [x: string]: string } | null;
   _context: TRoute;
-};
+}>;
 ```
 
 ### <a name="useLocation"></a>useLocation
@@ -538,7 +540,9 @@ An array with these properties:
 ```ts
 type TOpenRouteParams = {
   name: string;
-  params?: { [x: string]: any };
+  params?: TParams;
+  queryParams?: TQueryParams;
+  hash?: string;
 };
 ```
 
