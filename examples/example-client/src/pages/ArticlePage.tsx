@@ -1,12 +1,15 @@
-import React, { ForwardedRef, forwardRef, useRef } from "react";
+import React, {ForwardedRef, forwardRef, useEffect, useRef} from "react"
 import { useLocation } from "@cher-ami/router";
-import { useStack }  from "@cher-ami/router";
+import { useStack } from "@cher-ami/router";
 import { transitionsHelper } from "../helper/transitionsHelper";
 import debug from "@wbe/debug";
 
 interface IProps {
   params?: {
     id: string;
+  };
+  time: {
+    datetime: string
   };
 }
 
@@ -28,8 +31,14 @@ export const ArticlePage = forwardRef((props: IProps, handleRef: ForwardedRef<an
     playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   });
 
+  useEffect(()=>
+  {
+    log("props.time",props.time)
+  },[props.time])
   return (
     <div className={componentName} ref={rootRef}>
+      <div>fetch props datetime: {props.time?.datetime}</div>
+      <br />
       {componentName} - id: {props?.params?.id}
       <br />
       <br />

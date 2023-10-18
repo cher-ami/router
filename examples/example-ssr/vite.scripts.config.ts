@@ -1,10 +1,11 @@
-import { resolve } from "path"
-import { defineConfig } from "vite"
-import debug from "@wbe/debug"
-const log = debug("config:vite.config")
+import { resolve } from "path";
+import { defineConfig } from "vite";
+import debug from "@wbe/debug";
+const log = debug("config:vite.config");
 
 export default defineConfig(({ command, mode }) => {
   return {
+    base: '/',
     build: {
       assetsDir: "./",
       write: true,
@@ -18,7 +19,6 @@ export default defineConfig(({ command, mode }) => {
         input: [
           resolve("server.js"),
           resolve("prerender/prerender.ts"),
-          resolve("prerender/exe-prerender-server.ts"),
           resolve("prerender/exe-prerender.ts"),
         ],
         output: {
@@ -28,7 +28,14 @@ export default defineConfig(({ command, mode }) => {
           assetFileNames: `[name].[ext]`,
         },
 
+        external: ["react", "react-dom"],
       },
     },
-  }
-})
+
+    resolve: {
+      alias: {
+        "~": resolve(__dirname, "src"),
+      },
+    },
+  };
+});

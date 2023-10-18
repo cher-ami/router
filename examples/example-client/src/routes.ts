@@ -30,6 +30,11 @@ export const routesList: TRoute[] = [
           {
             path: "/yolo",
             component: YoloPage,
+            getStaticProps: async (props, currentLang) => {
+              const res = await fetch("https://worldtimeapi.org/api/ip");
+              const time = await res.json();
+              return { time };
+            },
           },
           {
             path: "/hello",
@@ -60,6 +65,11 @@ export const routesList: TRoute[] = [
     component: ArticlePage,
     props: {
       color: "red",
+    },
+    getStaticProps: async (props, currentLang) => {
+      const res = await fetch("https://worldtimeapi.org/api/ip");
+      const time = await res.json();
+      return { time };
     },
   },
   {

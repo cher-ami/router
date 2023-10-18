@@ -1,8 +1,8 @@
-import { resolve } from "path"
-import { defineConfig } from "vite"
-import debug from "@wbe/debug"
-import react from "@vitejs/plugin-react"
-const log = debug("config:vite.config")
+import { resolve } from "path";
+import { defineConfig } from "vite";
+import debug from "@wbe/debug";
+import react from "@vitejs/plugin-react";
+const log = debug("config:vite.config");
 
 /**
  * Vite config
@@ -10,10 +10,7 @@ const log = debug("config:vite.config")
  */
 export default defineConfig(({ command, mode }) => {
   return {
-    server: {
-      middlewareMode: "ssr",
-    },
-
+    base: '/',
     build: {
       assetsDir: "./",
       write: true,
@@ -21,16 +18,16 @@ export default defineConfig(({ command, mode }) => {
       emptyOutDir: true,
       manifest: true,
       assetsInlineLimit: 0,
-      rollupOptions: {
-        // output: {
-        //"index.html": "index-template.html",
-        // entryFileNames: `[name].js`,
-        // chunkFileNames: `[name].js`,
-        // assetFileNames: `[name].[ext]`,
-        // },
-      },
+      rollupOptions: {},
     },
 
-    plugins: [react()]
-  }
-})
+    plugins: [react()],
+
+    resolve: {
+      extensions: [".mjs", ".js", ".ts", ".jsx", ".tsx", ".json", ".vue"],
+      alias: {
+        "~": resolve(__dirname, "src"),
+      },
+    },
+  };
+});

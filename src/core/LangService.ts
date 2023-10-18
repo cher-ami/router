@@ -97,7 +97,7 @@ class LangService<TLang = any> {
   public setLang(
     toLang: TLanguage<TLang>,
     forcePageReload = true,
-    currentRoute: TRoute = Routers.currentRoute
+    currentRoute: TRoute = Routers.currentRoute,
   ): void {
     if (toLang.key === this.currentLang.key) {
       log("setLang: This is the same language, exit.");
@@ -134,7 +134,7 @@ class LangService<TLang = any> {
       const urlPartToRemove = `${this.base}/${toLang.key}`;
       const newUrlWithoutBaseAndLang = preparedNewUrl.substring(
         urlPartToRemove.length,
-        preparedNewUrl.length
+        preparedNewUrl.length,
       );
       newUrl = joinPaths([this.base, newUrlWithoutBaseAndLang]);
       chooseForcePageReload = true;
@@ -145,7 +145,7 @@ class LangService<TLang = any> {
     else if (!this.showDefaultLangInUrl && this.isDefaultLangKey(this.currentLang.key)) {
       const newUrlWithoutBase = preparedNewUrl.substring(
         this.base.length,
-        preparedNewUrl.length
+        preparedNewUrl.length,
       );
       newUrl = joinPaths([this.base, "/", toLang.key as string, "/", newUrlWithoutBase]);
       log("3. after add lang in URL", newUrl);
@@ -259,12 +259,9 @@ class LangService<TLang = any> {
    */
   public addLangParamToRoutes(
     routes: TRoute[],
-    showLangInUrl = this.showLangInUrl()
+    showLangInUrl = this.showLangInUrl(),
   ): TRoute[] {
     if (routes?.some((el) => !!el._langPath)) {
-      log(
-        "Routes have already been formatted by 'addLangParamToRoutes()', return routes."
-      );
       return routes;
     }
 
@@ -276,7 +273,7 @@ class LangService<TLang = any> {
     const patchLangParam = (pPath: string, pShowLang): string =>
       removeLastCharFromString(
         joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : "/"]),
-        "/"
+        "/",
       );
 
     /**
@@ -345,7 +342,7 @@ class LangService<TLang = any> {
   protected getLangPathByLang(
     route: TRoute,
     lang = this.getLangFromString(this.staticLocation || window.location.pathname)?.key ||
-      this.defaultLang.key
+      this.defaultLang.key,
   ): string {
     let selectedPath: string;
     if (typeof route.path === "string") {
@@ -380,7 +377,7 @@ class LangService<TLang = any> {
     return languages.find((lang) =>
       lang.key.includes("-")
         ? (lang.key as string) === browserLanguage.toLowerCase()
-        : (lang.key as string) === browserLanguage.toLowerCase().split("-")[0]
+        : (lang.key as string) === browserLanguage.toLowerCase().split("-")[0],
     );
   }
 
@@ -389,7 +386,7 @@ class LangService<TLang = any> {
    * @param pathname
    */
   public getLangFromString(
-    pathname = this.staticLocation || window.location.pathname
+    pathname = this.staticLocation || window.location.pathname,
   ): TLanguage<TLang> {
     let pathnameWithoutBase = pathname.replace(this.base, "/");
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
@@ -404,7 +401,7 @@ class LangService<TLang = any> {
    */
   protected langIsAvailable(
     langObject: TLanguage<TLang>,
-    languesList = this.languages
+    languesList = this.languages,
   ): boolean {
     return languesList.some((lang) => lang.key === langObject?.key);
   }

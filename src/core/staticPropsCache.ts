@@ -1,6 +1,6 @@
 import { Routers } from "./Routers";
 import debug from "@wbe/debug";
-const componentName: string = "staticPropsCache";
+const componentName: string = "cache";
 const log = debug(`router:${componentName}`);
 
 /**
@@ -13,16 +13,14 @@ export function staticPropsCache(cache = Routers.staticPropsCache) {
    */
   const get = (key: string): any => {
     const dataAlreadyExist = Object.keys(cache).some((el) => el === key);
-
     if (!dataAlreadyExist) {
-      log(`"${key}" key doesn't exist in cache, we need to request the API.`);
+      log(`"${key}" data doesn't exist in cache.`);
       return null;
     }
     const dataCache = cache[key];
-    log("current page data is already in 'cache', we use it.", dataCache);
+    log("data is already in cache, return it.", dataCache);
     return dataCache;
   };
-
   /**
    * Set Data in static props cache
    */
