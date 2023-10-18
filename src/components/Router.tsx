@@ -317,7 +317,7 @@ function Router(props: {
           cache.set(urlWithoutHash, newRoute.props ?? {});
         }
         else if (newRoute.getStaticProps) {
-          log(props.id, "firstRoute > isClient > request getStaticProps");
+          log(props.id, "firstRoute > isClient > request getStaticProps & set cache")
           await requestStaticPropsAndCacheIt()
         }
       }
@@ -325,11 +325,11 @@ function Router(props: {
       else {
         const cacheData = cache.get(urlWithoutHash)
         if (cacheData) {
-          log(props.id, "Not firstRoute > isClient > assign dataFromCache to newRoute.props");
+          log(props.id, "not firstRoute > isClient > assign dataFromCache to newRoute.props");
           Object.assign(newRoute.props, cacheData);
         }
         else if (newRoute.getStaticProps) {
-          log(props.id, "Not firstRoute > isClient > request getStaticProps");
+          log(props.id, "not firstRoute > isClient > request getStaticProps");
           await requestStaticPropsAndCacheIt()
         }
 

@@ -262,9 +262,6 @@ class LangService<TLang = any> {
     showLangInUrl = this.showLangInUrl()
   ): TRoute[] {
     if (routes?.some((el) => !!el._langPath)) {
-      log(
-        "Routes have already been formatted by 'addLangParamToRoutes()', return routes."
-      );
       return routes;
     }
 

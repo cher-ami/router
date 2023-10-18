@@ -287,7 +287,8 @@ export function getRouteFromUrl({
         "/",
       );
       const matcher = match(currentRoutePath)(urlWithoutHashAndQuery);
-      log(id, `"${urlWithoutHashAndQuery}" match with "${currentRoutePath}"?`, !!matcher);
+      // prettier-ignore
+      log(id, `url "${urlWithoutHashAndQuery}" match path "${currentRoutePath}"?`,!!matcher);
 
       // if current route path match with the param url
       if (matcher) {
@@ -323,7 +324,7 @@ export function getRouteFromUrl({
           _context: pParent ? formatRouteObj(pParent) : formattedCurrentRoute,
         };
 
-        log(id, "getRouteFromUrl: MATCH routeObj", routeObj);
+        log(id, "match", routeObj);
         return routeObj;
       }
 
