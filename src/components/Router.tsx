@@ -1,7 +1,15 @@
 import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
-import React, { useMemo } from "react";
+import React, {
+  createContext,
+  memo,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+} from "react";
 import { formatRoutes, TParams, TQueryParams } from "../core/core";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
@@ -66,7 +74,7 @@ const isServer = isSSR();
  * Big thing is you can access this context from the closest provider in the tree.
  * This allows to manage easily nested stack instances.
  */
-export const RouterContext = React.createContext<IRouterContext>({
+export const RouterContext = createContext<IRouterContext>({
   base: "/",
   routes: undefined,
   history: undefined,
@@ -95,7 +103,7 @@ Router.defaultProps = {
  * @returns JSX.Element
  */
 function Router(props: {
-  children: React.ReactNode;
+  children: ReactNode;
   routes: TRoute[];
   base: string;
   history?: BrowserHistory | HashHistory | MemoryHistory | undefined;
@@ -127,7 +135,7 @@ function Router(props: {
    *  const { routes } = useRouter();
    *  return current Router instance routes list, not all routes given to the first instance.
    */
-  const routes = React.useMemo(() => {
+  const routes = useMemo(() => {
     const routesList = formatRoutes(
       props.routes,
       langService,
@@ -187,7 +195,7 @@ function Router(props: {
   /**
    * States list muted when history change
    */
-  const [reducerState, dispatch] = React.useReducer(
+  const [reducerState, dispatch] = useReducer(
     (
       state,
       action: { type: "update-current-route" | "unmount-previous-page"; value?: any },
@@ -216,8 +224,8 @@ function Router(props: {
   /**
    * Enable paused on Router instance
    */
-  const _waitingUrl = React.useRef(null);
-  const _paused = React.useRef<boolean>(false);
+  const _waitingUrl = useRef(null);
+  const _paused = useRef<boolean>(false);
   const getPaused = () => _paused.current;
   const setPaused = (value: boolean) => {
     _paused.current = value;
@@ -227,7 +235,7 @@ function Router(props: {
     }
   };
 
-  const currentRouteRef = React.useRef<TRoute>();
+  const currentRouteRef = useRef<TRoute>();
 
   /**
    * Handle history
@@ -356,7 +364,7 @@ function Router(props: {
    * - Get matching route with current URL
    * - Dispatch new routes states from RouterContext
    */
-  const historyListener = React.useMemo(() => {
+  const historyListener = useMemo(() => {
     if (!routes) return;
 
     const historyListener = () => {
@@ -386,7 +394,7 @@ function Router(props: {
   }, [routes, history]);
 
   // remove listener
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       log(props.id, "Stop to listen history.");
       historyListener();
@@ -420,5 +428,5 @@ function Router(props: {
 }
 
 Router.displayName = componentName;
-const MemoizedRouter = React.memo(Router);
+const MemoizedRouter = memo(Router);
 export { MemoizedRouter as Router };

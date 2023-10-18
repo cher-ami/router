@@ -11,7 +11,7 @@ import { GlobalDataContext } from "~/store/GlobalDataContext";
 /**
  * Client side
  */
-const root = hydrateRoot(
+hydrateRoot(
   document.getElementById("root"),
   <Router
     routes={routes}

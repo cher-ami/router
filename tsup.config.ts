@@ -8,8 +8,8 @@ export default defineConfig({
   minify: true,
   dts: true,
   format: ["cjs", "esm"],
-  name: "interpol",
-  external: ["@wbe/debug", "history", "path-to-regexp"],
+  name: "@cher-ami/router",
+  external: ["@wbe/debug", "history", "path-to-regexp", "react"],
   sourcemap: true,
   async onSuccess() {
     const process = spawn("npx", ["size-limit"], { shell: true });
