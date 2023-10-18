@@ -33,14 +33,14 @@ export function createUrl(
   args: string | TOpenRouteParams,
   base: string = Routers.base,
   allRoutes: TRoute[] = Routers.routes,
-  langService = Routers.langService
+  langService = Routers.langService,
 ): string {
   if (!allRoutes) return;
   let urlToPush: string;
 
   if (typeof args === "object" && !langService) {
     log(
-      "route.path object is not supported without langService. Use should use route.path string instead."
+      "route.path object is not supported without langService. Use should use route.path string instead.",
     );
   }
 
@@ -62,18 +62,18 @@ export function createUrl(
       };
     }
 
-
     // add params to URL if exist
-    let queryParams = ""
+    let queryParams = "";
     if (args?.queryParams) {
-        queryParams = "?"
-        queryParams += Object.keys(args.queryParams)
-          .map((key) => `${key}=${args?.queryParams[key]}`).join("&")
+      queryParams = "?";
+      queryParams += Object.keys(args.queryParams)
+        .map((key) => `${key}=${args?.queryParams[key]}`)
+        .join("&");
     }
     // add hash to URL if exist
-    let hash = ""
+    let hash = "";
     if (args?.hash) {
-      hash = "#" + args.hash
+      hash = "#" + args.hash;
     }
 
     // Get URL by the route name
@@ -107,7 +107,7 @@ export function createUrl(
 export function getSubRouterBase(
   path: string | { [x: string]: string },
   base: string,
-  addLangToUrl: boolean = true
+  addLangToUrl: boolean = true,
 ): string {
   // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
   // /:lang is return as path, but we want to get no lang in returned base string
@@ -124,7 +124,7 @@ export function getSubRouterBase(
  */
 export function getSubRouterRoutes(
   path: string | { [x: string]: string },
-  routes: TRoute[]
+  routes: TRoute[],
 ): TRoute[] {
   // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
   // /:lang is return as path, but we want to search path with "/" instead
@@ -146,7 +146,7 @@ export function getSubRouterRoutes(
  */
 export function getPathByRouteName(
   routes: TRoute[],
-  name: string
+  name: string,
 ): string | { [x: string]: string } {
   for (let route of routes) {
     if (route.name === name || route?.component?.displayName === name) {
@@ -232,7 +232,7 @@ export async function requestStaticPropsFromRoute({
     try {
       SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(
         currentRoute.props,
-        langService?.currentLang
+        langService?.currentLang,
       );
     } catch (e) {
       log("fetch getStatic Props data error");
@@ -251,7 +251,7 @@ type TGetRouteFromUrl = {
   pMatcher?: any;
   pParent?: TRoute;
   id?: number | string;
-  urlWithoutHashAndQuery?: string
+  urlWithoutHashAndQuery?: string;
 };
 
 /**
@@ -268,7 +268,7 @@ export function getRouteFromUrl({
   if (!pRoutes || pRoutes?.length === 0) return;
 
   // extract queryParams params and hash
-  const {queryParams, hash, urlWithoutHashAndQuery} = extractQueryParamsAndHash(pUrl)
+  const { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(pUrl);
 
   function next({
     pUrl,
@@ -279,13 +279,12 @@ export function getRouteFromUrl({
     pParent,
     id,
   }: TGetRouteFromUrl): TRoute {
-
     // test each routes
     for (let currentRoute of pRoutes) {
       // create parser & matcher
       const currentRoutePath = removeLastCharFromString(
         joinPaths([pBase, currentRoute.path as string]),
-        "/"
+        "/",
       );
       const matcher = match(currentRoutePath)(urlWithoutHashAndQuery);
       log(id, `"${urlWithoutHashAndQuery}" match with "${currentRoutePath}"?`, !!matcher);
@@ -305,6 +304,7 @@ export function getRouteFromUrl({
             parser: pMatcher || matcher,
             name: route?.name || route?.component?.displayName,
             getStaticProps: route?.getStaticProps,
+            params,
             queryParams,
             hash,
             props: {
@@ -358,41 +358,45 @@ export function getRouteFromUrl({
  */
 export function getNotFoundRoute(routes: TRoute[]): TRoute {
   return routes?.find(
-    (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage"
+    (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage",
   );
 }
 
-
-export const extractQueryParamsAndHash = (url: string): {
-  queryParams: {[x:string]: string},
-  hash:string,
-  urlWithoutHashAndQuery :string
+export const extractQueryParamsAndHash = (
+  url: string,
+): {
+  queryParams: { [x: string]: string };
+  hash: string;
+  urlWithoutHashAndQuery: string;
 } => {
-  let queryParams = {}
-  let hash = null
-  const queryIndex = url.indexOf("?")
-  const hashIndex = url.indexOf("#")
+  let queryParams = {};
+  let hash = null;
+  const queryIndex = url.indexOf("?");
+  const hashIndex = url.indexOf("#");
 
   if (queryIndex === -1 && hashIndex === -1) {
-    return {queryParams, hash, urlWithoutHashAndQuery: url}
+    return { queryParams, hash, urlWithoutHashAndQuery: url };
   }
 
   // Extract hash
   if (hashIndex !== -1) {
-    hash = url.slice(hashIndex + 1)
+    hash = url.slice(hashIndex + 1);
   }
   // Extract queryParams parameters
   if (queryIndex !== -1) {
-    const queryString = url.slice(queryIndex + 1, hashIndex !== -1 ? hashIndex : undefined)
-    const searchParams = new URLSearchParams(queryString)
-    searchParams.forEach((value, key) => (queryParams[key] = value))
+    const queryString = url.slice(
+      queryIndex + 1,
+      hashIndex !== -1 ? hashIndex : undefined,
+    );
+    const searchParams = new URLSearchParams(queryString);
+    searchParams.forEach((value, key) => (queryParams[key] = value));
   }
   // finally remove queryParams and hash from pathname
   for (let e of ["?", "#"]) {
-    url = url.includes(e) ? url.split(e)[0] : url
+    url = url.includes(e) ? url.split(e)[0] : url;
   }
-  return { queryParams, hash, urlWithoutHashAndQuery: url}
-}
+  return { queryParams, hash, urlWithoutHashAndQuery: url };
+};
 
 // ----------------------------------------------------------------------------- ROUTES
 
@@ -422,10 +426,10 @@ export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute
     (route) =>
       (typeof route.path === "object" &&
         Object.keys(route.path).some(
-          (el) => route.path[el] === "/" || route.path[el] === "/:lang"
+          (el) => route.path[el] === "/" || route.path[el] === "/:lang",
         )) ||
       route.path === "/" ||
-      route.path === "/:lang"
+      route.path === "/:lang",
   );
   if (!rootPathExist) {
     routes.unshift({
@@ -445,12 +449,12 @@ export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute
  */
 export function applyMiddlewaresToRoutes(
   preMiddlewareRoutes: TRoute[],
-  middlewares: ((routes: TRoute[]) => TRoute[])[]
+  middlewares: ((routes: TRoute[]) => TRoute[])[],
 ): TRoute[] {
   return (
     middlewares?.reduce(
       (routes, middleware) => middleware(routes),
-      preMiddlewareRoutes
+      preMiddlewareRoutes,
     ) || preMiddlewareRoutes
   );
 }
@@ -464,7 +468,7 @@ export function formatRoutes(
   routes: TRoute[],
   langService?: LangService,
   middlewares?: ((routes: TRoute[]) => TRoute[])[],
-  id?: number | string
+  id?: number | string,
 ): TRoute[] {
   if (!routes) {
     console.error(id, "props.routes is missing or empty, return.");
@@ -508,7 +512,7 @@ export function getFullPathByPath(
   path: string | { [x: string]: string },
   routeName: string,
   lang: string = Routers.langService?.currentLang.key || undefined,
-  basePath: string = null
+  basePath: string = null,
 ): string {
   let localPath: string[] = [basePath];
 
@@ -533,7 +537,7 @@ export function getFullPathByPath(
         path,
         routeName,
         lang,
-        joinPaths(localPath)
+        joinPaths(localPath),
       );
       // return recursive Fn only if match, else continue to next iteration
       if (matchChildrenPath) {
@@ -545,7 +549,7 @@ export function getFullPathByPath(
           path,
           routeName,
           lang,
-          joinPaths(localPath)
+          joinPaths(localPath),
         );
       }
     }
@@ -579,7 +583,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           pRoutes,
           path,
           route.name,
-          pParams?.params?.lang
+          pParams?.params?.lang,
         );
         // build URL
         // console.log("_fullPath", _fullPath, params);
@@ -607,7 +611,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
  */
 export function getLangPath(
   langPath: string | { [p: string]: string },
-  lang: string = Routers.langService?.currentLang.key
+  lang: string = Routers.langService?.currentLang.key,
 ) {
   let path;
   if (typeof langPath === "string") {
@@ -644,7 +648,7 @@ export function getLangPath(
 export function addLangToUrl(
   url: string,
   lang: string = Routers.langService?.currentLang.key,
-  enable = Routers.langService?.showLangInUrl()
+  enable = Routers.langService?.showLangInUrl(),
 ): string {
   if (!enable) return url;
   url = joinPaths([`/${lang}`, url === "/" ? "" : url]);

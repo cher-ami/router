@@ -61,6 +61,11 @@ export const routesList: TRoute[] = [
     props: {
       color: "red",
     },
+    getStaticProps: async (props, currentLang) => {
+      const res = await fetch("https://worldtimeapi.org/api/ip");
+      const time = await res.json();
+      return { time };
+    },
   },
   {
     path: "/:rest",

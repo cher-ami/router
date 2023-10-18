@@ -2,7 +2,7 @@ import debug from "@wbe/debug";
 import { BrowserHistory, HashHistory, MemoryHistory } from "history";
 import { Match } from "path-to-regexp";
 import React, { useMemo } from "react";
-import { formatRoutes, TQueryParams } from "../core/core";
+import { formatRoutes, TParams, TQueryParams } from "../core/core";
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core";
 import { Routers } from "../core/Routers";
 import LangService, { TLanguage } from "../core/LangService";
@@ -12,7 +12,7 @@ import { isSSR, removeLastCharFromString } from "../core/helpers";
 // -------------------------------------------------------------------------------- TYPES
 
 export type TRouteProps = {
-  params?: { [x: string]: any };
+  params?: TParams;
   [x: string]: any;
 };
 
@@ -25,8 +25,9 @@ export type TRoute = Partial<{
   props: TRouteProps;
   children: TRoute[];
   url: string;
-  queryParams: TQueryParams;
-  hash: string;
+  params?: TParams;
+  queryParams?: TQueryParams;
+  hash?: string;
   getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>;
   _fullUrl: string; // full URL who not depends on current instance
   _fullPath: string; // full Path /base/:lang/foo/second-foo
@@ -275,22 +276,36 @@ function Router(props: {
     const initialStaticPropsUrl = removeLastCharFromString(props.initialStaticProps?.url, "/");
     // remove hash from initialStaticPropsUrl and keep it
     const fullUrl = removeLastCharFromString(newRoute._fullUrl, "/");
-    const [fullUrlWithoutHash, fullUrlHash] = fullUrl.split("#");
+    const [urlWithoutHash, urlHash] = fullUrl.split("#");
 
     log(props.id, {
-      initialStaticPropsUrl,
-      fullUrlWithoutHash,
-      fullUrlHash,
       isFirstRoute: Routers.isFirstRoute,
-      "initialStaticPropsUrl === fullUrlWithoutHash ?":
-        initialStaticPropsUrl === fullUrlWithoutHash,
+      initialStaticPropsUrl,
+      urlWithoutHash,
+      urlHash,
     });
+
+    /**
+     * Request static props and cache it
+     */
+    const requestStaticPropsAndCacheIt = async () => {
+      try {
+        const request = await newRoute.getStaticProps(
+          newRoute.props,
+          langService?.currentLang,
+        );
+        Object.assign(newRoute.props, request);
+        cache.set(urlWithoutHash, request);
+      } catch (e) {
+        console.error("requestStaticProps failed");
+      }
+    };
 
     // SERVER (first route)
     // prettier-ignore
     if (isServer) {
-      if (props.initialStaticProps && newRoute.props) {
-        log("isServer (firstRoute) > assign initial static props to new route props & set cache",);
+      if (props.initialStaticProps) {
+        log("firstRoute > isServer > assign initialStaticProps to newRoute props & set cache",);
         Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
       }
     }
@@ -299,36 +314,27 @@ function Router(props: {
     else {
       // CLIENT > FIRST ROUTE
       if (Routers.isFirstRoute) {
-        log("is first route visited");
-        if (props.initialStaticProps && newRoute.props) {
+        if (props.initialStaticProps) {
           // assign initial static props to new route props & set cache
-          log("firstRoute > isClient > assign initial static props to new route props & set cache");
+          log(props.id, "firstRoute > isClient > assign initial static props to new route props & set cache");
           Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
-          cache.set(fullUrlWithoutHash, newRoute.props ?? {});
+          cache.set(urlWithoutHash, newRoute.props ?? {});
+        }
+        else if (newRoute.getStaticProps) {
+          log(props.id, "firstRoute > isClient > request getStaticProps");
+          await requestStaticPropsAndCacheIt()
         }
       }
       // CLIENT > NOT FIRST ROUTE
       else {
-        log("is not first route visited");
-        const dataFromCache = cache.get(fullUrlWithoutHash);
-        // If cache exist for this route, assign it and continue.
-        if (dataFromCache) {
-          log(props.id, "assign dataFromCache to newRoute.props");
-          Object.assign(newRoute.props, dataFromCache);
+        const cacheData = cache.get(urlWithoutHash)
+        if (cacheData) {
+          log(props.id, "Not firstRoute > isClient > assign dataFromCache to newRoute.props");
+          Object.assign(newRoute.props, cacheData);
         }
-        // else, we request the static props and cache it
         else if (newRoute.getStaticProps) {
-          log(props.id, "request getStaticProps");
-          try {
-            const request = await newRoute.getStaticProps(
-              newRoute.props,
-              langService?.currentLang,
-            );
-            Object.assign(newRoute.props, request);
-            cache.set(fullUrlWithoutHash, request);
-          } catch (e) {
-            console.error("requestStaticProps failed");
-          }
+          log(props.id, "Not firstRoute > isClient > request getStaticProps");
+          await requestStaticPropsAndCacheIt()
         }
 
       }
