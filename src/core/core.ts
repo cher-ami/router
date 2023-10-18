@@ -1,22 +1,22 @@
-import { Routers } from "./Routers"
-import debug from "@wbe/debug"
-import { compile, match } from "path-to-regexp"
-import { TRoute } from "../components/Router"
-import LangService from "./LangService"
-import { joinPaths, removeLastCharFromString } from "./helpers"
+import { Routers } from "./Routers";
+import debug from "@wbe/debug";
+import { compile, match } from "path-to-regexp";
+import { TRoute } from "../components/Router";
+import LangService from "./LangService";
+import { joinPaths, removeLastCharFromString } from "./helpers";
 
-const componentName: string = "core"
-const log = debug(`router:${componentName}`)
+const componentName: string = "core";
+const log = debug(`router:${componentName}`);
 
-export type TParams = { [x: string]: any }
-export type TQueryParams = { [x: string]: string }
+export type TParams = { [x: string]: any };
+export type TQueryParams = { [x: string]: string };
 
 export type TOpenRouteParams = {
-  name: string
-  params?: TParams
-  queryParams?: TQueryParams
-  hash?: string
-}
+  name: string;
+  params?: TParams;
+  queryParams?: TQueryParams;
+  hash?: string;
+};
 
 // ----------------------------------------------------------------------------- PUBLIC
 
@@ -35,20 +35,20 @@ export function createUrl(
   allRoutes: TRoute[] = Routers.routes,
   langService = Routers.langService,
 ): string {
-  if (!allRoutes) return
-  let urlToPush: string
+  if (!allRoutes) return;
+  let urlToPush: string;
 
   if (typeof args === "object" && !langService) {
     log(
       "route.path object is not supported without langService. Use should use route.path string instead.",
-    )
+    );
   }
 
   // in case we receive a string
   if (typeof args === "string") {
-    urlToPush = args as string
+    urlToPush = args as string;
     if (!!langService) {
-      urlToPush = addLangToUrl(urlToPush)
+      urlToPush = addLangToUrl(urlToPush);
     }
   }
 
@@ -59,40 +59,40 @@ export function createUrl(
       args.params = {
         ...args.params,
         lang: langService.currentLang.key,
-      }
+      };
     }
 
     // add params to URL if exist
-    let queryParams = ""
+    let queryParams = "";
     if (args?.queryParams) {
-      queryParams = "?"
+      queryParams = "?";
       queryParams += Object.keys(args.queryParams)
         .map((key) => `${key}=${args?.queryParams[key]}`)
-        .join("&")
+        .join("&");
     }
     // add hash to URL if exist
-    let hash = ""
+    let hash = "";
     if (args?.hash) {
-      hash = "#" + args.hash
+      hash = "#" + args.hash;
     }
 
     // Get URL by the route name
-    urlToPush = getUrlByRouteName(allRoutes, args) + queryParams + hash
+    urlToPush = getUrlByRouteName(allRoutes, args) + queryParams + hash;
 
     // in other case return.
   } else {
-    console.warn("createUrl param isn't valid. to use createUrl return.", args)
-    return
+    console.warn("createUrl param isn't valid. to use createUrl return.", args);
+    return;
   }
 
   // Add base
   const addBaseToUrl = (url: string, base = Routers.base): string =>
-    joinPaths([base === "/" ? "" : base, url])
+    joinPaths([base === "/" ? "" : base, url]);
   // compile base if contains lang params
-  const newBase = compileUrl(base, { lang: Routers.langService?.currentLang.key })
+  const newBase = compileUrl(base, { lang: Routers.langService?.currentLang.key });
   // in each case, add base URL
-  urlToPush = addBaseToUrl(urlToPush, newBase)
-  return urlToPush
+  urlToPush = addBaseToUrl(urlToPush, newBase);
+  return urlToPush;
 }
 
 /**
@@ -111,9 +111,9 @@ export function getSubRouterBase(
 ): string {
   // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
   // /:lang is return as path, but we want to get no lang in returned base string
-  const addLang = Routers.langService?.showLangInUrl() && addLangToUrl ? "/:lang" : ""
-  const pathAfterLang = path === "/:lang" ? getLangPath("/") : getLangPath(path)
-  return joinPaths([base, addLang, pathAfterLang])
+  const addLang = Routers.langService?.showLangInUrl() && addLangToUrl ? "/:lang" : "";
+  const pathAfterLang = path === "/:lang" ? getLangPath("/") : getLangPath(path);
+  return joinPaths([base, addLang, pathAfterLang]);
 }
 
 /**
@@ -129,11 +129,11 @@ export function getSubRouterRoutes(
   // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
   // /:lang is return as path, but we want to search path with "/" instead
   const formattedPath =
-    !Routers.langService?.showLangInUrl() && path === "/:lang" ? "/" : path
+    !Routers.langService?.showLangInUrl() && path === "/:lang" ? "/" : path;
 
   return routes.find((route) => {
-    return getLangPath(route.path) === getLangPath(formattedPath)
-  })?.children
+    return getLangPath(route.path) === getLangPath(formattedPath);
+  })?.children;
 }
 
 /**
@@ -153,15 +153,15 @@ export function getPathByRouteName(
       // specific case, we want to retrieve path of route with "/" route and langService is used,
       // we need to patch it with lang param
       if (route.path === "/" && Routers.langService) {
-        return "/:lang"
+        return "/:lang";
       } else {
-        return route.path
+        return route.path;
       }
     } else {
       if (route.children) {
-        const next = getPathByRouteName(route.children, name)
+        const next = getPathByRouteName(route.children, name);
         if (next) {
-          return next
+          return next;
         }
       }
     }
@@ -175,8 +175,8 @@ export function getPathByRouteName(
  * @param history
  */
 export function openRoute(args: string | TOpenRouteParams, history = Routers?.history) {
-  const url = typeof args === "string" ? args : createUrl(args)
-  history?.push(url)
+  const url = typeof args === "string" ? args : createUrl(args);
+  history?.push(url);
 }
 
 /**
@@ -193,31 +193,31 @@ export async function requestStaticPropsFromRoute({
   middlewares,
   id,
 }: {
-  url: string
-  base: string
-  routes: TRoute[]
-  langService?: LangService
-  middlewares?: ((routes: TRoute[]) => TRoute[])[]
-  id?: string | number
+  url: string;
+  base: string;
+  routes: TRoute[];
+  langService?: LangService;
+  middlewares?: ((routes: TRoute[]) => TRoute[])[];
+  id?: string | number;
 }): Promise<{ props: any; name: string; url: string }> {
   const currentRoute = getRouteFromUrl({
     pUrl: url,
     pBase: base,
     pRoutes: formatRoutes(routes, langService, middlewares, id),
     id,
-  })
+  });
 
-  const notFoundRoute = getNotFoundRoute(routes)
+  const notFoundRoute = getNotFoundRoute(routes);
 
   if (!currentRoute && !notFoundRoute) {
-    log(id, "currentRoute not found & 'notFoundRoute' not found, return.")
-    return
+    log(id, "currentRoute not found & 'notFoundRoute' not found, return.");
+    return;
   }
 
   // get out
   if (!currentRoute) {
-    log("No currentRoute, return")
-    return
+    log("No currentRoute, return");
+    return;
   }
 
   // prepare returned obj
@@ -225,7 +225,7 @@ export async function requestStaticPropsFromRoute({
     props: null,
     name: currentRoute.name,
     url,
-  }
+  };
 
   // await promise from getStaticProps
   if (currentRoute?.getStaticProps) {
@@ -233,26 +233,26 @@ export async function requestStaticPropsFromRoute({
       SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(
         currentRoute.props,
         langService?.currentLang,
-      )
+      );
     } catch (e) {
-      log("fetch getStatic Props data error")
+      log("fetch getStatic Props data error");
     }
   }
-  return SSR_STATIC_PROPS
+  return SSR_STATIC_PROPS;
 }
 
 // ----------------------------------------------------------------------------- MATCHER
 
 type TGetRouteFromUrl = {
-  pUrl: string
-  pRoutes?: TRoute[]
-  pBase?: string
-  pCurrentRoute?: TRoute
-  pMatcher?: any
-  pParent?: TRoute
-  id?: number | string
-  urlWithoutHashAndQuery?: string
-}
+  pUrl: string;
+  pRoutes?: TRoute[];
+  pBase?: string;
+  pCurrentRoute?: TRoute;
+  pMatcher?: any;
+  pParent?: TRoute;
+  id?: number | string;
+  urlWithoutHashAndQuery?: string;
+};
 
 /**
  * Get current route from URL, using path-to-regex
@@ -265,10 +265,10 @@ export function getRouteFromUrl({
   pMatcher,
   id,
 }: TGetRouteFromUrl): TRoute {
-  if (!pRoutes || pRoutes?.length === 0) return
+  if (!pRoutes || pRoutes?.length === 0) return;
 
   // extract queryParams params and hash
-  const { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(pUrl)
+  const { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(pUrl);
 
   function next({
     pUrl,
@@ -285,17 +285,17 @@ export function getRouteFromUrl({
       const currentRoutePath = removeLastCharFromString(
         joinPaths([pBase, currentRoute.path as string]),
         "/",
-      )
-      const matcher = match(currentRoutePath)(urlWithoutHashAndQuery)
+      );
+      const matcher = match(currentRoutePath)(urlWithoutHashAndQuery);
       // prettier-ignore
       log(id, `url "${urlWithoutHashAndQuery}" match path "${currentRoutePath}"?`,!!matcher);
 
       // if current route path match with the param url
       if (matcher) {
-        const params = pMatcher?.params || matcher?.params
+        const params = pMatcher?.params || matcher?.params;
 
         const formatRouteObj = (route) => {
-          if (!route) return
+          if (!route) return;
           return {
             path: route?.path,
             url: compile(route.path as string)(params),
@@ -315,17 +315,17 @@ export function getRouteFromUrl({
             _fullPath: currentRoutePath,
             _fullUrl: pUrl,
             _langPath: route?._langPath,
-          }
-        }
+          };
+        };
 
-        const formattedCurrentRoute = formatRouteObj(currentRoute)
+        const formattedCurrentRoute = formatRouteObj(currentRoute);
         const routeObj = {
           ...formattedCurrentRoute,
           _context: pParent ? formatRouteObj(pParent) : formattedCurrentRoute,
-        }
+        };
 
-        log(id, "match", routeObj)
-        return routeObj
+        log(id, "match", routeObj);
+        return routeObj;
       }
 
       // if not match
@@ -339,17 +339,17 @@ export function getRouteFromUrl({
           pParent: pParent || currentRoute,
           pBase: currentRoutePath, // parent base
           pMatcher: matcher,
-        })
+        });
 
         // only if matching, return this match, else continue to next iteration
         if (matchingChildren) {
-          return matchingChildren
+          return matchingChildren;
         }
       }
     }
   }
 
-  return next({ pUrl, urlWithoutHashAndQuery, pRoutes, pBase, pMatcher, id })
+  return next({ pUrl, urlWithoutHashAndQuery, pRoutes, pBase, pMatcher, id });
 }
 
 /**
@@ -360,44 +360,44 @@ export function getRouteFromUrl({
 export function getNotFoundRoute(routes: TRoute[]): TRoute {
   return routes?.find(
     (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage",
-  )
+  );
 }
 
 export const extractQueryParamsAndHash = (
   url: string,
 ): {
-  queryParams: { [x: string]: string }
-  hash: string
-  urlWithoutHashAndQuery: string
+  queryParams: { [x: string]: string };
+  hash: string;
+  urlWithoutHashAndQuery: string;
 } => {
-  let queryParams = {}
-  let hash = null
-  const queryIndex = url.indexOf("?")
-  const hashIndex = url.indexOf("#")
+  let queryParams = {};
+  let hash = null;
+  const queryIndex = url.indexOf("?");
+  const hashIndex = url.indexOf("#");
 
   if (queryIndex === -1 && hashIndex === -1) {
-    return { queryParams, hash, urlWithoutHashAndQuery: url }
+    return { queryParams, hash, urlWithoutHashAndQuery: url };
   }
 
   // Extract hash
   if (hashIndex !== -1) {
-    hash = url.slice(hashIndex + 1)
+    hash = url.slice(hashIndex + 1);
   }
   // Extract queryParams parameters
   if (queryIndex !== -1) {
     const queryString = url.slice(
       queryIndex + 1,
       hashIndex !== -1 ? hashIndex : undefined,
-    )
-    const searchParams = new URLSearchParams(queryString)
-    searchParams.forEach((value, key) => (queryParams[key] = value))
+    );
+    const searchParams = new URLSearchParams(queryString);
+    searchParams.forEach((value, key) => (queryParams[key] = value));
   }
   // finally remove queryParams and hash from pathname
   for (let e of ["?", "#"]) {
-    url = url.includes(e) ? url.split(e)[0] : url
+    url = url.includes(e) ? url.split(e)[0] : url;
   }
-  return { queryParams, hash, urlWithoutHashAndQuery: url }
-}
+  return { queryParams, hash, urlWithoutHashAndQuery: url };
+};
 
 // ----------------------------------------------------------------------------- ROUTES
 
@@ -420,8 +420,8 @@ export const extractQueryParamsAndHash = (
  */
 export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute[] {
   if (!routes) {
-    log("routes doesnt exist, return", routes)
-    return
+    log("routes doesnt exist, return", routes);
+    return;
   }
   const rootPathExist = routes.some(
     (route) =>
@@ -431,15 +431,15 @@ export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute
         )) ||
       route.path === "/" ||
       route.path === "/:lang",
-  )
+  );
   if (!rootPathExist) {
     routes.unshift({
       path: "/",
       component: null,
       name: `auto-generate-slash-route-${Math.random()}`,
-    })
+    });
   }
-  return routes
+  return routes;
 }
 
 /**
@@ -457,7 +457,7 @@ export function applyMiddlewaresToRoutes(
       (routes, middleware) => middleware(routes),
       preMiddlewareRoutes,
     ) || preMiddlewareRoutes
-  )
+  );
 }
 
 /**
@@ -472,23 +472,23 @@ export function formatRoutes(
   id?: number | string,
 ): TRoute[] {
   if (!routes) {
-    console.error(id, "props.routes is missing or empty, return.")
-    return
+    console.error(id, "props.routes is missing or empty, return.");
+    return;
   }
 
   // For each instances
-  let routesList = patchMissingRootRoute(routes)
+  let routesList = patchMissingRootRoute(routes);
 
   // subRouter instances shouldn't inquired middlewares and LangService
   if (middlewares) {
-    routesList = applyMiddlewaresToRoutes(routesList, middlewares)
+    routesList = applyMiddlewaresToRoutes(routesList, middlewares);
   }
   // Only for first instance
   if (langService) {
-    routesList = langService.addLangParamToRoutes(routesList)
+    routesList = langService.addLangParamToRoutes(routesList);
   }
 
-  return routesList
+  return routesList;
 }
 
 // ----------------------------------------------------------------------------- URLS / PATH
@@ -499,7 +499,7 @@ export function formatRoutes(
  *  compile("foo/:id")({id: example-client}) // "foo/example-client"
  */
 export function compileUrl(path: string, params?: TParams): string {
-  return compile(path)(params)
+  return compile(path)(params);
 }
 
 /**
@@ -515,19 +515,19 @@ export function getFullPathByPath(
   lang: string = Routers.langService?.currentLang.key || undefined,
   basePath: string = null,
 ): string {
-  let localPath: string[] = [basePath]
+  let localPath: string[] = [basePath];
 
   for (let route of routes) {
-    const langPath = route._langPath?.[lang]
-    const routePath = route.path as string
+    const langPath = route._langPath?.[lang];
+    const routePath = route.path as string;
 
     const pathMatch =
-      (langPath === path || routePath === path) && route.name === routeName
+      (langPath === path || routePath === path) && route.name === routeName;
 
     // if path match on first level, keep path in local array and return it, stop here.
     if (pathMatch) {
-      localPath.push(langPath || routePath)
-      return joinPaths(localPath)
+      localPath.push(langPath || routePath);
+      return joinPaths(localPath);
     }
 
     // if not matching but as children, return it
@@ -539,11 +539,11 @@ export function getFullPathByPath(
         routeName,
         lang,
         joinPaths(localPath),
-      )
+      );
       // return recursive Fn only if match, else continue to next iteration
       if (matchChildrenPath) {
         // keep path in local array
-        localPath.push(langPath || routePath)
+        localPath.push(langPath || routePath);
         // Return the function after localPath push
         return getFullPathByPath(
           route.children,
@@ -551,7 +551,7 @@ export function getFullPathByPath(
           routeName,
           lang,
           joinPaths(localPath),
-        )
+        );
       }
     }
   }
@@ -567,17 +567,17 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
   const next = (routes: TRoute[], params: TOpenRouteParams): string => {
     for (let route of routes) {
       const match =
-        route?.name === params.name || route.component?.displayName === params.name
+        route?.name === params.name || route.component?.displayName === params.name;
       if (match) {
         if (!route?.path) {
-          log("getUrlByRouteName > There is no route with this name, exit", params.name)
-          return
+          log("getUrlByRouteName > There is no route with this name, exit", params.name);
+          return;
         }
 
         let path =
           typeof route.path === "object"
             ? route.path[Object.keys(route.path)[0]]
-            : route.path
+            : route.path;
 
         // get full path
         const _fullPath = getFullPathByPath(
@@ -585,22 +585,22 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           path,
           route.name,
           pParams?.params?.lang,
-        )
+        );
         // build URL
         // console.log("_fullPath", _fullPath, params);
-        return compileUrl(_fullPath, params.params)
+        return compileUrl(_fullPath, params.params);
       }
 
       // if route has children
       else if (route.children?.length > 0) {
         // getUrlByRouteName > no match, recall recursively on children
-        const match = next(route.children, params)
+        const match = next(route.children, params);
         // return recursive Fn only if match, else, continue to next iteration
-        if (match) return match
+        if (match) return match;
       }
     }
-  }
-  return next(pRoutes, pParams)
+  };
+  return next(pRoutes, pParams);
 }
 
 /**
@@ -614,20 +614,20 @@ export function getLangPath(
   langPath: string | { [p: string]: string },
   lang: string = Routers.langService?.currentLang.key,
 ) {
-  let path
+  let path;
   if (typeof langPath === "string") {
-    path = langPath
+    path = langPath;
   } else if (typeof langPath === "object") {
-    path = langPath?.[lang]
+    path = langPath?.[lang];
   }
 
   const removeLangFromPath = (path: string): string => {
     if (path?.includes(`/:lang`)) {
-      return path?.replace("/:lang", "")
-    } else return path
-  }
+      return path?.replace("/:lang", "");
+    } else return path;
+  };
 
-  return removeLangFromPath(path)
+  return removeLangFromPath(path);
 }
 
 /**
@@ -651,7 +651,7 @@ export function addLangToUrl(
   lang: string = Routers.langService?.currentLang.key,
   enable = Routers.langService?.showLangInUrl(),
 ): string {
-  if (!enable) return url
-  url = joinPaths([`/${lang}`, url === "/" ? "" : url])
-  return url
+  if (!enable) return url;
+  url = joinPaths([`/${lang}`, url === "/" ? "" : url]);
+  return url;
 }
