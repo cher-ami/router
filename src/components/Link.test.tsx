@@ -8,6 +8,7 @@ import LangService from "../core/LangService";
 import { TOpenRouteParams } from "../core/core";
 import { TRoute } from "./Router";
 import { createBrowserHistory } from "history";
+import {vi, test, it, expect, describe} from "vitest"
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
 const routesList: TRoute[] = [
@@ -16,7 +17,7 @@ const routesList: TRoute[] = [
   { path: "/bar/:id", component: null, name: "BarPage" },
 ];
 
-const mockClickHandler = jest.fn();
+const mockClickHandler = vi.fn();
 const App = ({ base = "/", to }: { base: string; to: string | TOpenRouteParams }) => {
   const langService = new LangService({
     languages: locales,

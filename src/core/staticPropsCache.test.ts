@@ -1,4 +1,5 @@
 import { staticPropsCache } from "./staticPropsCache";
+import { expect, describe, it } from "vitest";
 
 describe("staticPropsCache", () => {
   const store = {};

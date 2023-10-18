@@ -1,3 +1,4 @@
+import {vi, test, it, expect, describe} from "vitest"
 import LangService from "./LangService";
 import {
   compileUrl,

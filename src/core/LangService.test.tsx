@@ -1,3 +1,4 @@
+import { vi, test, it, expect, describe, beforeAll, afterEach } from "vitest";
 import React from "react";
 import { Router } from "../components/Router";
 import LangService from "../core/LangService";
@@ -12,7 +13,7 @@ const routesList: TRoute[] = [
   { path: "/foo", name: "foo" },
 ];
 
-const mockClickHandler = jest.fn();
+const mockClickHandler = vi.fn();
 const App = ({ base = "/", to = "/foo", langService }) => {
   return (
     <Router
@@ -31,7 +32,7 @@ const App = ({ base = "/", to = "/foo", langService }) => {
   );
 };
 
-const windowOpenMock = jest.fn();
+const windowOpenMock = vi.fn();
 
 beforeAll(() => {
   const location = window.location;
@@ -82,7 +83,6 @@ it("should not redirect to default lang if showDefaultLangInUrl is set to false"
   expect(window.open).toHaveBeenCalledTimes(0);
 });
 
-
 /**
  * Add lang path param allows to test the same array before and after middleware
  * The method added langPath param even if it doesn't patch all routes
@@ -99,7 +99,7 @@ const routesListLang: TRoute[] = [
     path: "/hello",
     children: [
       { path: { en: "/zoo-en", fr: "/zoo-fr", de: "zoo-de" }, _langPath: null },
-      { path: "/:id", },
+      { path: "/:id" },
     ],
   },
 ];
@@ -126,7 +126,7 @@ describe("addLangParamToRoutes", () => {
   const langService = new LangService({ languages: locales, base: "/" });
   it("should patch all first level routes if LangService is init", () => {
     expect(langService.addLangParamToRoutes(routesListLang, true)).toEqual(
-      patchedRoutesListLang
+      patchedRoutesListLang,
     );
   });
 });

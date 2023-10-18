@@ -3,6 +3,7 @@ import { Router } from "./Router";
 import { render } from "@testing-library/react";
 import { TRoute } from "./Router";
 import { createBrowserHistory } from "history";
+import {vi, test, it, expect, describe} from "vitest"
 
 describe("Router", () => {
   const routesList: TRoute[] = [

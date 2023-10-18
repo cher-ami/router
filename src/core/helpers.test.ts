@@ -1,3 +1,4 @@
+import {vi, test, it, expect, describe} from "vitest"
 import { joinPaths, preventSlashes, removeLastCharFromString } from "./helpers";
 
 describe("joinPaths", () => {
