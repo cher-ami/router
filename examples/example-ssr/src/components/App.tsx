@@ -1,17 +1,12 @@
 import React, { useEffect } from "react";
 import { Link, Stack, useLang } from "@cher-ami/router";
-import languages from "../languages";
-import { EPages } from "../routes";
+import { languages } from "~/languages";
+import { EPages } from "~/routes";
 import { useRouter } from "@cher-ami/router";
 
 export function App() {
   const { langService } = useRouter();
   const [lang, setLang] = useLang();
-
-  useEffect(() => {
-    console.log("langService", langService);
-    langService.redirectToDefaultLang()
-  }, []);
 
   const crossedTransitions = ({
     previousPage,

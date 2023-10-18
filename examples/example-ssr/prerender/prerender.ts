@@ -1,54 +1,77 @@
-import * as mfs from "../config/helpers/mfs.js"
-import path from "path"
-import { render } from "../src/index-server"
-const { log } = console
+// @ts-ignore
+import { render } from "~/server/index-server";
+import * as mfs from "@wbe/mfs";
+import path, { resolve } from "path";
+import chalk from "chalk";
+import { loadEnv } from "vite";
+import { isRouteIndex } from "./helpers/isRouteIndex";
+import { ManifestParser } from "./helpers/ManifestParser";
+import { renderToPipeableStream, renderToString } from "react-dom/server";
+import { ReactElement } from "react";
+import { htmlReplacement } from "~/server/helpers/htmlReplacement";
 
-export const prerender = async (urls: string[]) => {
-  log("URLs to generate", urls)
-  const indexTemplateSrc = "./dist/static/index-template.html"
+/**
+ * Prerender
+ * Create static HTML files from react render DOM
+ * @param urls: Urls to generate
+ * @param outDirStatic: Generation destination directory
+ */
+export const prerender = async (
+  urls: string[],
+  outDirStatic = resolve("dist/static"),
+) => {
+  const indexTemplateSrc = `${outDirStatic}/index-template.html`;
 
   // copy index as template to avoid the override with the generated static index.html bellow
-  if (!(await mfs.fileExists(indexTemplateSrc)))
-    await mfs.copyFile("./dist/static/index.html", indexTemplateSrc)
+  if (!(await mfs.fileExists(indexTemplateSrc))) {
+    await mfs.copyFile(`${outDirStatic}/index.html`, indexTemplateSrc);
+  }
 
-  // now the layout is index-template.html
-  const layout = await mfs.readFile(indexTemplateSrc)
+  // get script tags to inject in render
+  const base = process.env.VITE_APP_BASE || loadEnv("", process.cwd(), "").VITE_APP_BASE;
+  const manifest = (await mfs.readFile(`${outDirStatic}/manifest.json`)) as string;
+  const scriptTags = ManifestParser.getScriptTagFromManifest(manifest, base);
 
-  // pre-render each route...
-  for (const url of urls) {
-    let preparedUrl = url.startsWith("/") ? url : `/${url}`
+  // pre-render each route
+  for (let url of urls) {
+    url = url.startsWith("/") ? url : `/${url}`;
 
-    // get react app HTML render to string
     try {
-      const { renderToString, ssrStaticProps, globalData, languages } =
-        await render(preparedUrl)
-
-      if (preparedUrl === "/") preparedUrl = "/index"
-
-      if (languages && languages.some((e) => `/${e.key}` === preparedUrl)) {
-        preparedUrl = `${preparedUrl}/index`
-      }
-
-      // include it in the template
-      const template = layout
-        ? layout
-            .replace(`<!--app-html-->`, renderToString)
-            .replace(`"<!--ssr-static-props-->"`, JSON.stringify(ssrStaticProps))
-            .replace(`"<!--ssr-global-data-->"`, JSON.stringify(globalData))
-        : ""
-
-      // prepare sub folder templates if exist
-      const routePath = path.resolve(`dist/static${preparedUrl}`)
-
-      // add .html to the end of th pat
-      const htmlFilePath = `${routePath}.html`
-
-      // write file on the server
-      await mfs.createFile(htmlFilePath, template)
-
-      console.log(` → ${htmlFilePath.split("static")[1]}`)
+      // Request DOM
+      const dom = await render(url, scriptTags, true);
+      // create stream and generate current file when all DOM is ready
+      renderToPipeableStream(dom, {
+        onAllReady() {
+          createHtmlFile(urls, url, outDirStatic, dom);
+        },
+        onError(x) {
+          console.error(x);
+        },
+      });
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
   }
-}
+};
+
+/**
+ * Create a single HTML file
+ * @param urls: All urls to generate
+ * @param url: Current URL to generate
+ * @param outDir:  Generation destination directory
+ * @param dom: React DOM from index-server.tsx
+ */
+const createHtmlFile = async (
+  urls: string[],
+  url: string,
+  outDir: string,
+  dom: ReactElement,
+): Promise<void> => {
+  // Prepare file
+  if (isRouteIndex(url, urls)) url = `${url}/index`;
+  const routePath = path.resolve(`${outDir}/${url}`);
+  const htmlFilePath = `${routePath}.html`;
+  // Create file
+  await mfs.createFile(htmlFilePath, htmlReplacement(renderToString(dom)));
+  console.log(chalk.green(` → ${htmlFilePath.split("static")[1]}`));
+};

@@ -1,18 +1,26 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "lib": ["es6", "dom", "esnext"],
+    "module": "ESNext",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
+    "skipLibCheck": false,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "sourceMap": false,
     "jsx": "react",
-    "moduleResolution": "node",
-    "types": ["node", "jest"],
-    "declaration": true,
-    "isolatedModules": false,
-    "noImplicitAny": false,
-    "esModuleInterop": true,
-    "preserveConstEnums": true,
-    "strictNullChecks": false
+    "baseUrl": "./src",
+    "paths": {
+      "*": ["src/*.d.ts"],
+      "~/*": ["./*"]
+    }
   },
-  "include": ["./"],
-  "exclude": ["node_modules", "dist", "test"]
+  "include": ["./src", "./prerender", "./config"]
 }

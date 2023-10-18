@@ -128,7 +128,7 @@ importers:
   examples/example-ssr:
     dependencies:
       '@cher-ami/router':
-        specifier: latest
+        specifier: ^3.1.2
         version: link:../..
       gsap:
         specifier: ^3.12.2

@@ -1,14 +1,19 @@
 import React, { useState, useRef, useContext, useEffect } from "react";
 import { useLang, useStack } from "@cher-ami/router";
-import { transitionsHelper } from "../helpers/transitionsHelper";
-import { GlobalDataContext } from "../GlobalDataContext";
+import { transitionsHelper } from "~/helpers/transitionsHelper";
+import { GlobalDataContext } from "~/store/GlobalDataContext";
 
 const componentName = "HomePage";
 function HomePage(props, handleRef) {
   const rootRef = useRef(null);
   const [n, setN] = useState(0);
-  const { globalData } = useContext(GlobalDataContext);
+  const globalData = useContext(GlobalDataContext);
+//    console.log("globalData",globalData)
   const [lang] = useLang();
+
+  useEffect(()=>
+  {
+  },[])
 
   useStack({
     componentName,
