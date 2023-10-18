@@ -1,0 +1,6 @@
+{
+  "buildCommand": "build",
+  "packages": ["/"],
+  "sandboxes": ["/examples/example-client", "/examples/example-ssr"],
+  "node": "18"
+}
