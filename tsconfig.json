@@ -2,8 +2,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "commonjs",
-    "target": "ES5",
+    "target": "esnext",
+    "module": "esnext",
     "lib": ["es2015.promise", "es6", "dom", "esnext"],
     "jsx": "react",
     "moduleResolution": "node",

@@ -40,7 +40,7 @@ function Link(props: ILinkProps, ref: MutableRefObject<any>) {
       props.onClick?.();
       history?.push(url);
     },
-    [url, history],
+    [url, history]
   );
 
   const [isActive, setIsActive] = React.useState<boolean>();
