@@ -29,10 +29,7 @@
     "clean": "rm -rf dist",
     "build": "tsup",
     "build:watch": "tsup --watch --sourcemap",
-    "dev:example-client": "pnpm --filter ./examples/example-client run dev",
-    "build:example-client": "pnpm --filter ./examples/example-client run build",
-    "dev:example-ssr": "pnpm --filter ./examples/example-ssr run dev",
-    "build:example-ssr": "pnpm --filter ./examples/example-ssr run build",
+    "dev": "FORCE_COLOR=1 turbo run dev",
     "size": "size-limit",
     "size-why": "size-limit -- --why",
     "test": "jest && npm run size",
@@ -77,6 +74,7 @@
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",
     "tsup": "^7.2.0",
+    "turbo": "^1.10.15",
     "typescript": "^5.2.2"
   },
   "husky": {
