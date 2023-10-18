@@ -5,7 +5,7 @@ import {transitionsHelper} from "~/helpers/transitionsHelper"
 const componentName = "ContactPage"
 function ContactPage(props, handleRef) {
   const rootRef = useRef(null)
-  
+
   useStack({
     componentName,
     handleRef,

@@ -278,20 +278,9 @@ function Router(props: {
     const cache = staticPropsCache();
 
     // check if new route data as been store in cache
-    // the matcher will match even if the URL ends with a slash,
-    // so we need to remove it to get the right cache key and initialStaticPropsUrl
-    // prettier-ignore
-    const initialStaticPropsUrl = removeLastCharFromString(props.initialStaticProps?.url, "/");
-    // remove hash from initialStaticPropsUrl and keep it
+    // the matcher will match even if the URL ends with a slash
     const fullUrl = removeLastCharFromString(newRoute._fullUrl, "/");
-    const [urlWithoutHash, urlHash] = fullUrl.split("#");
-
-    log(props.id, {
-      isFirstRoute: Routers.isFirstRoute,
-      initialStaticPropsUrl,
-      urlWithoutHash,
-      urlHash,
-    });
+    const [urlWithoutHash] = fullUrl.split("#");
 
     /**
      * Request static props and cache it
