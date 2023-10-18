@@ -1,12 +1,16 @@
-import "regenerator-runtime/runtime";
+/**
+ * @vitest-environment jsdom
+ */
+
+import { vi, it, expect, describe } from "vitest";
 import React from "react";
-import { Link } from "./Link";
-import { Router } from "./Router";
 import { render, fireEvent } from "@testing-library/react";
 import { Routers } from "../core/Routers";
 import LangService from "../core/LangService";
 import { TOpenRouteParams } from "../core/core";
-import { TRoute } from "./Router";
+import { Link } from "..";
+import { Router } from "..";
+import { TRoute } from "..";
 import { createBrowserHistory } from "history";
 
 const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
@@ -16,7 +20,7 @@ const routesList: TRoute[] = [
   { path: "/bar/:id", component: null, name: "BarPage" },
 ];
 
-const mockClickHandler = jest.fn();
+const mockClickHandler = vi.fn();
 const App = ({ base = "/", to }: { base: string; to: string | TOpenRouteParams }) => {
   const langService = new LangService({
     languages: locales,
@@ -25,7 +29,11 @@ const App = ({ base = "/", to }: { base: string; to: string | TOpenRouteParams }
   });
 
   return (
-    <Router langService={langService} base={base} routes={routesList} history={createBrowserHistory()}
+    <Router
+      langService={langService}
+      base={base}
+      routes={routesList}
+      history={createBrowserHistory()}
     >
       <Link to={to} className={"containerLink"} onClick={mockClickHandler}>
         Foo
@@ -80,7 +88,7 @@ describe("Link", () => {
 
   it("should return the right href URL with param", () => {
     const { container } = render(
-      <App base={"/"} to={{ name: "BarPage", params: { id: "test" } }} />
+      <App base={"/"} to={{ name: "BarPage", params: { id: "test" } }} />,
     );
     fireEvent.click(container.firstChild);
     expect(Routers.history.location.pathname).toBe("/bar/test");

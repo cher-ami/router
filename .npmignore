@@ -8,8 +8,6 @@ src/**
 test
 example
 example-node
-.babelrc
 .prettierignore
 .prettierrc
-jest.config.ts
 tsconfig.json

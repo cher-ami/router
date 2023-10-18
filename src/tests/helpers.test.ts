@@ -1,4 +1,5 @@
-import { joinPaths, preventSlashes, removeLastCharFromString } from "./helpers";
+import { it, expect, describe } from "vitest";
+import { joinPaths, preventSlashes, removeLastCharFromString } from "../core/helpers";
 
 describe("joinPaths", () => {
   it("should join paths without error", () => {
