@@ -3,7 +3,11 @@ import { useLocation, useStack } from "@cher-ami/router";
 import { transitionsHelper } from "../helper/transitionsHelper";
 const componentName: string = "YoloPage";
 
-interface IProps {}
+interface IProps {
+  time: {
+    datetime: string;
+  };
+}
 
 const YoloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null);
@@ -21,6 +25,7 @@ const YoloPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
+      <div>fetch props datetime: {props.time?.datetime}</div>
 
       <br />
       <br />
