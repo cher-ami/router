@@ -1,5 +1,5 @@
-import { Stack } from "./Stack";
-import { vi, test, it, expect, describe } from "vitest";
+import { Stack } from "..";
+import { it, expect, describe } from "vitest";
 
 describe("Stack", () => {
   it("should be defined", () => {

@@ -1,5 +1,8 @@
-import {vi, test, it, expect, describe} from "vitest"
-import LangService from "./LangService";
+/**
+ * @vitest-environment jsdom
+ */
+
+import { it, expect, describe } from "vitest";
 import {
   compileUrl,
   getPathByRouteName,
@@ -15,10 +18,10 @@ import {
   getSubRouterRoutes,
   patchMissingRootRoute,
   applyMiddlewaresToRoutes,
-} from "./core";
-import { preventSlashes } from "./helpers";
-import { routeList } from "../_fixtures/routeList";
-import { Routers } from "./Routers";
+} from "../core/core";
+import { preventSlashes } from "../core/helpers";
+import { routeList } from "./_fixtures/routeList";
+import { Routers, LangService } from "..";
 
 /**
  * Public
@@ -40,26 +43,42 @@ describe("public", () => {
       const base = "/custom-base/";
       const routes = [
         { path: "/a" },
-        { path: "/b", name:"b-page", children: [{ path: "/c", name:"c-page" }, { path: "/d" }] }
-      ]
+        {
+          path: "/b",
+          name: "b-page",
+          children: [{ path: "/c", name: "c-page" }, { path: "/d" }],
+        },
+      ];
       // test single param
-      expect(createUrl({ name: "b-page", queryParams: {foo: "bar"} }, base, routes))
-        .toBe(`${base}b?foo=bar`);
+      expect(
+        createUrl({ name: "b-page", queryParams: { foo: "bar" } }, base, routes),
+      ).toBe(`${base}b?foo=bar`);
 
       // test multiple params
-      expect(createUrl({ name: "b-page", queryParams: {foo: "bar", "zoo": "a,b"} }, base, routes))
-        .toBe(`${base}b?foo=bar&zoo=a,b`);
+      expect(
+        createUrl(
+          { name: "b-page", queryParams: { foo: "bar", zoo: "a,b" } },
+          base,
+          routes,
+        ),
+      ).toBe(`${base}b?foo=bar&zoo=a,b`);
 
       // test hash
-      expect(createUrl({ name: "b-page", hash: "hello" }, base, routes))
-        .toBe(`${base}b#hello`);
-      expect(createUrl({ name: "c-page", hash: "hello" }, base, routes))
-        .toBe(`${base}b/c#hello`);
+      expect(createUrl({ name: "b-page", hash: "hello" }, base, routes)).toBe(
+        `${base}b#hello`,
+      );
+      expect(createUrl({ name: "c-page", hash: "hello" }, base, routes)).toBe(
+        `${base}b/c#hello`,
+      );
 
       // test both
-      expect(createUrl({ name: "c-page", hash: "hello", queryParams: {foo: "bar"} }, base, routes))
-        .toBe(`${base}b/c?foo=bar#hello`);
-
+      expect(
+        createUrl(
+          { name: "c-page", hash: "hello", queryParams: { foo: "bar" } },
+          base,
+          routes,
+        ),
+      ).toBe(`${base}b/c?foo=bar#hello`);
     });
   });
 
@@ -70,7 +89,7 @@ describe("public", () => {
       expect(getSubRouterBase("/foo", "/hello/")).toBe("/hello/foo");
       expect(getSubRouterBase("/foo", "/hello")).toBe("/hello/foo");
       expect(getSubRouterBase("/foo", "/custom/base/hello/")).toBe(
-        "/custom/base/hello/foo"
+        "/custom/base/hello/foo",
       );
 
       Routers.langService = new LangService({
@@ -101,7 +120,7 @@ describe("public", () => {
       expect(homeChildren).toEqual(routeList.find((e) => e.name === "HomePage").children);
       const aboutChildren = getSubRouterRoutes("/about", routeList);
       expect(aboutChildren).toEqual(
-        routeList.find((e) => e.name === "AboutPage").children
+        routeList.find((e) => e.name === "AboutPage").children,
       );
     });
   });
@@ -205,12 +224,9 @@ describe("matcher", () => {
         { path: "/a" },
         {
           path: "/b",
-          children: [
-            { path: "/c" },
-            { path: "/d" }
-          ]
-        }
-      ]
+          children: [{ path: "/c" }, { path: "/d" }],
+        },
+      ];
       // only params
       let getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b?foo=bar&lang=en" });
       expect(getRoute.queryParams).toEqual({ foo: "bar", lang: "en" });
@@ -277,11 +293,6 @@ describe("routes", () => {
       expect(transformRoutes).toEqual(afterMiddlewareRoutes);
     });
   });
-
-  describe("formatRoutes", () => {
-    // No need test for this function who is calling already tested low level fn
-    // (patchMissingRootRoute etc...)
-  });
 });
 
 /***
@@ -303,7 +314,7 @@ describe("URLs and paths", () => {
       expect(getFullPathByPath(routeList, "/foo", "FooPage")).toBe("/hello/foo");
       expect(getFullPathByPath(routeList, "/yes", "YesPage")).toBe("/hello/foo/bla/yes");
       expect(getFullPathByPath(routeList, "/", "FirstLevelRoute-2")).toBe(
-        "/hello/foo/bla/"
+        "/hello/foo/bla/",
       );
       expect(getFullPathByPath(routeList, "/no", "NoPage")).toBe("/hello/foo/bla/no");
     });
@@ -314,10 +325,10 @@ describe("URLs and paths", () => {
       expect(getUrlByRouteName(routeList, { name: "HelloPage" })).toBe("/hello");
       expect(getUrlByRouteName(routeList, { name: "FooPage" })).toBe("/hello/foo");
       expect(getUrlByRouteName(routeList, { name: "BlaPage", params: { id: 2 } })).toBe(
-        "/hello/foo/bla"
+        "/hello/foo/bla",
       );
       expect(getUrlByRouteName(routeList, { name: "NoPage", params: { id: 4 } })).toBe(
-        "/hello/foo/bla/no"
+        "/hello/foo/bla/no",
       );
     });
   });

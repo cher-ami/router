@@ -1,9 +1,12 @@
+/**
+ * @vitest-environment jsdom
+ */
+
+import { it, expect, describe } from "vitest";
 import React from "react";
-import { Router } from "./Router";
+import { TRoute, Router } from "..";
 import { render } from "@testing-library/react";
-import { TRoute } from "./Router";
 import { createBrowserHistory } from "history";
-import {vi, test, it, expect, describe} from "vitest"
 
 describe("Router", () => {
   const routesList: TRoute[] = [
@@ -22,7 +25,7 @@ describe("Router", () => {
     const { container } = render(
       <Router routes={routesList} history={createBrowserHistory()}>
         <div id={"app"}>app</div>
-      </Router>
+      </Router>,
     );
     const router = container.firstChild;
     expect(router.textContent).toBe("app");

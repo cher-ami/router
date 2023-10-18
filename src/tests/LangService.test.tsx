@@ -1,4 +1,8 @@
-import { vi, test, it, expect, describe, beforeAll, afterEach } from "vitest";
+/**
+ * @vitest-environment jsdom
+ */
+
+import { vi, it, expect, describe, beforeAll, afterEach } from "vitest";
 import React from "react";
 import { Router } from "../components/Router";
 import LangService from "../core/LangService";
