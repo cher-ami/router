@@ -1,12 +1,11 @@
 import React, {useState, useRef} from "react"
 import { useStack } from "@cher-ami/router";
-import {transitionsHelper} from "../helpers/transitionsHelper"
+import {transitionsHelper} from "~/helpers/transitionsHelper"
 
 const componentName = "ContactPage"
 function ContactPage(props, handleRef) {
   const rootRef = useRef(null)
-  const [n, setN] = useState(0)
-
+  
   useStack({
     componentName,
     handleRef,
@@ -14,7 +13,6 @@ function ContactPage(props, handleRef) {
     playIn: () => transitionsHelper(rootRef.current, true, { x: -50 }, { x: 0 }),
     playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   });
-
 
   return (
     <div className={componentName} ref={rootRef}>

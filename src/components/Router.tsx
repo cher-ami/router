@@ -313,7 +313,7 @@ function Router(props: {
     // prettier-ignore
     if (isServer) {
       if (props.initialStaticProps) {
-        log("firstRoute > isServer > assign initialStaticProps to newRoute props & set cache",);
+        log("firstRoute > isServer > assign initialStaticProps to newRoute props & set cache");
         Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
       }
     }
@@ -323,8 +323,7 @@ function Router(props: {
       // CLIENT > FIRST ROUTE
       if (Routers.isFirstRoute) {
         if (props.initialStaticProps) {
-          // assign initial static props to new route props & set cache
-          log(props.id, "firstRoute > isClient > assign initial static props to new route props & set cache");
+          log(props.id, "firstRoute > isClient > assign initialStaticProps to newRoute props & set cache");
           Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
           cache.set(urlWithoutHash, newRoute.props ?? {});
         }

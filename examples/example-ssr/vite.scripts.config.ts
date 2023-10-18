@@ -27,6 +27,8 @@ export default defineConfig(({ command, mode }) => {
           chunkFileNames: `[name].js`,
           assetFileNames: `[name].[ext]`,
         },
+
+        external: ["react", "react-dom"],
       },
     },
 
