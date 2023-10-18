@@ -10,11 +10,6 @@ A fresh high-level react router designed for flexible route transitions
 
 <br>
 
-cher-ami router API is inspired by [wouter](https://github.com/molefrog/wouter),
-[solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts)
-and
-[vue router](https://router.vuejs.org/) API.
-
 ## Why another react router?
 
 Because managing route transitions with React is always complicated, this router
@@ -25,18 +20,24 @@ This router loads [history](https://github.com/ReactTraining/history)
 , [path-to-regexp](https://github.com/pillarjs/path-to-regexp)
 and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
 
+## Playground
+
+- [example client](https://codesandbox.io/s/github/cher-ami/router/tree/main/examples/example-client)
+- [example ssr](https://codesandbox.io/s/github/cher-ami/router/tree/main/examples/example-ssr)
+
 ## Summary
 
 - [Installation](#Installation)
-- [Simple usage](#SimpleUsage)
-- [Dynamic routes](#DynamicRoutes)
-- [Sub Routers](#SubRouters)
-- [Manage Transitions](#ManageTransitions)
-  - [Default sequential transitions](#DefaultSequentialTransitions)
-  - [Custom transitions](#CustomTransitions)
-- [SSR support](#SSRSupport)
-- [Debug](#Debug)
-- [Example](#Example)
+- [Simple usage](#Simple-Usage)
+- [Dynamic routes](#Dynamic-Routes)
+- [Sub Router](#Sub-Router)
+- [Manage Transitions](#Manage-Transitions)
+  - [Default sequential transitions](#Default-Sequential-Transitions)
+  - [Custom transitions](#Custom-Transitions)
+- [SSR support](#SSR-Support)
+- [Workflow](#Workflow)
+- [thanks](#Thanks)
+- [credits](#Credits)
 
 **API**
 
@@ -66,13 +67,13 @@ Global:
 - [`Helpers`](#Helpers) Global Routers helpers
 - [`Routers object`](#Routers) Global Routers object contains all routers properties (history, instances...)
 
-## <a name="Installation"></a>Installation
+## Installation
 
 ```shell
 $ npm i @cher-ami/router -s
 ```
 
-## <a name="SimpleUsage"></a>Simple usage
+## Simple usage
 
 ```jsx
 import React from "react";
@@ -139,9 +140,7 @@ const FooPage = forwardRef((props, handleRef) => {
 });
 ```
 
-**[Demo codesandbox: simple usage](https://codesandbox.io/s/simple-usage-cpufs)**
-
-## <a name="DynamicRoutes"></a>Dynamic routes
+## Dynamic routes
 
 cher-ami router use [path-to-regexp](https://github.com/pillarjs/path-to-regexp) which
 accept path parameters. (check
@@ -178,8 +177,6 @@ const ArticlePage = forwardRef((props, handleRef) => {
 });
 ```
 
-**[Demo codesandbox: simple usage](https://codesandbox.io/s/simple-usage-cpufs)**
-
 Also, it is possible to match a specific route by a simple dynamic route
 parameter for the "not found route" case. In this case, the routes object order
 declaration is important. `/:rest` path route need to be the last of
@@ -203,9 +200,7 @@ const routesList = [
 ];
 ```
 
-**[Demo codesandbox: not found route](https://codesandbox.io/s/not-found-route-eu4bi)**
-
-## <a name="SubRouters"></a>Sub-router
+## Sub-router
 
 cher-ami router supports nested routes from sub routers instance 🙏🏽.
 It is possible to nest as many routers as you want.
@@ -272,12 +267,12 @@ const FooPage = forwardRef((props, handleRef) => {
 });
 ```
 
-## <a name="ManageTransitions"></a>Manage transitions
+## Manage transitions
 
 `ManageTransitions` function allows to define, "when" and "in what conditions",
 routes transitions will be exectued.
 
-### <a name="DefaultSequentialTransitions"></a>Default sequential transitions
+### Default sequential transitions
 
 By default, a "sequential" transitions senario is used by Stack component: the
 previous page play out performs, then the new page play in.
@@ -310,7 +305,7 @@ const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }
 };
 ```
 
-### <a name="CustomTransitions"></a>Custom transitions
+### Custom transitions
 
 It's however possible to create a custom transitions senario function and pass
 it to the Stack `manageTransitions` props. In this example, we would like to
@@ -336,9 +331,7 @@ const App = (props, handleRef) => {
 };
 ```
 
-**[Demo codesandbox: custom manage transitions](https://codesandbox.io/s/inspiring-thompson-tw4qn)**
-
-## <a name="SSRSupport"></a>SSR Support
+## SSR Support
 
 This router is compatible with SSR due to using `staticLocation` props instead of `history` props on Router instance.
 In this case, the router will match only with `staticLocation` props value and render the appropiate route without invoking the browser history. (Because `window` is not available on the server).
@@ -383,25 +376,34 @@ function HomePage({ api }) {
 
 For larger example, check the [example-ssr folder](./examples/example-ssr/).
 
-## <a name="Example"></a>Example
-
-A use case example is available on this repos.
-
-Install dependencies
+## Workflow
 
 ```shell
-$ npm i
+# Install dependencies
+pnpm i
+
+## build watch
+pnpm run build:watch
+
+## start tests
+pnpm run test:watch
+
+## start all examples
+pnpm run dev
+
+## Before publishing
+pnpm run pre-publish
+
+## Increment version
+npm version {patch|minor|major}
+
+## Publish
+npm publish
 ```
 
-Start dev server
+## API
 
-```shell
-$ npm run dev
-```
-
-## <a name="Api"></a>API
-
-### <a name="Router"></a>Router
+### Router
 
 Router component creates a new router instance.
 
@@ -428,7 +430,7 @@ Router component creates a new router instance.
 - **middlewares** `[]` _(optional)_ add routes middleware function to patch each routes)
 - **id** `?number | string` _(optional)_ id of the router instance - default : `1`
 
-### <a name="Link"></a>Link
+### Link
 
 Trig new route.
 
@@ -444,7 +446,7 @@ Trig new route.
 - **onClick** `()=> void` _(optional)_ execute callback on the click event
 - **className** `string` _(optional)_ Class name added to component root DOM element
 
-### <a name="Stack"></a>Stack
+### Stack
 
 Render previous and current page component.
 
@@ -477,7 +479,7 @@ interface IRouteStack {
 }
 ```
 
-### <a name="useRouter"></a>useRouter
+### useRouter
 
 Get current router informations:
 
@@ -518,7 +520,7 @@ type TRoute = Partial<{
 }>;
 ```
 
-### <a name="useLocation"></a>useLocation
+### useLocation
 
 Allow the router to change location.
 
@@ -546,7 +548,7 @@ type TOpenRouteParams = {
 };
 ```
 
-### <a name="useStack"></a>useStack
+### useStack
 
 useStack allows to the parent Stack to handle page transitions and refs.
 
@@ -643,7 +645,7 @@ const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPag
 
 nothing
 
-### <a name="useRouteCounter"></a>useRouteCounter
+### useRouteCounter
 
 Returns route counter
 
@@ -663,7 +665,7 @@ An object with these properties:
 - **isFirstRoute** `boolean` Check if it's first route - default: `true`
 - **resetCounter** `() => void` Reset routerCounter & isFirstRoute states
 
-### <a name="useHistory"></a>useHistory
+### useHistory
 
 Allow to get the global router history and execute a callback each time history
 change.
@@ -683,7 +685,7 @@ const history = useHistory((e) => {
 
 - **history** `History` : global history object. (`Routers.history`)
 
-### <a name="useLang"></a>useLang
+### useLang
 
 Get and update langService current language object.
 
@@ -707,7 +709,7 @@ Array of :
 - **lang** `TLanguage` : current lang object
 - **setLang** `(lang: TLanguage | string, force: boolean) => void` : set new lang object (same API than `langService.setLang`)
 
-### <a name="LangService"></a>LangService
+### LangService
 
 Manage `:lang` params from anywhere inside Router scope.
 
@@ -848,13 +850,13 @@ langService.redirectToDefaultLang();
 #### redirectToBrowserLang(forcePageReload = true) `void`
 
 Same than `redirectToDefaultLang` method but redirect to the user `navigator.language`.
-If the browser language doesn't exist in Languages array, we redirect to the default lang. 
+If the browser language doesn't exist in Languages array, we redirect to the default lang.
 
 ```js
 langService.redirectToBrowserLang();
 ```
 
-### <a name="TranslatePath"></a>Translate Path
+### Translate Path
 
 Paths can be translated by lang in route path property. This option works only if LangService instance is created and passed to the Router component.
 
@@ -865,7 +867,7 @@ Paths can be translated by lang in route path property. This option works only i
   }
 ```
 
-## <a name="Helpers"></a>Helpers
+## Helpers
 
 #### createUrl()
 
@@ -879,7 +881,7 @@ Create a formated URL by string, or `TOpenRouteParams`
 
 Push new route in current history. Stack(s) component(s) will return the appriopriate route.
 
-## <a name="Routers"></a>Routers
+## Routers
 
 Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack, we need a global object to store shared informations between router instances.
 
@@ -912,6 +914,13 @@ How many route are resolved from the start of the session. This property is also
 `boolean`
 
 Is it the first route of the session. This property is also available from `useRouteCounter`.
+
+## Thanks
+
+cher-ami router API is inspired by [wouter](https://github.com/molefrog/wouter),
+[solidify router](https://github.com/solid-js/solidify/blob/master/navigation/Router.ts)
+and
+[vue router](https://router.vuejs.org/) API.
 
 ## Credits
 
