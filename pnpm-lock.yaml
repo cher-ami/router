@@ -94,7 +94,7 @@ importers:
   examples/example-client:
     dependencies:
       '@cher-ami/router':
-        specifier: latest
+        specifier: ^3.1.2
         version: link:../..
       react:
         specifier: ^18.2.0
