@@ -1,5 +1,5 @@
-import React, {useEffect, useRef} from "react"
-import { useStack } from "@cher-ami/router";
+import React, { useEffect, useRef } from "react"
+import { useStack } from "@cher-ami/router"
 import { transitionsHelper } from "../helpers/transitionsHelper"
 
 const componentName = "ArticlePage"
@@ -17,9 +17,7 @@ function ArticlePage(props, handleRef) {
   return (
     <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
       {componentName}
-      <p>
-         article slug: {props.params.slug}
-      </p>
+      <p>article slug: {props.params.slug}</p>
 
       {/*{props.todo?.map((e, i) => <div key={i}>{e.title}</div>)}*/}
     </div>

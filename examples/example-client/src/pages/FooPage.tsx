@@ -1,12 +1,12 @@
-import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { Link, useStack } from "@cher-ami/router";
-import { transitionsHelper } from "../helper/transitionsHelper";
-const componentName: string = "FooPage";
+import React, { ForwardedRef, forwardRef, useRef } from "react"
+import { Link, useStack } from "@cher-ami/router"
+import { transitionsHelper } from "../helper/transitionsHelper"
+const componentName: string = "FooPage"
 
 interface IProps {}
 
 const FooPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
-  const rootRef = useRef(null);
+  const rootRef = useRef(null)
 
   useStack({
     componentName,
@@ -16,7 +16,7 @@ const FooPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
       transitionsHelper(rootRef.current, true, { y: -50, autoAlpha: 1 }, { y: 0 }),
     playOut: () =>
       transitionsHelper(rootRef.current, false, { y: -0 }, { y: 50, autoAlpha: 0 }),
-  });
+  })
 
   return (
     <div className={componentName} ref={rootRef}>
@@ -26,8 +26,8 @@ const FooPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
       <br />
       <Link to={{ name: "AboutPage" }}>About</Link>
     </div>
-  );
-});
+  )
+})
 
-FooPage.displayName = componentName;
-export default FooPage;
+FooPage.displayName = componentName
+export default FooPage

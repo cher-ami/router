@@ -1,4 +1,4 @@
-import fetch from "cross-fetch";
+import fetch from "cross-fetch"
 
 export const fetchAvailableUrls = async (): Promise<string[]> => {
   /**
@@ -44,4 +44,4 @@ export const fetchAvailableUrls = async (): Promise<string[]> => {
       "/404"
     ])
   })
-};
+}

@@ -4,20 +4,20 @@ import {
   useEffect,
   useImperativeHandle,
   useMemo,
-} from "react";
+} from "react"
 
 export interface IUseStack extends Omit<IRouteStack, "$element" | "isReadyPromise"> {
-  handleRef: ForwardedRef<any>;
-  rootRef: MutableRefObject<any>;
+  handleRef: ForwardedRef<any>
+  rootRef: MutableRefObject<any>
 }
 
 export interface IRouteStack {
-  componentName: string;
-  playIn?: () => Promise<any>;
-  playOut?: () => Promise<any>;
-  isReady?: boolean;
-  $element: HTMLElement;
-  isReadyPromise?: () => Promise<void>;
+  componentName: string
+  playIn?: () => Promise<any>
+  playOut?: () => Promise<any>
+  isReady?: boolean
+  $element: HTMLElement
+  isReadyPromise?: () => Promise<void>
 }
 
 /**
@@ -34,17 +34,17 @@ export const useStack = ({
 }: IUseStack) => {
   // create deferred promise who we can resolve in the scope
   const deferredPromise = useMemo(() => {
-    const deferred: any = {};
+    const deferred: any = {}
     deferred.promise = new Promise((resolve) => {
-      deferred.resolve = resolve;
-    });
-    return deferred;
-  }, []);
+      deferred.resolve = resolve
+    })
+    return deferred
+  }, [])
 
   // resolve deferred if isReady param is true
   useEffect(() => {
-    isReady && deferredPromise.resolve();
-  }, [isReady]);
+    isReady && deferredPromise.resolve()
+  }, [isReady])
 
   useImperativeHandle(
     handleRef,
@@ -57,10 +57,10 @@ export const useStack = ({
         isReady,
         isReadyPromise: () => deferredPromise.promise,
         $element: rootRef.current,
-      };
+      }
 
-      return handleRouteCallback;
+      return handleRouteCallback
     },
-    [deferredPromise]
-  );
-};
+    [deferredPromise],
+  )
+}

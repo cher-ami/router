@@ -1,5 +1,5 @@
-import { languages, showDefaultLangInUrl } from "./languages";
-import { LangService } from "@cher-ami/router";
+import { languages, showDefaultLangInUrl } from "./languages"
+import { LangService } from "@cher-ami/router"
 
 export const langServiceInstance = (base = "/", url = window.location.pathname) =>
   new LangService({
@@ -7,4 +7,4 @@ export const langServiceInstance = (base = "/", url = window.location.pathname) 
     staticLocation: url,
     languages,
     base,
-  });
+  })

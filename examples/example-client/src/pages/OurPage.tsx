@@ -1,14 +1,14 @@
-import React, { ForwardedRef, forwardRef, useRef } from "react";
-import { Link, useLocation, useStack } from "@cher-ami/router";
-import { transitionsHelper } from "../helper/transitionsHelper";
-const componentName: string = "OurPage";
+import React, { ForwardedRef, forwardRef, useRef } from "react"
+import { Link, useLocation, useStack } from "@cher-ami/router"
+import { transitionsHelper } from "../helper/transitionsHelper"
+const componentName: string = "OurPage"
 
 interface IProps {}
 
 const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
-  const rootRef = useRef(null);
+  const rootRef = useRef(null)
 
-  const [location, setLocation] = useLocation();
+  const [location, setLocation] = useLocation()
 
   useStack({
     componentName,
@@ -16,7 +16,7 @@ const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
     rootRef,
     playIn: () => transitionsHelper(rootRef.current, true),
     playOut: () => transitionsHelper(rootRef.current, false),
-  });
+  })
 
   return (
     <div className={componentName} ref={rootRef}>
@@ -29,8 +29,8 @@ const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
 
       <Link to={{ name: "FooPage" }} children={`navigate to FooPage`} />
     </div>
-  );
-});
+  )
+})
 
-OurPage.displayName = componentName;
-export default OurPage;
+OurPage.displayName = componentName
+export default OurPage

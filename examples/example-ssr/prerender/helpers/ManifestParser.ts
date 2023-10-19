@@ -160,7 +160,7 @@ export class ManifestParser {
                 ...(jsonManifest[b]?.css || []),
               ]
             : a,
-        []
+        [],
       )
       .filter((e) => e)
 

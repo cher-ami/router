@@ -1,48 +1,48 @@
-import LangService from "../core/LangService";
-import { BrowserHistory, HashHistory, MemoryHistory } from "history";
-import { TRoute } from "../components/Router";
+import LangService from "../core/LangService"
+import { BrowserHistory, HashHistory, MemoryHistory } from "history"
+import { TRoute } from "../components/Router"
 
 export type TRouters = {
   /**
    * Base URL
    */
-  base: string;
+  base: string
   /**
    * Global routes list
    */
-  routes: TRoute[];
+  routes: TRoute[]
   /**
    * Global browser history
    */
-  history: HashHistory | MemoryHistory | BrowserHistory;
+  history: HashHistory | MemoryHistory | BrowserHistory
   /**
    * Global static location
    */
-  staticLocation: string;
+  staticLocation: string
   /**
    * Global route counter increment on each history push
    */
-  routeCounter: number;
+  routeCounter: number
   /**
    * Global is first route state
    * Is first route is true if routerCounter === 1
    */
-  isFirstRoute: boolean;
+  isFirstRoute: boolean
   /**
    * Store current route
    * Allows to always know what is last currentRoute path (for LangSerivce)
    */
-  currentRoute: TRoute;
+  currentRoute: TRoute
   /**
    * LangService instance (stored in Router)
    */
-  langService: LangService;
+  langService: LangService
 
   /**
    * Cache of getStaticProps Promise results
    */
-  staticPropsCache: { [x:string]: any }
-};
+  staticPropsCache: { [x: string]: any }
+}
 
 /**
  * ROUTERS object allows to keep safe globales values between Routers instances
@@ -57,5 +57,5 @@ export const Routers: TRouters = {
   isFirstRoute: true,
   currentRoute: undefined,
   langService: undefined,
-  staticPropsCache: {}
-};
+  staticPropsCache: {},
+}

@@ -1,15 +1,15 @@
-import { TRoute } from "@cher-ami/router";
+import { TRoute } from "@cher-ami/router"
 
-import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
-import ArticlePage from "./pages/ArticlePage";
-import FooPage from "./pages/FooPage";
-import BarPage from "./pages/BarPage";
-import NotFoundPage from "./pages/NotFoundPage";
-import YoloPage from "./pages/YoloPage";
-import HelloPage from "./pages/HelloPage";
-import LaPage from "./pages/LaPage";
-import OurPage from "./pages/OurPage";
+import HomePage from "./pages/HomePage"
+import AboutPage from "./pages/AboutPage"
+import ArticlePage from "./pages/ArticlePage"
+import FooPage from "./pages/FooPage"
+import BarPage from "./pages/BarPage"
+import NotFoundPage from "./pages/NotFoundPage"
+import YoloPage from "./pages/YoloPage"
+import HelloPage from "./pages/HelloPage"
+import LaPage from "./pages/LaPage"
+import OurPage from "./pages/OurPage"
 
 /**
  * Define routes list
@@ -31,9 +31,9 @@ export const routesList: TRoute[] = [
             path: "/yolo",
             component: YoloPage,
             getStaticProps: async (props, currentLang) => {
-              const res = await fetch("https://worldtimeapi.org/api/ip");
-              const time = await res.json();
-              return { time };
+              const res = await fetch("https://worldtimeapi.org/api/ip")
+              const time = await res.json()
+              return { time }
             },
           },
           {
@@ -67,13 +67,13 @@ export const routesList: TRoute[] = [
       color: "red",
     },
     getStaticProps: async (props, currentLang) => {
-      const res = await fetch("https://worldtimeapi.org/api/ip");
-      const time = await res.json();
-      return { time };
+      const res = await fetch("https://worldtimeapi.org/api/ip")
+      const time = await res.json()
+      return { time }
     },
   },
   {
     path: "/:rest",
     component: NotFoundPage,
   },
-];
+]

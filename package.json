@@ -34,7 +34,8 @@
     "size-why": "size-limit -- --why",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "pre-publish": "npm run build && npm run test"
+    "pre-publish": "npm run build && npm run test",
+    "prepare": "husky install"
   },
   "size-limit": [
     {
@@ -47,8 +48,8 @@
     "@wbe/debug": "^1.2.0",
     "history": "^5.3.0",
     "path-to-regexp": "^6.2.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0",
@@ -61,7 +62,9 @@
     "@types/node": "^20.8.7",
     "@types/react": "^18.2.29",
     "@types/react-dom": "^18.2.14",
+    "husky": "^8.0.3",
     "jsdom": "^22.1.0",
+    "lint-staged": "^15.0.1",
     "prettier": "^3.0.3",
     "react-test-renderer": "^18.2.0",
     "size-limit": "^9.0.0",
@@ -70,14 +73,13 @@
     "typescript": "^5.2.2",
     "vitest": "^0.34.6"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{tsx,ts,jsx,js,less,css,json,md}": [
-      "prettier --write"
+      "prettier --write ."
     ]
+  },
+  "prettier": {
+    "printWidth": 90,
+    "semi": false
   }
 }

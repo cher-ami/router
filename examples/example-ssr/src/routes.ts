@@ -1,11 +1,11 @@
-import HomePage from "./pages/HomePage";
-import AboutPage from "./pages/AboutPage";
-import ContactPage from "./pages/ContactPage";
-import NotFoundPage from "./pages/NotFoundPage";
-import { TRoute } from "@cher-ami/router";
-import ArticlePage from "./pages/ArticlePage";
-import FooPage from "./pages/FooPage";
-import BarPage from "./pages/BarPage";
+import HomePage from "./pages/HomePage"
+import AboutPage from "./pages/AboutPage"
+import ContactPage from "./pages/ContactPage"
+import NotFoundPage from "./pages/NotFoundPage"
+import { TRoute } from "@cher-ami/router"
+import ArticlePage from "./pages/ArticlePage"
+import FooPage from "./pages/FooPage"
+import BarPage from "./pages/BarPage"
 
 export enum EPages {
   HOME = "home",
@@ -23,9 +23,9 @@ export const routes: TRoute[] = [
     component: HomePage,
     name: EPages.HOME,
     getStaticProps: async (props, currentLang) => {
-      const res = await fetch("https://worldtimeapi.org/api/ip");
-      const time = await res.json();
-      return { time };
+      const res = await fetch("https://worldtimeapi.org/api/ip")
+      const time = await res.json()
+      return { time }
     },
   },
   {
@@ -33,9 +33,9 @@ export const routes: TRoute[] = [
     component: AboutPage,
     name: EPages.ABOUT,
     getStaticProps: async () => {
-      const res = await fetch("https://jsonplaceholder.typicode.com/todos");
-      const todo = await res.json();
-      return { todo };
+      const res = await fetch("https://jsonplaceholder.typicode.com/todos")
+      const todo = await res.json()
+      return { todo }
     },
     children: [
       {
@@ -43,9 +43,9 @@ export const routes: TRoute[] = [
         component: FooPage,
         name: EPages.FOO,
         getStaticProps: async () => {
-          const res = await fetch("https://jsonplaceholder.typicode.com/todos/1");
-          const todo = await res.json();
-          return { todo };
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/1")
+          const todo = await res.json()
+          return { todo }
         },
       },
       {
@@ -63,10 +63,10 @@ export const routes: TRoute[] = [
       color: "blue",
     },
     getStaticProps: async (props) => {
-      const res = await fetch("https://jsonplaceholder.typicode.com/todos");
-      const todo = await res.json();
-      const mySlug = props.params.slug;
-      return { todo, mySlug };
+      const res = await fetch("https://jsonplaceholder.typicode.com/todos")
+      const todo = await res.json()
+      const mySlug = props.params.slug
+      return { todo, mySlug }
     },
   },
   {
@@ -79,4 +79,4 @@ export const routes: TRoute[] = [
     component: NotFoundPage,
     name: EPages.NOT_FOUND,
   },
-];
+]

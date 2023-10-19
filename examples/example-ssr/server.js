@@ -1,23 +1,23 @@
-import express from "express";
-import portFinderSync from "portfinder-sync";
-import { renderToPipeableStream } from "react-dom/server";
-import { createServer } from "vite";
+import express from "express"
+import portFinderSync from "portfinder-sync"
+import { renderToPipeableStream } from "react-dom/server"
+import { createServer } from "vite"
 
-const port = portFinderSync.getPort(3000);
+const port = portFinderSync.getPort(3000)
 
-(async () => {
+;(async () => {
   /**
    * Dev server
    *
    *
    */
   async function createDevServer() {
-    const app = express();
+    const app = express()
 
     // dev script to inject
     const devScripts = {
       js: [{ tag: "script", attr: { type: "module", src: "/src/index.tsx" } }],
-    };
+    }
 
     // Create Vite server in middleware mode.
     // This disables Vite's own HTML serving logic and let the parent server take control.
@@ -28,36 +28,36 @@ const port = portFinderSync.getPort(3000);
         middlewareMode: true,
       },
       appType: "custom",
-    });
+    })
 
     // use vite's connect instance as middleware
-    app.use(vite.middlewares);
+    app.use(vite.middlewares)
     app.use("*", async (req, res, next) => {
       try {
         // Transforms the ESM source code to be usable in Node.js
-        const { render } = await vite.ssrLoadModule(`src/server/index-server.tsx`);
+        const { render } = await vite.ssrLoadModule(`src/server/index-server.tsx`)
         // Get react-dom from the render method
-        const dom = await render(req.originalUrl, devScripts, false);
+        const dom = await render(req.originalUrl, devScripts, false)
         // Create stream to support Suspense API
         const stream = renderToPipeableStream(dom, {
           onShellReady() {
-            res.statusCode = 200;
-            res.setHeader("Content-type", "text/html");
-            stream.pipe(res);
+            res.statusCode = 200
+            res.setHeader("Content-type", "text/html")
+            stream.pipe(res)
           },
           onError(e) {
-            res.statusCode = 500;
-            console.error(e);
+            res.statusCode = 500
+            console.error(e)
           },
-        });
+        })
       } catch (e) {
-        vite.ssrFixStacktrace(e);
-        next(e);
+        vite.ssrFixStacktrace(e)
+        next(e)
       }
-    });
+    })
 
     // return vite, app and server
-    return { vite, app };
+    return { vite, app }
   }
 
   /**
@@ -65,7 +65,7 @@ const port = portFinderSync.getPort(3000);
    */
   createDevServer().then(({ app }) =>
     app.listen(port, () => {
-      console.log(`http://localhost:${port}`);
+      console.log(`http://localhost:${port}`)
     }),
-  );
-})();
+  )
+})()

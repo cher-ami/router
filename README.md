@@ -76,9 +76,9 @@ $ npm i @cher-ami/router -s
 ## Simple usage
 
 ```jsx
-import React from "react";
-import { Router, Link, Stack } from "@cher-ami/router";
-import { createBrowserHistory } from "history";
+import React from "react"
+import { Router, Link, Stack } from "@cher-ami/router"
+import { createBrowserHistory } from "history"
 
 const routesList = [
   {
@@ -89,9 +89,9 @@ const routesList = [
     path: "/foo",
     component: FooPage,
   },
-];
+]
 
-const history = createBrowserHistory();
+const history = createBrowserHistory()
 
 function App() {
   return (
@@ -102,7 +102,7 @@ function App() {
       </nav>
       <Stack />
     </Router>
-  );
+  )
 }
 ```
 
@@ -110,34 +110,34 @@ Page component need to be wrapped by `React.forwardRef`. The `handleRef` lets
 hold transitions, and ref used by `<Stack />` component.
 
 ```jsx
-import React from "react";
-import { useStack } from "@cher-ami/router";
+import React from "react"
+import { useStack } from "@cher-ami/router"
 
 const FooPage = forwardRef((props, handleRef) => {
-  const componentName = "FooPage";
-  const rootRef = useRef(null);
+  const componentName = "FooPage"
+  const rootRef = useRef(null)
 
   // create custom page transitions (example-client with GSAP)
   const playIn = () => {
     return new Promise((resolve) => {
-      gsap.from(rootRef.current, { autoAlpha: 0, onComplete: resolve });
-    });
-  };
+      gsap.from(rootRef.current, { autoAlpha: 0, onComplete: resolve })
+    })
+  }
   const playOut = () => {
     return new Promise((resolve) => {
-      gsap.to(rootRef.current, { autoAlpha: 0, onComplete: resolve });
-    });
-  };
+      gsap.to(rootRef.current, { autoAlpha: 0, onComplete: resolve })
+    })
+  }
 
   // register page transition properties used by Stack component
-  useStack({ componentName, handleRef, rootRef, playIn, playOut });
+  useStack({ componentName, handleRef, rootRef, playIn, playOut })
 
   return (
     <div className={componentName} ref={rootRef}>
       {componentName}
     </div>
-  );
-});
+  )
+})
 ```
 
 ## Dynamic routes
@@ -153,28 +153,28 @@ const routesList = [
     path: "/blog/:id",
     component: ArticlePage,
   },
-];
+]
 ```
 
 You can access route parameters by page component props or by `useRouter()` hook.
 
 ```jsx
-import React, { useEffect, forwardRef } from "react";
-import { useRoute } from "@cher-ami/router";
+import React, { useEffect, forwardRef } from "react"
+import { useRoute } from "@cher-ami/router"
 
 const ArticlePage = forwardRef((props, handleRef) => {
   useEffect(() => {
-    console.log(props.params); // { id: "my-article" }
-  }, [props]);
+    console.log(props.params) // { id: "my-article" }
+  }, [props])
 
   // or from any nested components
-  const { currentRoute } = useRouter();
+  const { currentRoute } = useRouter()
   useEffect(() => {
-    console.log(currentRoute.props.params); // { id: "my-article" }
-  }, [currentRoute]);
+    console.log(currentRoute.props.params) // { id: "my-article" }
+  }, [currentRoute])
 
   // ...
-});
+})
 ```
 
 Also, it is possible to match a specific route by a simple dynamic route
@@ -197,7 +197,7 @@ const routesList = [
     path: "/:rest",
     component: NotFoundPage,
   },
-];
+]
 ```
 
 ## Sub-router
@@ -229,7 +229,7 @@ const routesList = [
       },
     ],
   },
-];
+]
 ```
 
 2. Children were defined within the route that render `FooPage` component, so
@@ -238,7 +238,7 @@ const routesList = [
 3. The new subRouter needs his own base and routes list, `getSubRouterBase` and `getSubRouterRoutes` functions are available to get them.
 
 ```jsx
-import React from "react";
+import React from "react"
 import {
   Router,
   useStack,
@@ -247,24 +247,24 @@ import {
   getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
-} from "@cher-ami/router";
+} from "@cher-ami/router"
 
 const FooPage = forwardRef((props, handleRef) => {
-  const router = useRouter();
+  const router = useRouter()
   // Parsed routes list and get path by route name -> "/foo"
-  const path = getPathByRouteName(router.routes, "FooPage");
+  const path = getPathByRouteName(router.routes, "FooPage")
   // (if last param is false, '/:lang' will be not added) -> "/base/:lang/foo"
-  const subBase = getSubRouterBase(path, router.base, true);
+  const subBase = getSubRouterBase(path, router.base, true)
   // get subRoutes
-  const subRoutes = getSubRouterRoutes(path, router.routes);
+  const subRoutes = getSubRouterRoutes(path, router.routes)
   return (
     <div>
       <Router base={subBase} routes={subRoutes}>
         <Stack />
       </Router>
     </div>
-  );
-});
+  )
+})
 ```
 
 ## Manage transitions
@@ -280,29 +280,29 @@ previous page play out performs, then the new page play in.
 ```js
 const sequencialTransition = ({ previousPage, currentPage, unmountPreviousPage }) => {
   return new Promise(async (resolve) => {
-    const $current = currentPage?.$element;
+    const $current = currentPage?.$element
 
     // hide new page
-    if ($current) $current.style.visibility = "hidden";
+    if ($current) $current.style.visibility = "hidden"
 
     // play out and unmount previous page
     if (previousPage) {
-      await previousPage.playOut();
-      unmountPreviousPage();
+      await previousPage.playOut()
+      unmountPreviousPage()
     }
 
     // wait page isReady promise
-    await currentPage?.isReadyPromise?.();
+    await currentPage?.isReadyPromise?.()
 
     // show and play in new page
     if (currentPage) {
-      if ($current) $current.style.visibility = "visible";
-      await currentPage?.playIn();
+      if ($current) $current.style.visibility = "visible"
+      await currentPage?.playIn()
     }
 
-    resolve();
-  });
-};
+    resolve()
+  })
+}
 ```
 
 ### Custom transitions
@@ -317,18 +317,18 @@ const App = (props, handleRef) => {
   const customSenario = ({ previousPage, currentPage, unmountPreviousPage }) => {
     return new Promise(async (resolve) => {
       // write a custom "crossed" senario...
-      if (previousPage) previousPage?.playOut();
-      if (currentPage) await currentPage?.playIn();
+      if (previousPage) previousPage?.playOut()
+      if (currentPage) await currentPage?.playIn()
 
-      resolve();
-    });
-  };
+      resolve()
+    })
+  }
 
   return (
     // ...
     <Stack manageTransitions={customSenario} />
-  );
-};
+  )
+}
 ```
 
 ## SSR Support
@@ -370,7 +370,7 @@ Then, get the response data populated in page component props:
 
 ```tsx
 function HomePage({ api }) {
-  return <div>{api.title}</div>;
+  return <div>{api.title}</div>
 }
 ```
 
@@ -464,18 +464,18 @@ Render previous and current page component.
 
 ```ts
 type TManageTransitions = {
-  previousPage: IRouteStack;
-  currentPage: IRouteStack;
-  unmountPreviousPage: () => void;
-};
+  previousPage: IRouteStack
+  currentPage: IRouteStack
+  unmountPreviousPage: () => void
+}
 
 interface IRouteStack {
-  componentName: string;
-  playIn: () => Promise<any>;
-  playOut: () => Promise<any>;
-  isReady: boolean;
-  $element: HTMLElement;
-  isReadyPromise: () => Promise<void>;
+  componentName: string
+  playIn: () => Promise<any>
+  playOut: () => Promise<any>
+  isReady: boolean
+  $element: HTMLElement
+  isReadyPromise: () => Promise<void>
 }
 ```
 
@@ -484,7 +484,7 @@ interface IRouteStack {
 Get current router informations:
 
 ```jsx
-const router = useRouter();
+const router = useRouter()
 ```
 
 **Returns:**
@@ -501,23 +501,23 @@ const router = useRouter();
 ```ts
 // previousRoute and currentRoute
 type TRoute = Partial<{
-  path: string | { [x: string]: string };
-  component: React.ComponentType<any>;
-  base: string;
-  name: string;
-  parser: Match;
-  props: TRouteProps;
-  children: TRoute[];
-  url: string;
-  params?: TParams;
-  queryParams?: TQueryParams;
-  hash?: string;
-  getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>;
-  _fullUrl: string; // full URL who not depends on current instance
-  _fullPath: string; // full Path /base/:lang/foo/second-foo
-  _langPath: { [x: string]: string } | null;
-  _context: TRoute;
-}>;
+  path: string | { [x: string]: string }
+  component: React.ComponentType<any>
+  base: string
+  name: string
+  parser: Match
+  props: TRouteProps
+  children: TRoute[]
+  url: string
+  params?: TParams
+  queryParams?: TQueryParams
+  hash?: string
+  getStaticProps: (props: TRouteProps, currentLang: TLanguage) => Promise<any>
+  _fullUrl: string // full URL who not depends on current instance
+  _fullPath: string // full Path /base/:lang/foo/second-foo
+  _langPath: { [x: string]: string } | null
+  _context: TRoute
+}>
 ```
 
 ### useLocation
@@ -525,11 +525,11 @@ type TRoute = Partial<{
 Allow the router to change location.
 
 ```jsx
-const [location, setLocation] = useLocation();
+const [location, setLocation] = useLocation()
 // give URL
-setLocation("/bar");
+setLocation("/bar")
 // or an object
-setLocation({ name: "FooPage", params: { id: "2" } });
+setLocation({ name: "FooPage", params: { id: "2" } })
 ```
 
 **Returns:**
@@ -541,11 +541,11 @@ An array with these properties:
 
 ```ts
 type TOpenRouteParams = {
-  name: string;
-  params?: TParams;
-  queryParams?: TQueryParams;
-  hash?: string;
-};
+  name: string
+  params?: TParams
+  queryParams?: TQueryParams
+  hash?: string
+}
 ```
 
 ### useStack
@@ -589,14 +589,14 @@ is executed.
 ```jsx
 // ...
 
-const [pageIsReady, setPageIsReady] = useState(false);
+const [pageIsReady, setPageIsReady] = useState(false)
 
 useEffect(() => {
   // simulate data fetching or whatever for 2 seconds
   setTimeout(() => {
-    setPageIsReady(true);
-  }, 2000);
-}, []);
+    setPageIsReady(true)
+  }, 2000)
+}, [])
 
 useStack({
   componentName,
@@ -607,7 +607,7 @@ useStack({
   // add the state to useStack
   // playIn function wait for isReady to change to true
   isReady: pageIsReady,
-});
+})
 
 // ...
 ```
@@ -621,11 +621,11 @@ const customManageTransitions = ({ previousPage, currentPage, unmountPreviousPag
   return new Promise(async (resolve) => {
     // ...
     // waiting for page "isReady" state to change to continue...
-    await currentPage?.isReadyPromise?.();
+    await currentPage?.isReadyPromise?.()
     // ...
-    resolve();
-  });
-};
+    resolve()
+  })
+}
 ```
 
 **[Demo codesandbox: wait-is-ready](https://codesandbox.io/s/wait-isready-6irps?file=/src/pages/AboutPage.tsx)**
@@ -650,7 +650,7 @@ nothing
 Returns route counter
 
 ```js
-const { routeCounter, isFirstRoute, resetCounter } = useRouteCounter();
+const { routeCounter, isFirstRoute, resetCounter } = useRouteCounter()
 ```
 
 **Parameters:**
@@ -673,7 +673,7 @@ change.
 ```js
 const history = useHistory((e) => {
   // do something
-});
+})
 ```
 
 **Parameters:**
@@ -690,16 +690,16 @@ const history = useHistory((e) => {
 Get and update langService current language object.
 
 ```tsx
-const [lang, setLang] = useLang();
+const [lang, setLang] = useLang()
 useEffect(() => {
   // when current lang change
   // it's usefull only if setLang method do not refresh the page.
-}, [lang]);
+}, [lang])
 
 // set new lang with lang object "key" property value only
-setLang("en");
+setLang("en")
 // set new lang with the lang object
-setLang({ key: "en" });
+setLang({ key: "en" })
 ```
 
 **Returns:**
@@ -714,13 +714,13 @@ Array of :
 Manage `:lang` params from anywhere inside Router scope.
 
 ```jsx
-import { LangService } from "@cher-ami/router";
-import { Stack } from "./Stack";
+import { LangService } from "@cher-ami/router"
+import { Stack } from "./Stack"
 
-const base = "/";
+const base = "/"
 
 // first lang object is default lang
-const languages = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+const languages = [{ key: "en" }, { key: "fr" }, { key: "de" }]
 // optionally, default lang can be defined explicitly
 // const languages = [{ key: "en" }, { key: "fr", default: true }, { key: "de" }];
 
@@ -729,11 +729,11 @@ const langService = new LangService({
   languages,
   showDefaultLangInUrl: true,
   base,
-});
+})
 
-<Router langService={langService} routes={routesList} base={base}>
+;<Router langService={langService} routes={routesList} base={base}>
   <App />
-</Router>;
+</Router>
 ```
 
 Inside the App
@@ -741,7 +741,7 @@ Inside the App
 ```jsx
 function App() {
   // get langService instance from router context
-  const { langService } = useRouter();
+  const { langService } = useRouter()
 
   return (
     <div>
@@ -756,7 +756,7 @@ function App() {
       </nav>
       <Stack />
     </div>
-  );
+  )
 }
 ```
 
@@ -777,16 +777,16 @@ const langService = new LangService({
   languages: [{ key: "en" }, { key: "fr" }],
   showDefaultLangInUrl: true,
   base: "/",
-});
+})
 ```
 
 `langService` instance is available in Router scope from `useRouter()` hook.
 
 ```tsx
 const Page = () => {
-  const { langService } = useRouter();
+  const { langService } = useRouter()
   // langService.setLang() ...
-};
+}
 ```
 
 #### languages `Tlanguage[]`
@@ -794,7 +794,7 @@ const Page = () => {
 Return languages list
 
 ```jsx
-const langages = langService.languages;
+const langages = langService.languages
 ```
 
 #### currentLang `TLanguage`
@@ -802,7 +802,7 @@ const langages = langService.languages;
 Return current Language object.
 
 ```jsx
-const lang = langService.currentLang;
+const lang = langService.currentLang
 // { key: "..." }
 ```
 
@@ -811,7 +811,7 @@ const lang = langService.currentLang;
 Return default language object
 
 ```jsx
-const defaultLang = langService.defaultLang;
+const defaultLang = langService.defaultLang
 // { key: "..." }
 ```
 
@@ -820,7 +820,7 @@ const defaultLang = langService.defaultLang;
 Return langService init state
 
 ```jsx
-const isInit = langService.isInit;
+const isInit = langService.isInit
 ```
 
 #### setLang(toLang: TLanguage, forcePageReload = true) `void`
@@ -832,7 +832,7 @@ component only.
   internal router stack to change the language
 
 ```jsx
-langService.setLang({ key: "de" });
+langService.setLang({ key: "de" })
 ```
 
 #### redirectToDefaultLang(forcePageReload = true) `void`
@@ -844,7 +844,7 @@ it will redirect to `/en`.
   internal router stack to change the language
 
 ```js
-langService.redirectToDefaultLang();
+langService.redirectToDefaultLang()
 ```
 
 #### redirectToBrowserLang(forcePageReload = true) `void`
@@ -853,7 +853,7 @@ Same than `redirectToDefaultLang` method but redirect to the user `navigator.lan
 If the browser language doesn't exist in Languages array, we redirect to the default lang.
 
 ```js
-langService.redirectToBrowserLang();
+langService.redirectToBrowserLang()
 ```
 
 ### Translate Path

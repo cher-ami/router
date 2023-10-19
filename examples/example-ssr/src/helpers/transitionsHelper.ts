@@ -1,16 +1,16 @@
-import { gsap } from "gsap";
-import debug from "@wbe/debug";
-const log = debug(`router:transitionsHelper`);
+import { gsap } from "gsap"
+import debug from "@wbe/debug"
+const log = debug(`router:transitionsHelper`)
 
 export const transitionsHelper = (
   el,
   show: boolean,
   from: any = {},
-  to: any = {}
+  to: any = {},
 ): Promise<any> => {
   return new Promise((resolve) => {
     if (!el) {
-      log("el doesnt exist", el);
+      log("el doesnt exist", el)
     }
 
     gsap.fromTo(
@@ -23,7 +23,7 @@ export const transitionsHelper = (
         autoAlpha: show ? 1 : 0,
         ease: "power1.out",
         onComplete: resolve,
-      }
-    );
-  });
-};
+      },
+    )
+  })
+}

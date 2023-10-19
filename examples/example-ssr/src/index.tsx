@@ -1,12 +1,12 @@
-import React from "react";
-import { hydrateRoot } from "react-dom/client";
-import { App } from "./components/App";
-import { routes } from "./routes";
-import { createBrowserHistory } from "history";
-import "./index.css";
-import { Router } from "@cher-ami/router";
-import { langServiceInstance } from "./langServiceInstance";
-import { GlobalDataContext } from "~/store/GlobalDataContext";
+import React from "react"
+import { hydrateRoot } from "react-dom/client"
+import { App } from "./components/App"
+import { routes } from "./routes"
+import { createBrowserHistory } from "history"
+import "./index.css"
+import { Router } from "@cher-ami/router"
+import { langServiceInstance } from "./langServiceInstance"
+import { GlobalDataContext } from "~/store/GlobalDataContext"
 
 /**
  * Client side
@@ -23,4 +23,4 @@ hydrateRoot(
       <App />
     </GlobalDataContext.Provider>
   </Router>,
-);
+)
