@@ -2,22 +2,22 @@
  * @vitest-environment jsdom
  */
 
-import { vi, it, expect, describe, beforeAll, afterEach } from "vitest";
-import React from "react";
-import { Router } from "../components/Router";
-import LangService from "../core/LangService";
-import { Link } from "../components/Link";
-import { act, render } from "@testing-library/react";
-import { TRoute } from "../components/Router";
-import { createBrowserHistory } from "history";
+import { vi, it, expect, describe, beforeAll, afterEach } from "vitest"
+import React from "react"
+import { Router } from "../components/Router"
+import LangService from "../core/LangService"
+import { Link } from "../components/Link"
+import { act, render } from "@testing-library/react"
+import { TRoute } from "../components/Router"
+import { createBrowserHistory } from "history"
 
-const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }];
+const locales = [{ key: "en" }, { key: "fr" }, { key: "de" }]
 const routesList: TRoute[] = [
   { path: "/", name: "home" },
   { path: "/foo", name: "foo" },
-];
+]
 
-const mockClickHandler = vi.fn();
+const mockClickHandler = vi.fn()
 const App = ({ base = "/", to = "/foo", langService }) => {
   return (
     <Router
@@ -33,21 +33,21 @@ const App = ({ base = "/", to = "/foo", langService }) => {
         children={"foo"}
       />
     </Router>
-  );
-};
+  )
+}
 
-const windowOpenMock = vi.fn();
+const windowOpenMock = vi.fn()
 
 beforeAll(() => {
-  const location = window.location;
-  delete global.window.location;
-  global.window.location = Object.assign({}, location);
-  global.window.open = windowOpenMock;
-});
+  const location = window.location
+  delete global.window.location
+  global.window.location = Object.assign({}, location)
+  global.window.open = windowOpenMock
+})
 
 afterEach(() => {
-  windowOpenMock.mockClear();
-});
+  windowOpenMock.mockClear()
+})
 
 /**
  * redirect
@@ -55,37 +55,37 @@ afterEach(() => {
  *
  */
 it("should redirect to default lang", () => {
-  const langService = new LangService({ languages: locales, base: "/" });
-  render(<App langService={langService} />);
+  const langService = new LangService({ languages: locales, base: "/" })
+  render(<App langService={langService} />)
   act(() => {
-    langService.redirectToDefaultLang(true);
-  });
-  const defaultLangKey = langService.defaultLang.key;
-  expect(window.open).toHaveBeenCalledWith(`/${defaultLangKey}`, "_self");
-});
+    langService.redirectToDefaultLang(true)
+  })
+  const defaultLangKey = langService.defaultLang.key
+  expect(window.open).toHaveBeenCalledWith(`/${defaultLangKey}`, "_self")
+})
 
 it("should redirect to default lang with custom base", () => {
-  const langService = new LangService({ languages: locales, base: "/" });
-  render(<App base={"/foo-base"} langService={langService} />);
+  const langService = new LangService({ languages: locales, base: "/" })
+  render(<App base={"/foo-base"} langService={langService} />)
   act(() => {
-    langService.redirectToDefaultLang(true);
-  });
-  const defaultLangKey = langService.defaultLang.key;
-  expect(window.open).toHaveBeenCalledWith(`/${defaultLangKey}`, "_self");
-});
+    langService.redirectToDefaultLang(true)
+  })
+  const defaultLangKey = langService.defaultLang.key
+  expect(window.open).toHaveBeenCalledWith(`/${defaultLangKey}`, "_self")
+})
 
 it("should not redirect to default lang if showDefaultLangInUrl is set to false", () => {
   const langService = new LangService({
     languages: locales,
     base: "/",
     showDefaultLangInUrl: false,
-  });
-  render(<App langService={langService} />);
+  })
+  render(<App langService={langService} />)
   act(() => {
-    langService.redirectToDefaultLang(true);
-  });
-  expect(window.open).toHaveBeenCalledTimes(0);
-});
+    langService.redirectToDefaultLang(true)
+  })
+  expect(window.open).toHaveBeenCalledTimes(0)
+})
 
 /**
  * Add lang path param allows to test the same array before and after middleware
@@ -106,7 +106,7 @@ const routesListLang: TRoute[] = [
       { path: "/:id" },
     ],
   },
-];
+]
 
 const patchedRoutesListLang: TRoute[] = [
   {
@@ -124,13 +124,13 @@ const patchedRoutesListLang: TRoute[] = [
       { path: "/:id", _langPath: { en: "/:id", fr: "/:id", de: "/:id" } },
     ],
   },
-];
+]
 
 describe("addLangParamToRoutes", () => {
-  const langService = new LangService({ languages: locales, base: "/" });
+  const langService = new LangService({ languages: locales, base: "/" })
   it("should patch all first level routes if LangService is init", () => {
     expect(langService.addLangParamToRoutes(routesListLang, true)).toEqual(
       patchedRoutesListLang,
-    );
-  });
-});
+    )
+  })
+})

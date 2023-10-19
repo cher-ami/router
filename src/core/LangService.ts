@@ -1,52 +1,52 @@
-import { Routers } from "./Routers";
-import { compileUrl, createUrl } from "./core";
-import { isSSR, joinPaths, removeLastCharFromString } from "./helpers";
-import { TRoute } from "../components/Router";
-import debug from "@wbe/debug";
+import { Routers } from "./Routers"
+import { compileUrl, createUrl } from "./core"
+import { isSSR, joinPaths, removeLastCharFromString } from "./helpers"
+import { TRoute } from "../components/Router"
+import debug from "@wbe/debug"
 
-const log = debug(`router:LangService`);
+const log = debug(`router:LangService`)
 
 export type TLanguage<T = any> = {
-  key: T | string;
-  name?: string;
-  default?: boolean;
-};
+  key: T | string
+  name?: string
+  default?: boolean
+}
 
 class LangService<TLang = any> {
   /**
    * contains available languages
    */
-  public languages: TLanguage<TLang>[];
+  public languages: TLanguage<TLang>[]
 
   /**
    * Current language object
    */
-  public currentLang: TLanguage<TLang>;
+  public currentLang: TLanguage<TLang>
 
   /**
    * Default language object
    */
-  public defaultLang: TLanguage<TLang>;
+  public defaultLang: TLanguage<TLang>
 
   /**
    * Browser language
    */
-  public browserLang: TLanguage<TLang>;
+  public browserLang: TLanguage<TLang>
 
   /**
    * Show default language in URL
    */
-  public showDefaultLangInUrl: boolean;
+  public showDefaultLangInUrl: boolean
 
   /**
    * Base URL of the app
    */
-  public base: string;
+  public base: string
 
   /**
    * Static Location used for SSR context
    */
-  public staticLocation: string;
+  public staticLocation: string
 
   /**
    * Init languages service
@@ -61,22 +61,22 @@ class LangService<TLang = any> {
     base = "/",
     staticLocation,
   }: {
-    languages: TLanguage<TLang>[];
-    showDefaultLangInUrl?: boolean;
-    base?: string;
-    staticLocation?: string;
+    languages: TLanguage<TLang>[]
+    showDefaultLangInUrl?: boolean
+    base?: string
+    staticLocation?: string
   }) {
     if (languages?.length === 0) {
-      throw new Error("ERROR, no language is set.");
+      throw new Error("ERROR, no language is set.")
     }
-    this.languages = languages;
+    this.languages = languages
     // remove extract / at the end, if exist
-    this.base = removeLastCharFromString(base, "/", true);
-    this.staticLocation = staticLocation;
-    this.defaultLang = this.getDefaultLang(languages);
-    this.currentLang = this.getLangFromString() || this.defaultLang;
-    this.browserLang = this.getBrowserLang(languages);
-    this.showDefaultLangInUrl = showDefaultLangInUrl;
+    this.base = removeLastCharFromString(base, "/", true)
+    this.staticLocation = staticLocation
+    this.defaultLang = this.getDefaultLang(languages)
+    this.currentLang = this.getLangFromString() || this.defaultLang
+    this.browserLang = this.getBrowserLang(languages)
+    this.showDefaultLangInUrl = showDefaultLangInUrl
   }
 
   /**
@@ -100,12 +100,12 @@ class LangService<TLang = any> {
     currentRoute: TRoute = Routers.currentRoute,
   ): void {
     if (toLang.key === this.currentLang.key) {
-      log("setLang: This is the same language, exit.");
-      return;
+      log("setLang: This is the same language, exit.")
+      return
     }
     if (!this.langIsAvailable(toLang)) {
-      log(`setLang: lang ${toLang.key} is not available in languages list, exit.`);
-      return;
+      log(`setLang: lang ${toLang.key} is not available in languages list, exit.`)
+      return
     }
 
     // Translate currentRoute URL to new lang URL
@@ -116,29 +116,29 @@ class LangService<TLang = any> {
         ...(currentRoute.props?.params || {}),
         lang: toLang.key,
       },
-    });
-    log("preparedNewUrl", preparedNewUrl);
+    })
+    log("preparedNewUrl", preparedNewUrl)
 
     // create newUrl variable to set in each condition
-    let newUrl: string;
+    let newUrl: string
     // choose force page reload in condition below
-    let chooseForcePageReload = forcePageReload;
+    let chooseForcePageReload = forcePageReload
 
     // 1. if default language should be always visible in URL
     if (this.showDefaultLangInUrl) {
-      newUrl = preparedNewUrl;
+      newUrl = preparedNewUrl
     }
 
     // 2. if toLang is default lang, need to REMOVE lang from URL
     else if (!this.showDefaultLangInUrl && this.isDefaultLangKey(toLang.key)) {
-      const urlPartToRemove = `${this.base}/${toLang.key}`;
+      const urlPartToRemove = `${this.base}/${toLang.key}`
       const newUrlWithoutBaseAndLang = preparedNewUrl.substring(
         urlPartToRemove.length,
         preparedNewUrl.length,
-      );
-      newUrl = joinPaths([this.base, newUrlWithoutBaseAndLang]);
-      chooseForcePageReload = true;
-      log("2. after remove lang from URL", newUrl);
+      )
+      newUrl = joinPaths([this.base, newUrlWithoutBaseAndLang])
+      chooseForcePageReload = true
+      log("2. after remove lang from URL", newUrl)
     }
 
     // 3. if current lang is default lang, add /currentLang.key after base
@@ -146,36 +146,36 @@ class LangService<TLang = any> {
       const newUrlWithoutBase = preparedNewUrl.substring(
         this.base.length,
         preparedNewUrl.length,
-      );
-      newUrl = joinPaths([this.base, "/", toLang.key as string, "/", newUrlWithoutBase]);
-      log("3. after add lang in URL", newUrl);
+      )
+      newUrl = joinPaths([this.base, "/", toLang.key as string, "/", newUrlWithoutBase])
+      log("3. after add lang in URL", newUrl)
     }
 
     // 4. other cases
     else {
-      newUrl = preparedNewUrl;
-      log("4, other case");
+      newUrl = preparedNewUrl
+      log("4, other case")
     }
 
     if (!newUrl) {
-      log("newUrl is no set, do not reload or refresh, return.", newUrl);
-      return;
+      log("newUrl is no set, do not reload or refresh, return.", newUrl)
+      return
     }
     // register current language (not useful if we reload the app.)
-    this.currentLang = toLang;
+    this.currentLang = toLang
     // remove last / if exist and if he is not alone
-    newUrl = removeLastCharFromString(newUrl, "/", true);
+    newUrl = removeLastCharFromString(newUrl, "/", true)
     // reload or refresh with new URL
-    this.reloadOrRefresh(newUrl, chooseForcePageReload);
+    this.reloadOrRefresh(newUrl, chooseForcePageReload)
   }
 
   public redirectToBrowserLang(forcePageReload: boolean = true) {
-    log("browserLang object", this.browserLang);
+    log("browserLang object", this.browserLang)
     // If browser language doesn't match, redirect to default lang
     if (!this.browserLang) {
-      log("browserLang is not set, redirect to defaultLang");
-      this.redirectToDefaultLang(forcePageReload);
-      return;
+      log("browserLang is not set, redirect to defaultLang")
+      this.redirectToDefaultLang(forcePageReload)
+      return
     }
     // We want to redirect only in case user is on / or /base/
     if (
@@ -185,10 +185,10 @@ class LangService<TLang = any> {
       // prepare path and build URL
       const newUrl = compileUrl(joinPaths([this.base, "/:lang"]), {
         lang: this.browserLang.key,
-      });
-      log("redirect: to browser language >", { newUrl });
+      })
+      log("redirect: to browser language >", { newUrl })
       // reload or refresh all application
-      this.reloadOrRefresh(newUrl, forcePageReload);
+      this.reloadOrRefresh(newUrl, forcePageReload)
     }
   }
 
@@ -197,15 +197,15 @@ class LangService<TLang = any> {
    * @param forcePageReload
    */
   public redirectToDefaultLang(forcePageReload: boolean = true): void {
-    if (isSSR()) return;
+    if (isSSR()) return
 
     if (!this.showDefaultLangInUrl) {
-      log("redirect: URLs have a lang param or language is valid, don't redirect.");
-      return;
+      log("redirect: URLs have a lang param or language is valid, don't redirect.")
+      return
     }
     if (this.langIsAvailable(this.getLangFromString())) {
-      log("redirect: lang from URL is valid, don't redirect");
-      return;
+      log("redirect: lang from URL is valid, don't redirect")
+      return
     }
     // We want to redirect only in case user is on / or /base/
     if (
@@ -215,10 +215,10 @@ class LangService<TLang = any> {
       // prepare path & build new URL
       const newUrl = compileUrl(joinPaths([this.base, "/:lang"]), {
         lang: this.defaultLang.key,
-      });
-      log("redirect to default lang >", { newUrl });
+      })
+      log("redirect to default lang >", { newUrl })
       // reload or refresh all application
-      this.reloadOrRefresh(newUrl, forcePageReload);
+      this.reloadOrRefresh(newUrl, forcePageReload)
     }
   }
 
@@ -226,7 +226,7 @@ class LangService<TLang = any> {
    * Current lang is default lang
    */
   public isDefaultLangKey(langKey = this.currentLang.key): boolean {
-    return langKey === this.defaultLang.key;
+    return langKey === this.defaultLang.key
   }
 
   /**
@@ -235,11 +235,11 @@ class LangService<TLang = any> {
   public showLangInUrl(): boolean {
     // if option is true, always display lang in URL
     if (this.showDefaultLangInUrl) {
-      return true;
+      return true
       // if this option is false
     } else {
       // show in URL only if whe are not on the default lang
-      return !this.isDefaultLangKey(this.currentLang.key);
+      return !this.isDefaultLangKey(this.currentLang.key)
     }
   }
 
@@ -262,7 +262,7 @@ class LangService<TLang = any> {
     showLangInUrl = this.showLangInUrl(),
   ): TRoute[] {
     if (routes?.some((el) => !!el._langPath)) {
-      return routes;
+      return routes
     }
 
     /**
@@ -274,7 +274,7 @@ class LangService<TLang = any> {
       removeLastCharFromString(
         joinPaths([pShowLang && "/:lang", pPath !== "/" ? pPath : "/"]),
         "/",
-      );
+      )
 
     /**
      * Patch routes
@@ -293,15 +293,15 @@ class LangService<TLang = any> {
      */
     const patchRoutes = (pRoutes, children = false) => {
       return pRoutes.map((route: TRoute) => {
-        const path = this.getLangPathByLang(route);
-        const hasChildren = route.children?.length > 0;
-        const showLang = !children && showLangInUrl;
+        const path = this.getLangPathByLang(route)
+        const hasChildren = route.children?.length > 0
+        const showLang = !children && showLangInUrl
 
-        let langPath = {};
+        let langPath = {}
         if (typeof route.path === "object") {
           Object.keys(route.path).forEach((lang) => {
-            langPath[lang] = patchLangParam(route.path[lang], showLang);
-          });
+            langPath[lang] = patchLangParam(route.path[lang], showLang)
+          })
         }
 
         // even if route.path is not an object, add his value to route.langPath object property
@@ -309,8 +309,8 @@ class LangService<TLang = any> {
           this.languages
             .map((el) => el.key)
             .forEach((key: string) => {
-              langPath[key] = patchLangParam(route.path as string, showLang);
-            });
+              langPath[key] = patchLangParam(route.path as string, showLang)
+            })
         }
 
         return {
@@ -318,10 +318,10 @@ class LangService<TLang = any> {
           path: patchLangParam(path, showLang),
           _langPath: Object.entries(langPath).length !== 0 ? langPath : null,
           ...(hasChildren ? { children: patchRoutes(route.children, true) } : {}),
-        };
-      });
-    };
-    return patchRoutes(routes);
+        }
+      })
+    }
+    return patchRoutes(routes)
   }
 
   // --------------------------------------------------------------------------- LOCAL
@@ -344,15 +344,15 @@ class LangService<TLang = any> {
     lang = this.getLangFromString(this.staticLocation || window.location.pathname)?.key ||
       this.defaultLang.key,
   ): string {
-    let selectedPath: string;
+    let selectedPath: string
     if (typeof route.path === "string") {
-      selectedPath = route.path;
+      selectedPath = route.path
     } else if (typeof route.path === "object") {
       Object.keys(route.path).find((el) => {
-        if (el === lang) selectedPath = route.path?.[el];
-      });
+        if (el === lang) selectedPath = route.path?.[el]
+      })
     }
-    return selectedPath;
+    return selectedPath
   }
 
   /**
@@ -361,7 +361,7 @@ class LangService<TLang = any> {
    * @param languages
    */
   protected getDefaultLang(languages: TLanguage<TLang>[]): TLanguage<TLang> {
-    return languages.find((el) => el?.default) ?? languages[0];
+    return languages.find((el) => el?.default) ?? languages[0]
   }
 
   /**
@@ -369,16 +369,16 @@ class LangService<TLang = any> {
    * @protected
    */
   protected getBrowserLang(languages: TLanguage[]): TLanguage<TLang> {
-    if (typeof navigator === "undefined") return;
+    if (typeof navigator === "undefined") return
 
-    const browserLanguage = navigator.language;
-    log("Browser language detected", browserLanguage);
+    const browserLanguage = navigator.language
+    log("Browser language detected", browserLanguage)
 
     return languages.find((lang) =>
       lang.key.includes("-")
         ? (lang.key as string) === browserLanguage.toLowerCase()
         : (lang.key as string) === browserLanguage.toLowerCase().split("-")[0],
-    );
+    )
   }
 
   /**
@@ -388,11 +388,11 @@ class LangService<TLang = any> {
   public getLangFromString(
     pathname = this.staticLocation || window.location.pathname,
   ): TLanguage<TLang> {
-    let pathnameWithoutBase = pathname.replace(this.base, "/");
-    const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1];
+    let pathnameWithoutBase = pathname.replace(this.base, "/")
+    const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1]
     return this.languages.find((language) => {
-      return firstPart === language.key;
-    });
+      return firstPart === language.key
+    })
   }
 
   /**
@@ -403,7 +403,7 @@ class LangService<TLang = any> {
     langObject: TLanguage<TLang>,
     languesList = this.languages,
   ): boolean {
-    return languesList.some((lang) => lang.key === langObject?.key);
+    return languesList.some((lang) => lang.key === langObject?.key)
   }
 
   /**
@@ -413,9 +413,9 @@ class LangService<TLang = any> {
    * @protected
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
-    if (isSSR()) return;
-    forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl);
+    if (isSSR()) return
+    forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl)
   }
 }
 
-export default LangService;
+export default LangService

@@ -77,5 +77,9 @@
     "*.{tsx,ts,jsx,js,less,css,json,md}": [
       "prettier --write ."
     ]
+  },
+  "prettier": {
+    "printWidth": 90,
+    "semi": false
   }
 }

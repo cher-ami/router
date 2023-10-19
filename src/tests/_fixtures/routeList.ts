@@ -1,4 +1,4 @@
-import { TRoute } from "..";
+import { TRoute } from ".."
 
 export const routeList: TRoute[] = [
   {
@@ -24,8 +24,8 @@ export const routeList: TRoute[] = [
     getStaticProps: async (props, currentLang) =>
       new Promise((resolve) => {
         setTimeout(() => {
-          resolve({ data: {} });
-        }, 100);
+          resolve({ data: {} })
+        }, 100)
       }),
     children: [
       {
@@ -62,8 +62,8 @@ export const routeList: TRoute[] = [
                 getStaticProps: async (props) =>
                   new Promise((resolve) => {
                     setTimeout(() => {
-                      resolve({ fetchData: {} });
-                    }, 100);
+                      resolve({ fetchData: {} })
+                    }, 100)
                   }),
               },
             ],
@@ -102,4 +102,4 @@ export const routeList: TRoute[] = [
     path: "/:rest",
     name: "NotFoundPage",
   },
-];
+]

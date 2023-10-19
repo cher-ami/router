@@ -1,11 +1,11 @@
-import { resolve } from "path";
-import { defineConfig } from "vite";
-import debug from "@wbe/debug";
-const log = debug("config:vite.config");
+import { resolve } from "path"
+import { defineConfig } from "vite"
+import debug from "@wbe/debug"
+const log = debug("config:vite.config")
 
 export default defineConfig(({ command, mode }) => {
   return {
-    base: '/',
+    base: "/",
     build: {
       assetsDir: "./",
       write: true,
@@ -37,5 +37,5 @@ export default defineConfig(({ command, mode }) => {
         "~": resolve(__dirname, "src"),
       },
     },
-  };
-});
+  }
+})

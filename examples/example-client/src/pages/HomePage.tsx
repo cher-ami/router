@@ -1,4 +1,4 @@
-import React, { ForwardedRef, forwardRef, useRef } from "react";
+import React, { ForwardedRef, forwardRef, useRef } from "react"
 import {
   getPathByRouteName,
   getSubRouterBase,
@@ -8,21 +8,21 @@ import {
   Stack,
   useRouter,
   useStack,
-} from "@cher-ami/router";
-import { transitionsHelper } from "../helper/transitionsHelper";
-import debug from "@wbe/debug";
+} from "@cher-ami/router"
+import { transitionsHelper } from "../helper/transitionsHelper"
+import debug from "@wbe/debug"
 
-const componentName: string = "HomePage";
-const log = debug(`router:${componentName}`);
+const componentName: string = "HomePage"
+const log = debug(`router:${componentName}`)
 
 interface IProps {
   params: {
-    lang: string;
-  };
+    lang: string
+  }
 }
 
 const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
-  const rootRef = useRef(null);
+  const rootRef = useRef(null)
 
   useStack({
     componentName,
@@ -30,12 +30,12 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
     rootRef,
     playIn: () => transitionsHelper(rootRef.current, true, { x: -50 }, { x: 0 }),
     playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
-  });
+  })
 
-  const router = useRouter();
-  const path = getPathByRouteName(router.routes, "HomePage");
-  const subBase = getSubRouterBase(path, router.base);
-  const subRoutes = getSubRouterRoutes(path, router.routes);
+  const router = useRouter()
+  const path = getPathByRouteName(router.routes, "HomePage")
+  const subBase = getSubRouterBase(path, router.base)
+  const subRoutes = getSubRouterRoutes(path, router.routes)
 
   return (
     <div className={componentName} ref={rootRef}>
@@ -56,8 +56,8 @@ const HomePage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
         </div>
       </Router>
     </div>
-  );
-});
+  )
+})
 
-HomePage.displayName = componentName;
-export default HomePage;
+HomePage.displayName = componentName
+export default HomePage

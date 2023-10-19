@@ -4,8 +4,8 @@
  * @param join
  */
 export function joinPaths(paths: string[], join: string = ""): string {
-  const preparePath = paths?.filter((str) => str).join(join);
-  return preventSlashes(preparePath);
+  const preparePath = paths?.filter((str) => str).join(join)
+  return preventSlashes(preparePath)
 }
 
 /**
@@ -15,7 +15,7 @@ export function joinPaths(paths: string[], join: string = ""): string {
  * @param str
  */
 export function preventSlashes(str: string): string {
-  return str.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
+  return str.replace(/(https?:\/\/)|(\/)+/g, "$1$2")
 }
 
 /**
@@ -27,16 +27,16 @@ export function preventSlashes(str: string): string {
 export function removeLastCharFromString(
   str: string,
   lastChar: string,
-  exeptIfStringIsLastChar = true
+  exeptIfStringIsLastChar = true,
 ): string {
-  if (exeptIfStringIsLastChar && str === lastChar) return str;
-  if (str?.endsWith(lastChar)) str = str.slice(0, -1);
-  return str;
+  if (exeptIfStringIsLastChar && str === lastChar) return str
+  if (str?.endsWith(lastChar)) str = str.slice(0, -1)
+  return str
 }
 
 /**
  * Check if we are in SRR context
  */
 export function isSSR() {
-  return !(typeof window != "undefined" && window.document);
+  return !(typeof window != "undefined" && window.document)
 }

@@ -1,4 +1,4 @@
-import { TLanguage } from "@cher-ami/router";
+import { TLanguage } from "@cher-ami/router"
 
 /**
  * Available languages
@@ -12,10 +12,10 @@ export const languages: TLanguage[] = [
   {
     key: "en",
   },
-];
+]
 
 /**
  * Show default lang in URL
  * Common configuration between server and client
  */
-export const showDefaultLangInUrl = false;
+export const showDefaultLangInUrl = false

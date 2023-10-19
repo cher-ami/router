@@ -1,23 +1,23 @@
-import React from "react";
-import { IRouterContext } from "./Router";
-import debug from "@wbe/debug";
-import { IRouteStack } from "../hooks/useStack";
-import { useRouter } from "../hooks/useRouter";
-import { isSSR } from "../core/helpers";
+import React from "react"
+import { IRouterContext } from "./Router"
+import debug from "@wbe/debug"
+import { IRouteStack } from "../hooks/useStack"
+import { useRouter } from "../hooks/useRouter"
+import { isSSR } from "../core/helpers"
 
 export type TManageTransitions = {
-  previousPage: IRouteStack;
-  currentPage: IRouteStack;
-  unmountPreviousPage: () => void;
-};
-
-interface IProps {
-  className?: string;
-  manageTransitions?: (T: TManageTransitions) => Promise<void>;
+  previousPage: IRouteStack
+  currentPage: IRouteStack
+  unmountPreviousPage: () => void
 }
 
-const componentName = "Stack";
-const log = debug(`router:${componentName}`);
+interface IProps {
+  className?: string
+  manageTransitions?: (T: TManageTransitions) => Promise<void>
+}
+
+const componentName = "Stack"
+const log = debug(`router:${componentName}`)
 
 /**
  * @name Stack
@@ -29,10 +29,10 @@ function Stack(props: IProps): JSX.Element {
     previousRoute,
     unmountPreviousPage,
     previousPageIsMount,
-  } = useRouter() as IRouterContext;
+  } = useRouter() as IRouterContext
 
-  const prevRef = React.useRef<IRouteStack>(null);
-  const currentRef = React.useRef<IRouteStack>(null);
+  const prevRef = React.useRef<IRouteStack>(null)
+  const currentRef = React.useRef<IRouteStack>(null)
 
   // Create the default sequential transition used
   // if manageTransitions props doesn't exist
@@ -43,39 +43,39 @@ function Stack(props: IProps): JSX.Element {
       unmountPreviousPage,
     }: TManageTransitions): Promise<void> => {
       return new Promise(async (resolve) => {
-        const $current = currentPage?.$element;
-        if ($current) $current.style.visibility = "hidden";
+        const $current = currentPage?.$element
+        if ($current) $current.style.visibility = "hidden"
         if (previousPage) {
-          await previousPage.playOut();
-          unmountPreviousPage();
+          await previousPage.playOut()
+          unmountPreviousPage()
         }
         if (currentPage) {
-          await currentPage.isReadyPromise();
-          if ($current) $current.style.visibility = "visible";
-          await currentPage.playIn();
+          await currentPage.isReadyPromise()
+          if ($current) $current.style.visibility = "visible"
+          await currentPage.playIn()
         }
-        resolve();
-      });
+        resolve()
+      })
     },
-    []
-  );
+    [],
+  )
 
   // 2. animate when route state changed
   React[isSSR() ? "useEffect" : "useLayoutEffect"](() => {
-    if (!currentRoute) return;
-    (props.manageTransitions || sequencialTransition)({
+    if (!currentRoute) return
+    ;(props.manageTransitions || sequencialTransition)({
       previousPage: prevRef.current,
       currentPage: currentRef.current,
       unmountPreviousPage,
     } as TManageTransitions).then(() => {
-      unmountPreviousPage();
-    });
-  }, [routeIndex]);
+      unmountPreviousPage()
+    })
+  }, [routeIndex])
 
   const [PrevRoute, CurrRoute] = [
     previousRoute?._context ?? previousRoute,
     currentRoute?._context ?? currentRoute,
-  ];
+  ]
 
   return (
     <div className={["Stack", props.className].filter((e) => e).join(" ")}>
@@ -94,7 +94,7 @@ function Stack(props: IProps): JSX.Element {
         />
       )}
     </div>
-  );
+  )
 }
 
-export { Stack };
+export { Stack }

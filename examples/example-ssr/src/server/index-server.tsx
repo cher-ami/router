@@ -1,17 +1,17 @@
-import fetch from "cross-fetch";
-import * as React from "react";
-import { routes } from "~/routes";
-import { App } from "~/components/App";
-import { languages, showDefaultLangInUrl } from "~/languages";
-import { LangService, requestStaticPropsFromRoute, Router } from "@cher-ami/router";
-import { loadEnv } from "vite";
-import { TScriptsObj } from "../../prerender/helpers/ManifestParser";
-import { CherScripts } from "~/server/helpers/CherScripts";
-import { RawScript } from "~/server/helpers/RawScript";
-import { ViteDevScripts } from "~/server/helpers/ViteDevScripts";
-import { ReactElement } from "react";
-import { preventSlashes } from "~/server/helpers/preventSlashes";
-import { GlobalDataContext } from "~/store/GlobalDataContext";
+import fetch from "cross-fetch"
+import * as React from "react"
+import { routes } from "~/routes"
+import { App } from "~/components/App"
+import { languages, showDefaultLangInUrl } from "~/languages"
+import { LangService, requestStaticPropsFromRoute, Router } from "@cher-ami/router"
+import { loadEnv } from "vite"
+import { TScriptsObj } from "../../prerender/helpers/ManifestParser"
+import { CherScripts } from "~/server/helpers/CherScripts"
+import { RawScript } from "~/server/helpers/RawScript"
+import { ViteDevScripts } from "~/server/helpers/ViteDevScripts"
+import { ReactElement } from "react"
+import { preventSlashes } from "~/server/helpers/preventSlashes"
+import { GlobalDataContext } from "~/store/GlobalDataContext"
 
 // ----------------------------------------------------------------------------- PREPARE
 

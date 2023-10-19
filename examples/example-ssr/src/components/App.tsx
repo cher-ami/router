@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import { Link, Stack, useLang } from "@cher-ami/router";
-import { languages } from "~/languages";
-import { EPages } from "~/routes";
-import { useRouter } from "@cher-ami/router";
+import React, { useEffect } from "react"
+import { Link, Stack, useLang } from "@cher-ami/router"
+import { languages } from "~/languages"
+import { EPages } from "~/routes"
+import { useRouter } from "@cher-ami/router"
 
 export function App() {
-  const { langService } = useRouter();
-  const [lang, setLang] = useLang();
+  const { langService } = useRouter()
+  const [lang, setLang] = useLang()
 
   const crossedTransitions = ({
     previousPage,
@@ -14,20 +14,20 @@ export function App() {
     unmountPreviousPage,
   }): Promise<void> => {
     return new Promise(async (resolve) => {
-      const $current = currentPage?.$element;
-      if ($current) $current.style.visibility = "hidden";
+      const $current = currentPage?.$element
+      if ($current) $current.style.visibility = "hidden"
       if (previousPage) {
-        previousPage.playOut();
+        previousPage.playOut()
       }
       if (currentPage) {
-        await currentPage.isReadyPromise();
-        if ($current) $current.style.visibility = "visible";
-        await currentPage.playIn();
-        unmountPreviousPage();
+        await currentPage.isReadyPromise()
+        if ($current) $current.style.visibility = "visible"
+        await currentPage.playIn()
+        unmountPreviousPage()
       }
-      resolve();
-    });
-  };
+      resolve()
+    })
+  }
 
   // prettier-ignore
   return (
