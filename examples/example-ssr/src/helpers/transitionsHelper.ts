@@ -1,5 +1,5 @@
 import { gsap } from "gsap"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 const log = debug(`router:transitionsHelper`)
 
 export const transitionsHelper = (

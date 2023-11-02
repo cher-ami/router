@@ -1,6 +1,6 @@
 import { resolve } from "path"
 import { defineConfig } from "vite"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 const log = debug("config:vite.config")
 
 export default defineConfig(({ command, mode }) => {

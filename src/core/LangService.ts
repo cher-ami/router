@@ -2,7 +2,7 @@ import { Routers } from "./Routers"
 import { compileUrl, createUrl } from "./core"
 import { isSSR, joinPaths, removeLastCharFromString } from "./helpers"
 import { TRoute } from "../components/Router"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 
 const log = debug(`router:LangService`)
 

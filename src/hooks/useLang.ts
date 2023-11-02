@@ -1,5 +1,5 @@
 import LangService, { TLanguage } from "../core/LangService"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 import React from "react"
 import { Routers } from "../core/Routers"
 import { useHistory } from "../hooks/useHistory"

@@ -2,7 +2,7 @@ import React, { ForwardedRef, forwardRef, useEffect, useRef } from "react"
 import { useLocation } from "@cher-ami/router"
 import { useStack } from "@cher-ami/router"
 import { transitionsHelper } from "../helper/transitionsHelper"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 
 interface IProps {
   params?: {

@@ -10,7 +10,7 @@ import {
   useStack,
 } from "@cher-ami/router"
 import { transitionsHelper } from "../helper/transitionsHelper"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 
 const componentName: string = "HomePage"
 const log = debug(`router:${componentName}`)

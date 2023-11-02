@@ -11,7 +11,7 @@ import {
 } from "@cher-ami/router"
 import { transitionsHelper } from "../helper/transitionsHelper"
 import { routesList } from "../routes"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 
 const componentName: string = "BarPage"
 const log = debug(`router:${componentName}`)
