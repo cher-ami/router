@@ -21,6 +21,8 @@ import { isSSR, removeLastCharFromString } from "../core/helpers"
 
 export type TRouteProps = {
   params?: TParams
+  queryParams?: TQueryParams
+  hash?: string
   [x: string]: any
 }
 
