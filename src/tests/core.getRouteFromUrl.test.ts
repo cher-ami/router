@@ -21,7 +21,12 @@ describe("getRouteFromUrl", () => {
     expect(getRoute.path).toBe("/bar/:id")
     expect(getRoute.url).toBe("/bar/my-id")
     expect(getRoute.name).toBe(`BarPage`)
-    const routeProps = { params: { id: "my-id" }, color: "blue" }
+    const routeProps = {
+      params: { id: "my-id" },
+      queryParams: {},
+      hash: null,
+      color: "blue",
+    }
     expect(getRoute.props).toEqual(routeProps)
     // no parent route, so context object need to return same route information
     expect(getRoute._context.props).toEqual(routeProps)
@@ -57,6 +62,8 @@ describe("getRouteFromUrl", () => {
     expect(getRoute.props).toEqual({
       color: "red",
       params: { testParam: "super-param" },
+      queryParams: {},
+      hash: null,
     })
   })
 
