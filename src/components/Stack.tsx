@@ -1,6 +1,6 @@
 import React from "react"
 import { IRouterContext } from "./Router"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 import { IRouteStack } from "../hooks/useStack"
 import { useRouter } from "../hooks/useRouter"
 import { isSSR } from "../core/helpers"

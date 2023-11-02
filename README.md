@@ -18,7 +18,7 @@ render previous and current page component when route change.
 
 This router loads [history](https://github.com/ReactTraining/history)
 , [path-to-regexp](https://github.com/pillarjs/path-to-regexp)
-and [@wbe/debug](https://github.com/willybrauner/debug) as dependencies.
+and [@cher-ami/debug](https://github.com/cher-ami/debug) as dependencies.
 
 ## Playground
 

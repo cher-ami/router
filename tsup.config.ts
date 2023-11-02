@@ -9,7 +9,7 @@ export default defineConfig({
   dts: true,
   format: ["cjs", "esm"],
   name: "@cher-ami/router",
-  external: ["@wbe/debug", "history", "path-to-regexp", "react", "react-dom"],
+  external: ["@cher-ami/debug", "history", "path-to-regexp", "react", "react-dom"],
   sourcemap: true,
   async onSuccess() {
     const process = spawn("npx", ["size-limit"], { shell: true })

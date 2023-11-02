@@ -1,7 +1,7 @@
 import { BrowserHistory, HashHistory, MemoryHistory, Update } from "history"
 import React from "react"
 import { useRouter } from "./useRouter"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 
 const log = debug("router:useHistory")
 

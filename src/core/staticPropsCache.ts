@@ -1,5 +1,5 @@
 import { Routers } from "./Routers"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 const componentName: string = "cache"
 const log = debug(`router:${componentName}`)
 

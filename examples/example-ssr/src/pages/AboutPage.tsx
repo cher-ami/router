@@ -10,7 +10,7 @@ import {
 } from "@cher-ami/router"
 import { transitionsHelper } from "../helpers/transitionsHelper"
 import { getPathByRouteName } from "@cher-ami/router"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 import { useLang } from "@cher-ami/router"
 import { EPages } from "../routes"
 

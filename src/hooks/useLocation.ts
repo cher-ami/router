@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useHistory } from "../hooks/useHistory"
 import { createUrl, TOpenRouteParams } from "../core/core"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 import { useRouter } from "./useRouter"
 const log = debug("router:useLocation")
 

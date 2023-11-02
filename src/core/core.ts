@@ -1,5 +1,5 @@
 import { Routers } from "./Routers"
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 import { compile, match } from "path-to-regexp"
 import { TRoute } from "../components/Router"
 import LangService from "./LangService"

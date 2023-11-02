@@ -1,4 +1,4 @@
-import debug from "@wbe/debug"
+import debug from "@cher-ami/debug"
 import { BrowserHistory, HashHistory, MemoryHistory } from "history"
 import { Match } from "path-to-regexp"
 import React, {
