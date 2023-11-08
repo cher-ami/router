@@ -18,6 +18,7 @@ hydrateRoot(
     history={createBrowserHistory()}
     initialStaticProps={window["__SSR_STATIC_PROPS__"]}
     langService={langServiceInstance()}
+    base={import.meta.env.VITE_APP_BASE || "/"}
   >
     <GlobalDataContext.Provider value={window["__GLOBAL_DATA__"]}>
       <App />

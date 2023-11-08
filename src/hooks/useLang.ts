@@ -2,7 +2,7 @@ import LangService, { TLanguage } from "../core/LangService"
 import debug from "@cher-ami/debug"
 import React from "react"
 import { Routers } from "../core/Routers"
-import { useHistory } from "../hooks/useHistory"
+import { useHistory } from "./useHistory"
 const log = debug("router:useLang")
 
 /**

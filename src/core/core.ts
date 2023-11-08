@@ -36,24 +36,19 @@ export function createUrl(
   langService = Routers.langService,
 ): string {
   if (!allRoutes) return
-  let urlToPush: string
+  let finalURL: string
 
-  if (typeof args === "object" && !langService) {
-    log(
-      "route.path object is not supported without langService. Use should use route.path string instead.",
-    )
-  }
-
-  // in case we receive a string
+  // STRING param
   if (typeof args === "string") {
-    urlToPush = args as string
+    finalURL = args as string
     if (!!langService) {
-      urlToPush = addLangToUrl(urlToPush)
+      finalURL = addLangToUrl(finalURL)
     }
+    finalURL = joinPaths([base === "/" ? "" : base, finalURL])
+    return finalURL
   }
 
-  // in case we receive an object
-  // add lang to params if no exist
+  // OBJECT param, add lang to params if no exist
   else if (typeof args === "object" && args?.name) {
     if (langService && !args.params?.lang) {
       args.params = {
@@ -76,23 +71,13 @@ export function createUrl(
       hash = "#" + args.hash
     }
 
-    // Get URL by the route name
-    urlToPush = getUrlByRouteName(allRoutes, args) + queryParams + hash
+    return getUrlByRouteName(allRoutes, args, base) + queryParams + hash
 
-    // in other case return.
+    // in other case return
   } else {
     console.warn("createUrl param isn't valid. to use createUrl return.", args)
     return
   }
-
-  // Add base
-  const addBaseToUrl = (url: string, base = Routers.base): string =>
-    joinPaths([base === "/" ? "" : base, url])
-  // compile base if contains lang params
-  const newBase = compileUrl(base, { lang: Routers.langService?.currentLang.key })
-  // in each case, add base URL
-  urlToPush = addBaseToUrl(urlToPush, newBase)
-  return urlToPush
 }
 
 /**
@@ -561,7 +546,11 @@ export function getFullPathByPath(
  * Get "full" URL by route name and params
  * @returns string
  */
-export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams): string {
+export function getUrlByRouteName(
+  pRoutes: TRoute[],
+  pParams: TOpenRouteParams,
+  base: string,
+): string {
   // need to wrap the function to be able to access the preserved "pRoutes" param
   // in local scope after recursion
   const next = (routes: TRoute[], params: TOpenRouteParams): string => {
@@ -585,6 +574,7 @@ export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams):
           path,
           route.name,
           pParams?.params?.lang,
+          base,
         )
         // build URL
         // console.log("_fullPath", _fullPath, params);

@@ -144,7 +144,7 @@ function Router(props: {
     )
 
     // if is the first instance, register routes in Routers
-    if (!Routers.routes || isServer) {
+    if (!Routers.routes) {
       Routers.routes = routesList
     }
     return routesList
