@@ -325,6 +325,8 @@ export function getRouteFromUrl({
             hash,
             props: {
               params,
+              queryParams,
+              hash,
               ...(route?.props || {}),
             },
             _fullPath: currentRoutePath,
