@@ -1,4 +1,4 @@
-export { Routers } from "./core/Routers"
+export { ROUTERS } from "./core/ROUTERS"
 export { Router } from "./components/Router"
 export type { TRoute } from "./components/Router"
 export { Link } from "./components/Link"

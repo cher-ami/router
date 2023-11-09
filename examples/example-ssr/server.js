@@ -33,10 +33,13 @@ const port = portFinderSync.getPort(3000)
     // use vite's connect instance as middleware
     app.use(vite.middlewares)
     app.use("*", async (req, res, next) => {
+      if (req.originalUrl === "/favicon.ico") return
+
       try {
         // Transforms the ESM source code to be usable in Node.js
         const { render } = await vite.ssrLoadModule(`src/server/index-server.tsx`)
         // Get react-dom from the render method
+
         const dom = await render(req.originalUrl, devScripts, false)
         // Create stream to support Suspense API
         const stream = renderToPipeableStream(dom, {

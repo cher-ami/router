@@ -10,6 +10,7 @@ export type TRouters = {
   /**
    * Global routes list
    */
+  //rootRoutes: TRoute[]
   routes: TRoute[]
   /**
    * Global browser history
@@ -45,11 +46,12 @@ export type TRouters = {
 }
 
 /**
- * ROUTERS object allows to keep safe globales values between Routers instances
+ * ROUTERS object allows to keep safe globales values between ROUTERS instances
  * This object values do not depend of one single router
  */
-export const Routers: TRouters = {
+export const ROUTERS: TRouters = {
   base: undefined,
+  //rootRoutes: undefined,
   routes: undefined,
   history: undefined,
   staticLocation: undefined,

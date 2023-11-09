@@ -21,7 +21,7 @@ import {
 } from "../core/core"
 import { preventSlashes } from "../core/helpers"
 import { routeList } from "./_fixtures/routeList"
-import { Routers, LangService } from ".."
+import { ROUTERS, LangService } from ".."
 
 /**
  * Public
@@ -92,17 +92,17 @@ describe("public", () => {
         "/custom/base/hello/foo",
       )
 
-      Routers.langService = new LangService({
+      ROUTERS.langService = new LangService({
         languages: [{ key: "en" }, { key: "fr" }],
       })
       const langPathTest = { en: "/foo-en", fr: "/foo-fr" }
       expect(getSubRouterBase(langPathTest, "/base/", true)).toBe("/base/:lang/foo-en")
       expect(getSubRouterBase(langPathTest, "/base/", false)).toBe("/base/foo-en")
-      Routers.langService = undefined
+      ROUTERS.langService = undefined
     })
 
     it("should return subRouter base URL with 'showDefaultLangInUrl: false' option", () => {
-      Routers.langService = new LangService({
+      ROUTERS.langService = new LangService({
         languages: [{ key: "en" }, { key: "fr" }],
         showDefaultLangInUrl: false,
       })
@@ -110,7 +110,7 @@ describe("public", () => {
         expect(getSubRouterBase(e, "/base/", true)).toBe(`/base${e}`)
         expect(getSubRouterBase(e, "/base/", false)).toBe(`/base${e}`)
       })
-      Routers.langService = undefined
+      ROUTERS.langService = undefined
     })
   })
 

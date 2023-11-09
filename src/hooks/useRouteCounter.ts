@@ -1,6 +1,6 @@
 import { useHistory } from "../hooks/useHistory"
 import { useState } from "react"
-import { Routers } from "../core/Routers"
+import { ROUTERS } from "../core/ROUTERS"
 
 /**
  * use Route Counter
@@ -11,15 +11,15 @@ export const useRouteCounter = (): {
   resetCounter: () => void
 } => {
   // get current route count
-  const [routeCounter, setRouteCounter] = useState<number>(Routers.routeCounter)
+  const [routeCounter, setRouteCounter] = useState<number>(ROUTERS.routeCounter)
   // check if is first route
-  const [isFirstRoute, setIsFirstRoute] = useState<boolean>(Routers.isFirstRoute)
+  const [isFirstRoute, setIsFirstRoute] = useState<boolean>(ROUTERS.isFirstRoute)
   // handle history
   useHistory(() => {
-    Routers.routeCounter = routeCounter + 1
+    ROUTERS.routeCounter = routeCounter + 1
     setRouteCounter(routeCounter + 1)
 
-    Routers.isFirstRoute = false
+    ROUTERS.isFirstRoute = false
     setIsFirstRoute(false)
   }, [routeCounter, isFirstRoute])
 

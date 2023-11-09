@@ -1,4 +1,4 @@
-import { Routers } from "./Routers"
+import { ROUTERS } from "./ROUTERS"
 import debug from "@cher-ami/debug"
 const componentName: string = "cache"
 const log = debug(`router:${componentName}`)
@@ -7,7 +7,7 @@ const log = debug(`router:${componentName}`)
  * Cache used to store getStaticProps result
  * @param cache
  */
-export function staticPropsCache(cache = Routers.staticPropsCache) {
+export function staticPropsCache(cache = ROUTERS.staticPropsCache) {
   /**
    * Get data in static props cache
    */

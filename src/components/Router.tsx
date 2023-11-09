@@ -12,7 +12,7 @@ import React, {
 } from "react"
 import { formatRoutes, TParams, TQueryParams } from "../core/core"
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core"
-import { Routers } from "../core/Routers"
+import { ROUTERS } from "../core/ROUTERS"
 import LangService, { TLanguage } from "../core/LangService"
 import { staticPropsCache } from "../core/staticPropsCache"
 import { isSSR, removeLastCharFromString } from "../core/helpers"
@@ -67,7 +67,7 @@ export interface IRouterContext extends IRouterContextStackStates {
 
 const componentName = "Router"
 const log = debug(`router:${componentName}`)
-const isServer = isSSR()
+const IS_SERVER = isSSR()
 /**
  * Router Context
  * Router instance will be keep on this context
@@ -114,22 +114,47 @@ function Router(props: {
   initialStaticProps?: { props: any; name: string; url: string }
 }): JSX.Element {
   /**
+   * Check if is the first router or a sub-router
+   * If is the first router, reset ROUTERS store
+   */
+  const IS_CLIENT_OR_SERVER_ROOT_ROUTER = useMemo(() => {
+    // base on supposition that:
+    // props.staticLocation exist on SERVER side
+    // props.history exist on CLIENT side
+    const isRootRouter = !!props.staticLocation || !!props.history
+    log(props.id, "IS_CLIENT_OR_SERVER_ROOT_ROUTER", isRootRouter)
+
+    // reset ROUTERS store
+    if (IS_SERVER && isRootRouter) {
+      ROUTERS.base = undefined
+      ROUTERS.routes = undefined
+      ROUTERS.history = undefined
+      ROUTERS.staticLocation = undefined
+      ROUTERS.routeCounter = 1
+      ROUTERS.isFirstRoute = true
+      ROUTERS.currentRoute = undefined
+      ROUTERS.langService = undefined
+      ROUTERS.staticPropsCache = {}
+    }
+    return isRootRouter
+  }, [props.id, props.staticLocation, props.history])
+
+  /**
    * 0. LangService
    * Check if langService props exist.
-   * If props exist, store langService instance in Routers store.
+   * If props exist, store langService instance in ROUTERS store.
    */
-
   const langService = useMemo(() => {
-    if (!Routers.langService || (props.langService && isServer)) {
-      Routers.langService = props.langService
+    if (IS_CLIENT_OR_SERVER_ROOT_ROUTER) {
+      ROUTERS.langService = props.langService
     }
-    return Routers.langService
+    return ROUTERS.langService
   }, [props.langService])
 
   /**
    * 1. routes
    * Format and return routes list
-   * If is the first Router instance, register routes in 'Routers' store.
+   * If is the first Router instance, register routes in 'ROUTERS' store.
    * In other case, return current props.routes
    *
    *  const { routes } = useRouter();
@@ -143,51 +168,50 @@ function Router(props: {
       props.id,
     )
 
-    // if is the first instance, register routes in Routers
-    if (!Routers.routes) {
-      Routers.routes = routesList
+    // register is Store if...
+    if (!ROUTERS.routes && props.routes) {
+      ROUTERS.routes = routesList
     }
+
+    // return current instance routes list
     return routesList
   }, [props.routes, langService, props.middlewares, props.id])
 
   /**
    * 2. base
    * Format and return base URL
-   * Register base in 'Routers' obj if is the first Router instance
+   * Register base in 'ROUTERS' obj if is the first Router instance
    * In all case, return current props.base
    */
-
-  if (!Routers.base) {
-    Routers.base = props.base
+  if (!ROUTERS.base) {
+    ROUTERS.base = props.base
   }
-  const base = Routers.base
+  const base = ROUTERS.base
 
   /**
    * 3. history
-   * If is the first Router instance, register history in 'Routers' store
+   * If is the first Router instance, register history in 'ROUTERS' store
    * 'history' object need to be the same between each Router instance
    */
-
-  if (props.history && !Routers.history) {
-    Routers.history = props.history
+  if (!ROUTERS.history && props.history) {
+    ROUTERS.history = props.history
   }
-  const history = Routers.history
+  const history = ROUTERS.history
 
   /**
    * 4 static location
    * Is useful in SSR context
    */
-
   if (props.staticLocation) {
-    Routers.staticLocation = props.staticLocation
+    ROUTERS.staticLocation = props.staticLocation
   }
-  const staticLocation: string | undefined = Routers.staticLocation
+  const staticLocation: string | undefined = ROUTERS.staticLocation
 
   /**
    * 5. reset is fist route visited
    */
-  if (isServer) {
-    Routers.isFirstRoute = true
+  if (IS_SERVER) {
+    ROUTERS.isFirstRoute = true
   }
 
   // -------------------------------------------------------------------------------- ROUTE CHANGE
@@ -300,7 +324,7 @@ function Router(props: {
 
     // SERVER (first route)
     // prettier-ignore
-    if (isServer) {
+    if (IS_SERVER) {
       if (props.initialStaticProps) {
         log("firstRoute > isServer > assign initialStaticProps to newRoute props & set cache");
         Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
@@ -310,7 +334,7 @@ function Router(props: {
     // CLIENT
     else {
       // CLIENT > FIRST ROUTE
-      if (Routers.isFirstRoute) {
+      if (ROUTERS.isFirstRoute) {
         if (props.initialStaticProps) {
           log(props.id, "firstRoute > isClient > assign initialStaticProps to newRoute props & set cache");
           Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
@@ -339,10 +363,10 @@ function Router(props: {
     // Final process: update context currentRoute from dispatch method \o/ !
     dispatch({ type: "update-current-route", value: newRoute })
 
-    // & register this new route as currentRoute in local and in Routers store
+    // & register this new route as currentRoute in local and in ROUTERS store
     currentRouteRef.current = newRoute
-    Routers.currentRoute = newRoute
-    Routers.isFirstRoute = false
+    ROUTERS.currentRoute = newRoute
+    ROUTERS.isFirstRoute = false
   }
 
   /**
@@ -387,7 +411,7 @@ function Router(props: {
       log(props.id, "Stop to listen history.")
       historyListener()
     }
-  }, [historyListener])
+  }, [historyListener, routes, staticLocation])
 
   // -------------------------------------------------------------------------------- RENDER
 

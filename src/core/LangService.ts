@@ -1,4 +1,4 @@
-import { Routers } from "./Routers"
+import { ROUTERS } from "./ROUTERS"
 import { compileUrl, createUrl } from "./core"
 import { isSSR, joinPaths, removeLastCharFromString } from "./helpers"
 import { TRoute } from "../components/Router"
@@ -39,6 +39,11 @@ class LangService<TLang = any> {
   public showDefaultLangInUrl: boolean
 
   /**
+   * Current url need to display lang in URL
+   */
+  public curentUrlNeedToContainLang: boolean
+
+  /**
    * Base URL of the app
    */
   public base: string
@@ -77,6 +82,7 @@ class LangService<TLang = any> {
     this.currentLang = this.getLangFromString() || this.defaultLang
     this.browserLang = this.getBrowserLang(languages)
     this.showDefaultLangInUrl = showDefaultLangInUrl
+    this.curentUrlNeedToContainLang = this.needToContainLangInUrl()
   }
 
   /**
@@ -97,7 +103,7 @@ class LangService<TLang = any> {
   public setLang(
     toLang: TLanguage<TLang>,
     forcePageReload = true,
-    currentRoute: TRoute = Routers.currentRoute,
+    currentRoute: TRoute = ROUTERS.currentRoute,
   ): void {
     if (toLang.key === this.currentLang.key) {
       log("setLang: This is the same language, exit.")
@@ -142,6 +148,7 @@ class LangService<TLang = any> {
     }
 
     // 3. if current lang is default lang, add /currentLang.key after base
+    //    else if (this.needToContainLangInUrl(toLang.key)) {
     else if (!this.showDefaultLangInUrl && this.isDefaultLangKey(this.currentLang.key)) {
       const newUrlWithoutBase = preparedNewUrl.substring(
         this.base.length,
@@ -414,7 +421,19 @@ class LangService<TLang = any> {
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
     if (isSSR()) return
-    forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl)
+    forcePageReload ? window?.open(newUrl, "_self") : ROUTERS.history.push(newUrl)
+  }
+
+  /**
+   * Determine if current URL need to contain lang
+   * @param currentLangKey
+   * @protected
+   */
+  protected needToContainLangInUrl(currentLangKey = this.currentLang.key): boolean {
+    return (
+      (this.isDefaultLangKey(currentLangKey) && this.showDefaultLangInUrl) ||
+      !this.isDefaultLangKey(currentLangKey)
+    )
   }
 }
 
