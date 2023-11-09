@@ -4,7 +4,6 @@ import { compile, match } from "path-to-regexp"
 import { TRoute } from "../components/Router"
 import LangService from "./LangService"
 import { joinPaths, removeLastCharFromString } from "./helpers"
-import { al, ar } from "vitest/dist/reporters-5f784f42"
 
 const componentName: string = "core"
 const log = debug(`router:${componentName}`)
@@ -510,15 +509,6 @@ export function formatRoutes(
 // ----------------------------------------------------------------------------- URLS / PATH
 
 /**
- * Compile an URL with path and params via path-to-regex
- * ex:
- *  compile("foo/:id")({id: example-client}) // "foo/example-client"
- */
-export function compileUrl(path: string, params?: TParams): string {
-  return compile(path)(params)
-}
-
-/**
  * returns lang path
  * (a 'langPath' is '/about' or '/a-propos' in path: {en: "/about", fr: "/a-propos", de: "uber", name: "about"})
  * @param langPath
@@ -530,11 +520,8 @@ export function getLangPath(
   lang: string = Routers.langService?.currentLang.key,
 ) {
   let path
-  if (typeof langPath === "string") {
-    path = langPath
-  } else if (typeof langPath === "object") {
-    path = langPath?.[lang]
-  }
+  if (typeof langPath === "string") path = langPath
+  else if (typeof langPath === "object") path = langPath?.[lang]
 
   const removeLangFromPath = (path: string): string => {
     if (path?.includes(`/:lang`)) {

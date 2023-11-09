@@ -31,7 +31,7 @@ describe("createUrl", () => {
       expect(createUrl("/d", "/foo/", routes)).toBe("/foo/d")
     })
 
-    it.only("should create URL with _langPath ", () => {
+    it("should create URL with _langPath ", () => {
       const routes = [
         {
           // path is set automatically by selected langPath
