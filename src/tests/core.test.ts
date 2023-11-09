@@ -331,6 +331,24 @@ describe("URLs and paths", () => {
         "/hello/foo/bla/no",
       )
     })
+
+    it("should return full URL with only page name with base URL", () => {
+      // prettier-ignore
+      const routes = [
+        { path: "/a", name: "a-page" },
+        {
+          path: "/b",
+          name: "b-page",
+          children: [
+            { path: "/c", name: "c-page" },
+            { path: "/d", name: "d-page" }
+          ],
+        },
+      ]
+      expect(getUrlByRouteName(routes, { name: "b-page" })).toBe("/b")
+      expect(getUrlByRouteName(routes, { name: "b-page" }, "/test/")).toBe("/test/b")
+      expect(getUrlByRouteName(routes, { name: "c-page" }, "/test/")).toBe("/test/b/c")
+    })
   })
 
   describe("getLangPath", () => {
