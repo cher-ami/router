@@ -65,7 +65,7 @@ Services:
 Global:
 
 - [`Helpers`](#Helpers) Global Routers helpers
-- [`Routers object`](#Routers) Global Routers object contains all Routers properties (history, instances...)
+- [`Routers object`](#Routers) Global Routers object contains all routers properties (history, instances...)
 
 ## Installation
 
@@ -202,8 +202,8 @@ const routesList = [
 
 ## Sub-router
 
-cher-ami router supports nested routes from sub Routers instance 🙏🏽.
-It is possible to nest as many Routers as you want.
+cher-ami router supports nested routes from sub routers instance 🙏🏽.
+It is possible to nest as many routers as you want.
 
 1. Define children routes in initial routes list with `children` property;
 
@@ -883,7 +883,7 @@ Push new route in current history. Stack(s) component(s) will return the appriop
 
 ## Routers
 
-Routers is a global object who contains all Routers informations. Because @cher-ami/router is possibly multi-stack, we need a global object to store shared informations between router instances.
+Routers is a global object who contains all routers informations. Because @cher-ami/router is possibly multi-stack, we need a global object to store shared informations between router instances.
 
 #### Routers.routes
 

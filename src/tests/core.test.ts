@@ -52,6 +52,7 @@ describe("public", () => {
         },
       ]
       expect(createUrl("/a", "/foo/", routes)).toBe("/foo/a")
+      // FIXME never parse routes list, it just add base URL if is a string
       expect(createUrl("/d", "/foo/", routes)).toBe("/foo/d")
     })
 
