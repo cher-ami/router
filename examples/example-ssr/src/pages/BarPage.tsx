@@ -1,6 +1,7 @@
 import React, { useRef } from "react"
-import { useStack } from "@cher-ami/router"
-import { transitionsHelper } from "../helpers/transitionsHelper"
+import { Link, useStack } from "@cher-ami/router"
+import { transitionsHelper } from "~/helpers/transitionsHelper"
+import { EPages } from "~/routes"
 
 const componentName = "BarPage"
 function BarPage(props, handleRef) {
@@ -17,6 +18,9 @@ function BarPage(props, handleRef) {
   return (
     <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
       {componentName}
+      <br />
+      <br />
+      <Link to={{ name: EPages.FOO }}>link to FOO</Link>
     </div>
   )
 }

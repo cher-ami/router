@@ -1,4 +1,4 @@
-import { TRoute } from ".."
+import { TRoute } from "../../components/Router"
 
 export const routeList: TRoute[] = [
   {

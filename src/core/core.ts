@@ -24,13 +24,13 @@ export type TOpenRouteParams = {
  * createUrl URL for setLocation
  * (Get URL to push in history)
  *
- * @param args can be string or TOpenRouteParams object
+ * @param openRouteParams can be string or TOpenRouteParams object
  * @param base
  * @param allRoutes
  * @param langService
  */
 export function createUrl(
-  args: string | TOpenRouteParams,
+  openRouteParams: string | TOpenRouteParams,
   base: string = Routers.base,
   allRoutes: TRoute[] = Routers.routes,
   langService = Routers.langService,
@@ -38,61 +38,75 @@ export function createUrl(
   if (!allRoutes) return
   let urlToPush: string
 
-  if (typeof args === "object" && !langService) {
-    log(
-      "route.path object is not supported without langService. Use should use route.path string instead.",
-    )
-  }
-
-  // in case we receive a string
-  if (typeof args === "string") {
-    urlToPush = args as string
+  // STRING param
+  if (typeof openRouteParams === "string") {
+    urlToPush = openRouteParams as string
     if (!!langService) {
       urlToPush = addLangToUrl(urlToPush)
     }
+    urlToPush = joinPaths([base === "/" ? "" : base, urlToPush])
+    return urlToPush
   }
 
-  // in case we receive an object
-  // add lang to params if no exist
-  else if (typeof args === "object" && args?.name) {
-    if (langService && !args.params?.lang) {
-      args.params = {
-        ...args.params,
+  // OBJECT param, add lang to params if no exist
+  else if (typeof openRouteParams === "object" && openRouteParams?.name) {
+    if (langService && !openRouteParams.params?.lang) {
+      openRouteParams.params = {
+        ...openRouteParams.params,
         lang: langService.currentLang.key,
       }
     }
 
     // add params to URL if exist
     let queryParams = ""
-    if (args?.queryParams) {
+    if (openRouteParams?.queryParams) {
       queryParams = "?"
-      queryParams += Object.keys(args.queryParams)
-        .map((key) => `${key}=${args?.queryParams[key]}`)
+      queryParams += Object.keys(openRouteParams.queryParams)
+        .map((key) => `${key}=${openRouteParams?.queryParams[key]}`)
         .join("&")
     }
     // add hash to URL if exist
     let hash = ""
-    if (args?.hash) {
-      hash = "#" + args.hash
+    if (openRouteParams?.hash) {
+      hash = "#" + openRouteParams.hash
     }
 
-    // Get URL by the route name
-    urlToPush = getUrlByRouteName(allRoutes, args) + queryParams + hash
+    function getUrlByRouteName(
+      allRoutes: TRoute[],
+      args: TOpenRouteParams,
+      base = Routers.base || "/",
+      langService = Routers.langService,
+    ): string {
+      const next = (routes, args, curBase): string => {
+        for (let route of routes) {
+          const lang = args.params?.lang || langService?.currentLang.key
+          const langPath = route._langPath?.[lang]
+          const routePath = route.path
+          // console.log("---------",{ lang, langPath, routePath })
+          if (route?.name === args.name || route.component?.displayName === args.name) {
+            // prettier-ignore
+            return (curBase + compile(langPath || routePath)(args.params)).replace(/(\/)+/g, "/")
+          } else if (route.children?.length > 0) {
+            const match = next(
+              route.children,
+              args,
+              curBase + compile(langPath || routePath)(args.params),
+            )
+            if (match) return match
+          }
+        }
+      }
+      return next(allRoutes, args, base)
+    }
 
-    // in other case return.
+    const url = getUrlByRouteName(allRoutes, openRouteParams, base)
+    if (url) return url + queryParams + hash
+
+    // in other case return
   } else {
-    console.warn("createUrl param isn't valid. to use createUrl return.", args)
+    console.warn("createUrl param isn't valid. to use createUrl return.", openRouteParams)
     return
   }
-
-  // Add base
-  const addBaseToUrl = (url: string, base = Routers.base): string =>
-    joinPaths([base === "/" ? "" : base, url])
-  // compile base if contains lang params
-  const newBase = compileUrl(base, { lang: Routers.langService?.currentLang.key })
-  // in each case, add base URL
-  urlToPush = addBaseToUrl(urlToPush, newBase)
-  return urlToPush
 }
 
 /**
@@ -266,6 +280,7 @@ export function getRouteFromUrl({
   id,
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return
+  // console.log(id,'getRouteFromUrl', pRoutes)
 
   // extract queryParams params and hash
   const { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(pUrl)
@@ -479,7 +494,7 @@ export function formatRoutes(
   // For each instances
   let routesList = patchMissingRootRoute(routes)
 
-  // subRouter instances shouldn't inquired middlewares and LangService
+  // subRouter instances shouldn't inquire middlewares and LangService
   if (middlewares) {
     routesList = applyMiddlewaresToRoutes(routesList, middlewares)
   }
@@ -494,116 +509,6 @@ export function formatRoutes(
 // ----------------------------------------------------------------------------- URLS / PATH
 
 /**
- * Compile an URL with path and params via path-to-regex
- * ex:
- *  compile("foo/:id")({id: example-client}) // "foo/example-client"
- */
-export function compileUrl(path: string, params?: TParams): string {
-  return compile(path)(params)
-}
-
-/**
- * Get full path by path
- *  if path "/foo" is a children of path "/bar", his full url is "/bar/foo"
- *  With the second URL part "/foo", this function will returns "/bar/foo"
- * @returns string
- */
-export function getFullPathByPath(
-  routes: TRoute[],
-  path: string | { [x: string]: string },
-  routeName: string,
-  lang: string = Routers.langService?.currentLang.key || undefined,
-  basePath: string = null,
-): string {
-  let localPath: string[] = [basePath]
-
-  for (let route of routes) {
-    const langPath = route._langPath?.[lang]
-    const routePath = route.path as string
-
-    const pathMatch =
-      (langPath === path || routePath === path) && route.name === routeName
-
-    // if path match on first level, keep path in local array and return it, stop here.
-    if (pathMatch) {
-      localPath.push(langPath || routePath)
-      return joinPaths(localPath)
-    }
-
-    // if not matching but as children, return it
-    else if (route?.children?.length > 0) {
-      // no match, recall recursively on children
-      const matchChildrenPath = getFullPathByPath(
-        route.children,
-        path,
-        routeName,
-        lang,
-        joinPaths(localPath),
-      )
-      // return recursive Fn only if match, else continue to next iteration
-      if (matchChildrenPath) {
-        // keep path in local array
-        localPath.push(langPath || routePath)
-        // Return the function after localPath push
-        return getFullPathByPath(
-          route.children,
-          path,
-          routeName,
-          lang,
-          joinPaths(localPath),
-        )
-      }
-    }
-  }
-}
-
-/**
- * Get "full" URL by route name and params
- * @returns string
- */
-export function getUrlByRouteName(pRoutes: TRoute[], pParams: TOpenRouteParams): string {
-  // need to wrap the function to be able to access the preserved "pRoutes" param
-  // in local scope after recursion
-  const next = (routes: TRoute[], params: TOpenRouteParams): string => {
-    for (let route of routes) {
-      const match =
-        route?.name === params.name || route.component?.displayName === params.name
-      if (match) {
-        if (!route?.path) {
-          log("getUrlByRouteName > There is no route with this name, exit", params.name)
-          return
-        }
-
-        let path =
-          typeof route.path === "object"
-            ? route.path[Object.keys(route.path)[0]]
-            : route.path
-
-        // get full path
-        const _fullPath = getFullPathByPath(
-          pRoutes,
-          path,
-          route.name,
-          pParams?.params?.lang,
-        )
-        // build URL
-        // console.log("_fullPath", _fullPath, params);
-        return compileUrl(_fullPath, params.params)
-      }
-
-      // if route has children
-      else if (route.children?.length > 0) {
-        // getUrlByRouteName > no match, recall recursively on children
-        const match = next(route.children, params)
-        // return recursive Fn only if match, else, continue to next iteration
-        if (match) return match
-      }
-    }
-  }
-  return next(pRoutes, pParams)
-}
-
-/**
  * returns lang path
  * (a 'langPath' is '/about' or '/a-propos' in path: {en: "/about", fr: "/a-propos", de: "uber", name: "about"})
  * @param langPath
@@ -615,11 +520,8 @@ export function getLangPath(
   lang: string = Routers.langService?.currentLang.key,
 ) {
   let path
-  if (typeof langPath === "string") {
-    path = langPath
-  } else if (typeof langPath === "object") {
-    path = langPath?.[lang]
-  }
+  if (typeof langPath === "string") path = langPath
+  else if (typeof langPath === "object") path = langPath?.[lang]
 
   const removeLangFromPath = (path: string): string => {
     if (path?.includes(`/:lang`)) {

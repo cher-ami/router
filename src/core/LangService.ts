@@ -1,8 +1,9 @@
 import { Routers } from "./Routers"
-import { compileUrl, createUrl } from "./core"
+import { createUrl } from "./core"
 import { isSSR, joinPaths, removeLastCharFromString } from "./helpers"
 import { TRoute } from "../components/Router"
 import debug from "@cher-ami/debug"
+import { compile } from "path-to-regexp"
 
 const log = debug(`router:LangService`)
 
@@ -183,7 +184,7 @@ class LangService<TLang = any> {
       removeLastCharFromString(location.pathname, "/", true) === this.base
     ) {
       // prepare path and build URL
-      const newUrl = compileUrl(joinPaths([this.base, "/:lang"]), {
+      const newUrl = compile(joinPaths([this.base, "/:lang"]))({
         lang: this.browserLang.key,
       })
       log("redirect: to browser language >", { newUrl })
@@ -213,7 +214,7 @@ class LangService<TLang = any> {
       removeLastCharFromString(location.pathname, "/", true) === this.base
     ) {
       // prepare path & build new URL
-      const newUrl = compileUrl(joinPaths([this.base, "/:lang"]), {
+      const newUrl = compile(joinPaths([this.base, "/:lang"]))({
         lang: this.defaultLang.key,
       })
       log("redirect to default lang >", { newUrl })

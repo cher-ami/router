@@ -27,6 +27,9 @@ export async function render(
   scripts: TScriptsObj,
   isPrerender = false
 ): Promise<ReactElement> {
+
+  if (url === "/@vite-plugin-checker-runtime") return
+
   // prepare base & URL
   const base = process.env.VITE_APP_BASE || loadEnv("", process.cwd(), "").VITE_APP_BASE || '/'
   url = preventSlashes(`${isPrerender ? base : ""}${url}`)
@@ -41,7 +44,7 @@ export async function render(
 
 
   // Request static props
-  const ssrStaticProps = await requestStaticPropsFromRoute({ url, base, routes, langService })
+  const ssrStaticProps = await requestStaticPropsFromRoute({ url, base, routes, langService, id:"1-RSP" })
   const meta = ssrStaticProps?.props?.meta
 
   // Request Global data example-client
@@ -75,6 +78,7 @@ export async function render(
             langService={langService}
             staticLocation={url}
             initialStaticProps={ssrStaticProps}
+            id={1}
           >
             <GlobalDataContext.Provider value={globalData}>
             <App />
