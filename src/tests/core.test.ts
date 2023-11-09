@@ -39,6 +39,22 @@ describe("public", () => {
       expect(createUrl({ name: "ZooPage" }, base, routeList)).toBe("/hello/foo/zoo")
     })
 
+    it("should create URL properly if is base URL", () => {
+      const routes = [
+        { path: "/a", name: "a-page" },
+        {
+          path: "/b",
+          name: "b-page",
+          children: [
+            { path: "/c", name: "c-page" },
+            { path: "/d", name: "d-page" },
+          ],
+        },
+      ]
+      expect(createUrl("/a", "/foo/", routes)).toBe("/foo/a")
+      expect(createUrl("/d", "/foo/", routes)).toBe("/foo/d")
+    })
+
     it("should create URL with params and hash", () => {
       const base = "/custom-base/"
       const routes = [
