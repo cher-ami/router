@@ -61,8 +61,6 @@ export interface IRouterContext extends IRouterContextStackStates {
   routeIndex: number
   previousPageIsMount: boolean
   unmountPreviousPage: () => void
-  getPaused: () => boolean
-  setPaused: (value: boolean) => void
 }
 
 // -------------------------------------------------------------------------------- PREPARE / CONTEXT
@@ -87,8 +85,6 @@ export const RouterContext = createContext<IRouterContext>({
   previousPageIsMount: true,
   staticLocation: undefined,
   unmountPreviousPage: () => {},
-  getPaused: () => false,
-  setPaused: (value: boolean) => {},
 })
 RouterContext.displayName = "RouterContext"
 
@@ -247,20 +243,6 @@ function Router(props: {
     },
   )
 
-  /**
-   * Enable paused on Router instance
-   */
-  const _waitingUrl = useRef(null)
-  const _paused = useRef<boolean>(false)
-  const getPaused = () => _paused.current
-  const setPaused = (value: boolean) => {
-    _paused.current = value
-    if (!value && _waitingUrl.current) {
-      handleHistory(_waitingUrl.current)
-      _waitingUrl.current = null
-    }
-  }
-
   const currentRouteRef = useRef<TRoute>()
 
   /**
@@ -270,11 +252,6 @@ function Router(props: {
    */
 
   const handleHistory = async (url = ""): Promise<void> => {
-    if (_paused.current) {
-      _waitingUrl.current = url
-      return
-    }
-
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
@@ -434,8 +411,6 @@ function Router(props: {
         routeIndex,
         previousPageIsMount,
         unmountPreviousPage,
-        getPaused,
-        setPaused,
       }}
     />
   )
