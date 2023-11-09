@@ -10,7 +10,6 @@ export type TRouters = {
   /**
    * Global routes list
    */
-  //rootRoutes: TRoute[]
   routes: TRoute[]
   /**
    * Global browser history
@@ -51,7 +50,6 @@ export type TRouters = {
  */
 export const ROUTERS: TRouters = {
   base: undefined,
-  //rootRoutes: undefined,
   routes: undefined,
   history: undefined,
   staticLocation: undefined,

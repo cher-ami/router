@@ -46,13 +46,13 @@ export function App() {
 
 
       {/* NAV */}
-      {/*<nav>*/}
-      {/*  <Link to={{ name: EPages.HOME }}>Home</Link> |{" "}*/}
-      {/*  <Link to={{ name: EPages.ABOUT }}>About</Link> |{" "}*/}
-      {/*  <Link to={{ name: EPages.ARTICLE, params: { slug: "article-1" } }}>Article 1</Link> |{" "}*/}
-      {/*  <Link to={{ name: EPages.ARTICLE, params: { slug: "article-2" } }}>Article 2</Link> |{" "}*/}
-      {/*  <Link to={{ name: EPages.CONTACT,  queryParams: {foo: "bar", "zoo": "ok" }, hash: "yo" }}>Contact</Link>*/}
-      {/*</nav>*/}
+      <nav>
+        <Link to={{ name: EPages.HOME }}>Home</Link> |{" "}
+        <Link to={{ name: EPages.ABOUT }}>About</Link> |{" "}
+        <Link to={{ name: EPages.ARTICLE, params: { slug: "article-1" } }}>Article 1</Link> |{" "}
+        <Link to={{ name: EPages.ARTICLE, params: { slug: "article-2" } }}>Article 2</Link> |{" "}
+        <Link to={{ name: EPages.CONTACT,  queryParams: {foo: "bar", "zoo": "ok" }, hash: "yo" }}>Contact</Link>
+      </nav>
 
       {/* RENDER PAGES */}
       <Stack manageTransitions={crossedTransitions} />

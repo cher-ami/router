@@ -39,11 +39,6 @@ class LangService<TLang = any> {
   public showDefaultLangInUrl: boolean
 
   /**
-   * Current url need to display lang in URL
-   */
-  public curentUrlNeedToContainLang: boolean
-
-  /**
    * Base URL of the app
    */
   public base: string
@@ -82,7 +77,6 @@ class LangService<TLang = any> {
     this.currentLang = this.getLangFromString() || this.defaultLang
     this.browserLang = this.getBrowserLang(languages)
     this.showDefaultLangInUrl = showDefaultLangInUrl
-    this.curentUrlNeedToContainLang = this.needToContainLangInUrl()
   }
 
   /**
@@ -422,18 +416,6 @@ class LangService<TLang = any> {
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
     if (isSSR()) return
     forcePageReload ? window?.open(newUrl, "_self") : ROUTERS.history.push(newUrl)
-  }
-
-  /**
-   * Determine if current URL need to contain lang
-   * @param currentLangKey
-   * @protected
-   */
-  protected needToContainLangInUrl(currentLangKey = this.currentLang.key): boolean {
-    return (
-      (this.isDefaultLangKey(currentLangKey) && this.showDefaultLangInUrl) ||
-      !this.isDefaultLangKey(currentLangKey)
-    )
   }
 }
 
