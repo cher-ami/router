@@ -24,6 +24,7 @@ and [@cher-ami/debug](https://github.com/cher-ami/debug) as dependencies.
 
 - [example client](https://codesandbox.io/s/github/cher-ami/router/tree/main/examples/example-client)
 - [example ssr](https://codesandbox.io/s/github/cher-ami/router/tree/main/examples/example-ssr)
+- [example history block](https://codesandbox.io/p/sandbox/github/cher-ami/router/tree/main/examples/example-history-block?file=%2Fsrc%2FApp.tsx%3A18%2C33)
 
 ## Summary
 
