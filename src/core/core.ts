@@ -1,4 +1,4 @@
-import { ROUTERS } from "./ROUTERS"
+import { Routers } from "./Routers"
 import debug from "@cher-ami/debug"
 import { compile, match } from "path-to-regexp"
 import { TRoute } from "../components/Router"
@@ -31,21 +31,21 @@ export type TOpenRouteParams = {
  */
 export function createUrl(
   args: string | TOpenRouteParams,
-  base: string = ROUTERS.base,
-  allRoutes: TRoute[] = ROUTERS.routes,
-  langService = ROUTERS.langService,
+  base: string = Routers.base,
+  allRoutes: TRoute[] = Routers.routes,
+  langService = Routers.langService,
 ): string {
   if (!allRoutes) return
-  let finalURL: string
+  let urlToPush: string
 
   // STRING param
   if (typeof args === "string") {
-    finalURL = args as string
+    urlToPush = args as string
     if (!!langService) {
-      finalURL = addLangToUrl(finalURL)
+      urlToPush = addLangToUrl(urlToPush)
     }
-    finalURL = joinPaths([base === "/" ? "" : base, finalURL])
-    return finalURL
+    urlToPush = joinPaths([base === "/" ? "" : base, urlToPush])
+    return urlToPush
   }
 
   // OBJECT param, add lang to params if no exist
@@ -73,7 +73,7 @@ export function createUrl(
 
     return getUrlByRouteName(allRoutes, args, base) + queryParams + hash
 
-    // in other case return
+    // in other case return.
   } else {
     console.warn("createUrl param isn't valid. to use createUrl return.", args)
     return
@@ -96,7 +96,7 @@ export function getSubRouterBase(
 ): string {
   // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
   // /:lang is return as path, but we want to get no lang in returned base string
-  const addLang = ROUTERS.langService?.showLangInUrl() && addLangToUrl ? "/:lang" : ""
+  const addLang = Routers.langService?.showLangInUrl() && addLangToUrl ? "/:lang" : ""
   const pathAfterLang = path === "/:lang" ? getLangPath("/") : getLangPath(path)
   return joinPaths([base, addLang, pathAfterLang])
 }
@@ -114,7 +114,7 @@ export function getSubRouterRoutes(
   // case langService is init, and we don't want to show default lang in URL, and we are on default lang.
   // /:lang is return as path, but we want to search path with "/" instead
   const formattedPath =
-    !ROUTERS.langService?.showLangInUrl() && path === "/:lang" ? "/" : path
+    !Routers.langService?.showLangInUrl() && path === "/:lang" ? "/" : path
 
   return routes.find((route) => {
     return getLangPath(route.path) === getLangPath(formattedPath)
@@ -137,7 +137,7 @@ export function getPathByRouteName(
     if (route.name === name || route?.component?.displayName === name) {
       // specific case, we want to retrieve path of route with "/" route and langService is used,
       // we need to patch it with lang param
-      if (route.path === "/" && ROUTERS.langService) {
+      if (route.path === "/" && Routers.langService) {
         return "/:lang"
       } else {
         return route.path
@@ -159,7 +159,7 @@ export function getPathByRouteName(
  * @param args can be string or TOpenRouteParams object
  * @param history
  */
-export function openRoute(args: string | TOpenRouteParams, history = ROUTERS?.history) {
+export function openRoute(args: string | TOpenRouteParams, history = Routers?.history) {
   const url = typeof args === "string" ? args : createUrl(args)
   history?.push(url)
 }
@@ -404,7 +404,7 @@ export const extractQueryParamsAndHash = (
  * ]
  * @param routes
  */
-export function patchMissingRootRoute(routes: TRoute[] = ROUTERS.routes): TRoute[] {
+export function patchMissingRootRoute(routes: TRoute[] = Routers.routes): TRoute[] {
   if (!routes) {
     log("routes doesnt exist, return", routes)
     return
@@ -448,7 +448,7 @@ export function applyMiddlewaresToRoutes(
 
 /**
  * Format and return routes list
- * If is the first Router instance, register routes in 'ROUTERS' store.
+ * If is the first Router instance, register routes in 'Routers' store.
  * In other case, return current props.routes
  */
 export function formatRoutes(
@@ -498,7 +498,7 @@ export function getFullPathByPath(
   routes: TRoute[],
   path: string | { [x: string]: string },
   routeName: string,
-  lang: string = ROUTERS.langService?.currentLang.key || undefined,
+  lang: string = Routers.langService?.currentLang.key || undefined,
   basePath: string = null,
 ): string {
   let localPath: string[] = [basePath]
@@ -550,7 +550,7 @@ export function getFullPathByPath(
 export function getUrlByRouteName(
   pRoutes: TRoute[],
   pParams: TOpenRouteParams,
-  base: string,
+  base?: string,
 ): string {
   // need to wrap the function to be able to access the preserved "pRoutes" param
   // in local scope after recursion
@@ -603,7 +603,7 @@ export function getUrlByRouteName(
  */
 export function getLangPath(
   langPath: string | { [p: string]: string },
-  lang: string = ROUTERS.langService?.currentLang.key,
+  lang: string = Routers.langService?.currentLang.key,
 ) {
   let path
   if (typeof langPath === "string") {
@@ -639,8 +639,8 @@ export function getLangPath(
  */
 export function addLangToUrl(
   url: string,
-  lang: string = ROUTERS.langService?.currentLang.key,
-  enable = ROUTERS.langService?.showLangInUrl(),
+  lang: string = Routers.langService?.currentLang.key,
+  enable = Routers.langService?.showLangInUrl(),
 ): string {
   if (!enable) return url
   url = joinPaths([`/${lang}`, url === "/" ? "" : url])

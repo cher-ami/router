@@ -1,4 +1,4 @@
-import { ROUTERS } from "./ROUTERS"
+import { Routers } from "./Routers"
 import { compileUrl, createUrl } from "./core"
 import { isSSR, joinPaths, removeLastCharFromString } from "./helpers"
 import { TRoute } from "../components/Router"
@@ -97,7 +97,7 @@ class LangService<TLang = any> {
   public setLang(
     toLang: TLanguage<TLang>,
     forcePageReload = true,
-    currentRoute: TRoute = ROUTERS.currentRoute,
+    currentRoute: TRoute = Routers.currentRoute,
   ): void {
     if (toLang.key === this.currentLang.key) {
       log("setLang: This is the same language, exit.")
@@ -142,7 +142,6 @@ class LangService<TLang = any> {
     }
 
     // 3. if current lang is default lang, add /currentLang.key after base
-    //    else if (this.needToContainLangInUrl(toLang.key)) {
     else if (!this.showDefaultLangInUrl && this.isDefaultLangKey(this.currentLang.key)) {
       const newUrlWithoutBase = preparedNewUrl.substring(
         this.base.length,
@@ -415,7 +414,7 @@ class LangService<TLang = any> {
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
     if (isSSR()) return
-    forcePageReload ? window?.open(newUrl, "_self") : ROUTERS.history.push(newUrl)
+    forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl)
   }
 }
 

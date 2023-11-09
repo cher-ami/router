@@ -45,10 +45,10 @@ export type TRouters = {
 }
 
 /**
- * ROUTERS object allows to keep safe globales values between ROUTERS instances
+ * ROUTERS object allows to keep safe globales values between Routers instances
  * This object values do not depend of one single router
  */
-export const ROUTERS: TRouters = {
+export const Routers: TRouters = {
   base: undefined,
   routes: undefined,
   history: undefined,

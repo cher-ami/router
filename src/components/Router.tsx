@@ -12,7 +12,7 @@ import React, {
 } from "react"
 import { formatRoutes, TParams, TQueryParams } from "../core/core"
 import { getNotFoundRoute, getRouteFromUrl } from "../core/core"
-import { ROUTERS } from "../core/ROUTERS"
+import { Routers } from "../core/Routers"
 import LangService, { TLanguage } from "../core/LangService"
 import { staticPropsCache } from "../core/staticPropsCache"
 import { isSSR, removeLastCharFromString } from "../core/helpers"
@@ -115,7 +115,7 @@ function Router(props: {
 }): JSX.Element {
   /**
    * Check if is the first router or a sub-router
-   * If is the first router, reset ROUTERS store
+   * If is the first router, reset Routers store
    */
   const IS_CLIENT_OR_SERVER_ROOT_ROUTER = useMemo(() => {
     // base on supposition that:
@@ -124,17 +124,17 @@ function Router(props: {
     const isRootRouter = !!props.staticLocation || !!props.history
     log(props.id, "IS_CLIENT_OR_SERVER_ROOT_ROUTER", isRootRouter)
 
-    // reset ROUTERS store
+    // reset Routers store
     if (IS_SERVER && isRootRouter) {
-      ROUTERS.base = undefined
-      ROUTERS.routes = undefined
-      ROUTERS.history = undefined
-      ROUTERS.staticLocation = undefined
-      ROUTERS.routeCounter = 1
-      ROUTERS.isFirstRoute = true
-      ROUTERS.currentRoute = undefined
-      ROUTERS.langService = undefined
-      ROUTERS.staticPropsCache = {}
+      Routers.base = undefined
+      Routers.routes = undefined
+      Routers.history = undefined
+      Routers.staticLocation = undefined
+      Routers.routeCounter = 1
+      Routers.isFirstRoute = true
+      Routers.currentRoute = undefined
+      Routers.langService = undefined
+      Routers.staticPropsCache = {}
     }
     return isRootRouter
   }, [props.id, props.staticLocation, props.history])
@@ -142,19 +142,19 @@ function Router(props: {
   /**
    * 0. LangService
    * Check if langService props exist.
-   * If props exist, store langService instance in ROUTERS store.
+   * If props exist, store langService instance in Routers store.
    */
   const langService = useMemo(() => {
     if (IS_CLIENT_OR_SERVER_ROOT_ROUTER) {
-      ROUTERS.langService = props.langService
+      Routers.langService = props.langService
     }
-    return ROUTERS.langService
+    return Routers.langService
   }, [props.langService])
 
   /**
    * 1. routes
    * Format and return routes list
-   * If is the first Router instance, register routes in 'ROUTERS' store.
+   * If is the first Router instance, register routes in 'Routers' store.
    * In other case, return current props.routes
    *
    *  const { routes } = useRouter();
@@ -169,8 +169,8 @@ function Router(props: {
     )
 
     // register is Store if...
-    if (!ROUTERS.routes && props.routes) {
-      ROUTERS.routes = routesList
+    if (!Routers.routes && props.routes) {
+      Routers.routes = routesList
     }
 
     // return current instance routes list
@@ -180,38 +180,38 @@ function Router(props: {
   /**
    * 2. base
    * Format and return base URL
-   * Register base in 'ROUTERS' obj if is the first Router instance
+   * Register base in 'Routers' obj if is the first Router instance
    * In all case, return current props.base
    */
-  if (!ROUTERS.base) {
-    ROUTERS.base = props.base
+  if (!Routers.base) {
+    Routers.base = props.base
   }
-  const base = ROUTERS.base
+  const base = Routers.base
 
   /**
    * 3. history
-   * If is the first Router instance, register history in 'ROUTERS' store
+   * If is the first Router instance, register history in 'Routers' store
    * 'history' object need to be the same between each Router instance
    */
-  if (!ROUTERS.history && props.history) {
-    ROUTERS.history = props.history
+  if (!Routers.history && props.history) {
+    Routers.history = props.history
   }
-  const history = ROUTERS.history
+  const history = Routers.history
 
   /**
    * 4 static location
    * Is useful in SSR context
    */
   if (props.staticLocation) {
-    ROUTERS.staticLocation = props.staticLocation
+    Routers.staticLocation = props.staticLocation
   }
-  const staticLocation: string | undefined = ROUTERS.staticLocation
+  const staticLocation: string | undefined = Routers.staticLocation
 
   /**
    * 5. reset is fist route visited
    */
   if (IS_SERVER) {
-    ROUTERS.isFirstRoute = true
+    Routers.isFirstRoute = true
   }
 
   // -------------------------------------------------------------------------------- ROUTE CHANGE
@@ -334,7 +334,7 @@ function Router(props: {
     // CLIENT
     else {
       // CLIENT > FIRST ROUTE
-      if (ROUTERS.isFirstRoute) {
+      if (Routers.isFirstRoute) {
         if (props.initialStaticProps) {
           log(props.id, "firstRoute > isClient > assign initialStaticProps to newRoute props & set cache");
           Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
@@ -363,10 +363,10 @@ function Router(props: {
     // Final process: update context currentRoute from dispatch method \o/ !
     dispatch({ type: "update-current-route", value: newRoute })
 
-    // & register this new route as currentRoute in local and in ROUTERS store
+    // & register this new route as currentRoute in local and in Routers store
     currentRouteRef.current = newRoute
-    ROUTERS.currentRoute = newRoute
-    ROUTERS.isFirstRoute = false
+    Routers.currentRoute = newRoute
+    Routers.isFirstRoute = false
   }
 
   /**

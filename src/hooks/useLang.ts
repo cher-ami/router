@@ -1,7 +1,7 @@
 import LangService, { TLanguage } from "../core/LangService"
 import debug from "@cher-ami/debug"
 import React from "react"
-import { ROUTERS } from "../core/ROUTERS"
+import { Routers } from "../core/Routers"
 import { useHistory } from "../hooks/useHistory"
 const log = debug("router:useLang")
 
@@ -9,7 +9,7 @@ const log = debug("router:useLang")
  * useLang
  */
 export const useLang = (
-  langService: LangService = ROUTERS.langService,
+  langService: LangService = Routers.langService,
 ): [lang: TLanguage, setLang: (lang: TLanguage | string, force: boolean) => void] => {
   const [lang, setLang] = React.useState<TLanguage>(langService?.currentLang)
 

@@ -5,7 +5,7 @@
 import { vi, it, expect, describe } from "vitest"
 import React from "react"
 import { render, fireEvent } from "@testing-library/react"
-import { ROUTERS } from "../core/ROUTERS"
+import { Routers } from "../core/Routers"
 import LangService from "../core/LangService"
 import { TOpenRouteParams } from "../core/core"
 import { Link } from ".."
@@ -52,7 +52,7 @@ describe("Link", () => {
     expect(link.textContent).toBe("Foo")
   })
 
-  // Can't test base URL added on link because the base /master is store in "ROUTERS" object
+  // Can't test base URL added on link because the base /master is store in "Routers" object
   // and this one is used by Link > createUrl()
   it("sould add formatted URL to href attr if custom base is set", () => {
     // const { container } = render(<App base={"/master"} to={"/foo"} />);
@@ -83,7 +83,7 @@ describe("Link", () => {
   it("should return the right href URL", () => {
     const { container } = render(<App base={"/"} to={{ name: "FooPage" }} />)
     fireEvent.click(container.firstChild)
-    expect(ROUTERS.history.location.pathname).toBe("/foo")
+    expect(Routers.history.location.pathname).toBe("/foo")
   })
 
   it("should return the right href URL with param", () => {
@@ -91,13 +91,13 @@ describe("Link", () => {
       <App base={"/"} to={{ name: "BarPage", params: { id: "test" } }} />,
     )
     fireEvent.click(container.firstChild)
-    expect(ROUTERS.history.location.pathname).toBe("/bar/test")
+    expect(Routers.history.location.pathname).toBe("/bar/test")
   })
 
   it("should push in history on click", () => {
     const { container } = render(<App base={"/"} to={"/bar"} />)
     fireEvent.click(container.firstChild)
-    expect(ROUTERS.history.location.pathname).toBe("/bar")
-    expect(ROUTERS.history.action).toBe("PUSH")
+    expect(Routers.history.location.pathname).toBe("/bar")
+    expect(Routers.history.action).toBe("PUSH")
   })
 })
