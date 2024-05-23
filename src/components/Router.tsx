@@ -92,11 +92,6 @@ export const RouterContext = createContext<IRouterContext>({
 })
 RouterContext.displayName = "RouterContext"
 
-Router.defaultProps = {
-  base: "/",
-  id: 1,
-}
-
 // -------------------------------------------------------------------------------- COMPONENT
 
 /**
@@ -104,17 +99,24 @@ Router.defaultProps = {
  * @param props
  * @returns JSX.Element
  */
-function Router(props: {
-  children: ReactNode
-  routes: TRoute[]
-  base: string
-  history?: BrowserHistory | HashHistory | MemoryHistory | undefined
-  staticLocation?: string
-  middlewares?: ((routes: TRoute[]) => TRoute[])[]
-  langService?: LangService
-  id?: number | string
-  initialStaticProps?: { props: any; name: string; url: string }
-}): JSX.Element {
+function Router(
+  props: {
+    children: ReactNode
+    routes: TRoute[]
+    base: string
+    history?: BrowserHistory | HashHistory | MemoryHistory | undefined
+    staticLocation?: string
+    middlewares?: ((routes: TRoute[]) => TRoute[])[]
+    langService?: LangService
+    id?: number | string
+    initialStaticProps?: { props: any; name: string; url: string }
+  } = {
+    base: "/",
+    id: 1,
+    children: "",
+    routes: [],
+  },
+): JSX.Element {
   /**
    * Check if is the first router or a sub-router
    * If is the first router, reset Routers store
