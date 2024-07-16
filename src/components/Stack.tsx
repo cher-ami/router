@@ -78,7 +78,7 @@ function Stack(props: IProps): JSX.Element {
   ]
 
   return (
-    <div className={["Stack", props.className].filter((e) => e).join(" ")}>
+    <main className={["Stack", props.className].filter((e) => e).join(" ")}>
       {previousPageIsMount && PrevRoute?.component && (
         <PrevRoute.component
           ref={prevRef}
@@ -93,7 +93,7 @@ function Stack(props: IProps): JSX.Element {
           {...(CurrRoute.props || {})}
         />
       )}
-    </div>
+    </main>
   )
 }
 
