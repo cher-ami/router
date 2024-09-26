@@ -3,7 +3,8 @@
   "sandboxes": [
     "/examples/example-client",
     "/examples/example-ssr",
-    "/examples/example-history-block"
+    "/examples/example-history-block",
+    "/examples/example-hash-history"
   ],
   "node": "18"
 }
