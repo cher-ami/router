@@ -427,7 +427,7 @@ Router component creates a new router instance.
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
   the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md) \
-- **isHashHistory** `boolean` _(optional)_ default `false`. If you use `HashHistory`, you must set `isHashHistory` to `true`
+- **isHashHistory** `boolean` _(optional)_ default `false`. If you use `HashHistory`, you must set `isHashHistory` to `true`. ⚠️ Add it to sub-router too
 - **staticLocation** `string` _(optional)_ use static URL location matching instead of history
 - **middlewares** `[]` _(optional)_ add routes middleware function to patch each routes)
 - **id** `?number | string` _(optional)_ id of the router instance - default : `1`
