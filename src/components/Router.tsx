@@ -398,9 +398,10 @@ function Router(
         return
         // client
       } else if (history) {
-        let url = window.location.pathname + window.location.search + window.location.hash
+        let url =
+          history.location.pathname + history.location.search + history.location.hash
         if (props.isHashHistory) {
-          url = history.location.pathname + window.location.search
+          url = history.location.pathname + history.location.search
         }
         handleHistory(url)
 
