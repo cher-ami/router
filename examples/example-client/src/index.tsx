@@ -4,15 +4,19 @@ import "./index.css"
 import App from "./App"
 import { Router, LangService } from "@cher-ami/router"
 import { routesList } from "./routes"
-import { createBrowserHistory } from "history"
+import { createBrowserHistory, createHashHistory } from "history"
 
-const base = "/base/"
+const base = "/"
 type TLang = "en" | "fr" | "de"
+
+const isHashHistory = true
+const history = isHashHistory ? createHashHistory() : createBrowserHistory()
 
 const langService = new LangService<TLang>({
   languages: [{ key: "en" }, { key: "fr" }, { key: "de" }],
   showDefaultLangInUrl: false,
   base,
+  isHashHistory,
 })
 
 /**
@@ -22,8 +26,9 @@ const root = createRoot(document.getElementById("root"))
 
 root.render(
   <Router
-    history={createBrowserHistory()}
+    history={history}
     langService={langService}
+    isHashHistory={isHashHistory}
     routes={routesList}
     base={base}
   >

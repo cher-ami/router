@@ -54,6 +54,7 @@ export interface IRouterContext extends IRouterContextStackStates {
   base: string
   routes: TRoute[]
   history: BrowserHistory | HashHistory | MemoryHistory | undefined
+  isHashHistory: boolean
   staticLocation: string
   currentRoute: TRoute
   previousRoute: TRoute
@@ -84,6 +85,7 @@ export const RouterContext = createContext<IRouterContext>({
   currentRoute: undefined,
   previousRoute: undefined,
   routeIndex: 0,
+  isHashHistory: false,
   previousPageIsMount: true,
   staticLocation: undefined,
   unmountPreviousPage: () => {},
@@ -107,6 +109,7 @@ function Router(
     history?: BrowserHistory | HashHistory | MemoryHistory | undefined
     staticLocation?: string
     middlewares?: ((routes: TRoute[]) => TRoute[])[]
+    isHashHistory?: boolean
     langService?: LangService
     id?: number | string
     initialStaticProps?: { props: any; name: string; url: string }
@@ -134,6 +137,7 @@ function Router(
       Routers.routes = undefined
       Routers.history = undefined
       Routers.staticLocation = undefined
+      Routers.isHashHistory = false
       Routers.routeCounter = 1
       Routers.isFirstRoute = true
       Routers.currentRoute = undefined
@@ -201,6 +205,7 @@ function Router(
     Routers.history = props.history
   }
   const history = Routers.history
+  const isHashHistory = Routers.isHashHistory
 
   /**
    * 4 static location
@@ -281,6 +286,7 @@ function Router(
       pRoutes: routes,
       pBase: props.base,
       id: props.id,
+      isHashHistory: props.isHashHistory,
     })
 
     const notFoundRoute = getNotFoundRoute(props.routes)
@@ -359,7 +365,6 @@ function Router(
           log(props.id, "not firstRoute > isClient > request getStaticProps");
           await requestStaticPropsAndCacheIt()
         }
-
       }
     }
 
@@ -393,9 +398,12 @@ function Router(
         return
         // client
       } else if (history) {
-        handleHistory(
-          window.location.pathname + window.location.search + window.location.hash,
-        )
+        let url = window.location.pathname + window.location.search + window.location.hash
+        if (props.isHashHistory) {
+          url = history.location.pathname + window.location.search
+        }
+        handleHistory(url)
+
         return history?.listen(({ location }) => {
           handleHistory(location.pathname + location.search + location.hash)
         })
@@ -406,7 +414,7 @@ function Router(
       }
     }
     return historyListener()
-  }, [routes, history])
+  }, [routes, history, props.isHashHistory])
 
   // remove listener
   useEffect(() => {
@@ -429,6 +437,7 @@ function Router(
         base,
         langService,
         history,
+        isHashHistory,
         staticLocation,
         currentRoute,
         previousRoute,

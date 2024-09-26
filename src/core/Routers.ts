@@ -16,6 +16,10 @@ export type TRouters = {
    */
   history: HashHistory | MemoryHistory | BrowserHistory
   /**
+   * Is hash history ?
+   */
+  isHashHistory: boolean
+  /**
    * Global static location
    */
   staticLocation: string
@@ -52,6 +56,7 @@ export const Routers: TRouters = {
   base: undefined,
   routes: undefined,
   history: undefined,
+  isHashHistory: false,
   staticLocation: undefined,
   routeCounter: 1,
   isFirstRoute: true,
