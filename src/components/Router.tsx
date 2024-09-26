@@ -281,6 +281,7 @@ function Router(
       return
     }
 
+    console.log("url", url)
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
