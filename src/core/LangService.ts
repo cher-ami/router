@@ -25,6 +25,11 @@ class LangService<TLang = any> {
   public currentLang: TLanguage<TLang>
 
   /**
+   * Is history hash
+   */
+  public isHashHistory: boolean
+
+  /**
    * Default language object
    */
   public defaultLang: TLanguage<TLang>
@@ -61,15 +66,18 @@ class LangService<TLang = any> {
     showDefaultLangInUrl = true,
     base = "/",
     staticLocation,
+    isHashHistory,
   }: {
     languages: TLanguage<TLang>[]
     showDefaultLangInUrl?: boolean
     base?: string
     staticLocation?: string
+    isHashHistory?: boolean
   }) {
     if (languages?.length === 0) {
       throw new Error("ERROR, no language is set.")
     }
+    this.isHashHistory = isHashHistory
     this.languages = languages
     // remove extract / at the end, if exist
     this.base = removeLastCharFromString(base, "/", true)
@@ -389,7 +397,12 @@ class LangService<TLang = any> {
   public getLangFromString(
     pathname = this.staticLocation || window.location.pathname,
   ): TLanguage<TLang> {
+    if (this.isHashHistory) {
+      pathname = window.location.hash.replace("#", "")
+    }
+
     let pathnameWithoutBase = pathname.replace(this.base, "/")
+
     const firstPart = joinPaths([pathnameWithoutBase]).split("/")[1]
     return this.languages.find((language) => {
       return firstPart === language.key
@@ -415,7 +428,12 @@ class LangService<TLang = any> {
    */
   protected reloadOrRefresh(newUrl: string, forcePageReload = true): void {
     if (isSSR()) return
-    forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl)
+    if (this.isHashHistory) {
+      window.location.hash = newUrl
+      forcePageReload && window.location.reload()
+    } else {
+      forcePageReload ? window?.open(newUrl, "_self") : Routers.history.push(newUrl)
+    }
   }
 }
 

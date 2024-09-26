@@ -82,7 +82,6 @@ export function createUrl(
           const lang = args.params?.lang || langService?.currentLang.key
           const langPath = route._langPath?.[lang]
           const routePath = route.path
-          // console.log("---------",{ lang, langPath, routePath })
           if (route?.name === args.name || route.component?.displayName === args.name) {
             // prettier-ignore
             return (curBase + compile(langPath || routePath)(args.params)).replace(/(\/)+/g, "/")
@@ -100,7 +99,8 @@ export function createUrl(
     }
 
     const url = getUrlByRouteName(allRoutes, openRouteParams, base)
-    if (url) return url + queryParams + hash
+
+    return url + queryParams + hash
 
     // in other case return
   } else {
@@ -266,6 +266,7 @@ type TGetRouteFromUrl = {
   pParent?: TRoute
   id?: number | string
   urlWithoutHashAndQuery?: string
+  isHashHistory?: boolean
 }
 
 /**
@@ -278,13 +279,12 @@ export function getRouteFromUrl({
   pBase,
   pMatcher,
   id,
+  isHashHistory,
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return
-  // console.log(id,'getRouteFromUrl', pRoutes)
 
   // extract queryParams params and hash
-  const { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(pUrl)
-
+  let { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(pUrl)
   function next({
     pUrl,
     urlWithoutHashAndQuery,
@@ -303,7 +303,7 @@ export function getRouteFromUrl({
       )
       const matcher = match(currentRoutePath)(urlWithoutHashAndQuery)
       // prettier-ignore
-      log(id, `url "${urlWithoutHashAndQuery}" match path "${currentRoutePath}"?`,!!matcher);
+      log(id, `url "${urlWithoutHashAndQuery}" match path "${currentRoutePath}"?`, !!matcher);
 
       // if current route path match with the param url
       if (matcher) {
@@ -382,38 +382,47 @@ export function getNotFoundRoute(routes: TRoute[]): TRoute {
 
 export const extractQueryParamsAndHash = (
   url: string,
+  isHashHistory?: boolean,
 ): {
   queryParams: { [x: string]: string }
   hash: string
   urlWithoutHashAndQuery: string
 } => {
-  let queryParams = {}
-  let hash = null
-  const queryIndex = url.indexOf("?")
-  const hashIndex = url.indexOf("#")
-
-  if (queryIndex === -1 && hashIndex === -1) {
-    return { queryParams, hash, urlWithoutHashAndQuery: url }
+  const parseQueryParams = (queryString) => {
+    const params = {}
+    const queryPairs = queryString.split("&")
+    queryPairs.forEach((pair) => {
+      const [key, value] = pair.split("=")
+      if (key) params[decodeURIComponent(key)] = decodeURIComponent(value || "")
+    })
+    return params
   }
 
-  // Extract hash
-  if (hashIndex !== -1) {
-    hash = url.slice(hashIndex + 1)
+  let queryParams = ""
+  let hash = ""
+  if (isHashHistory) {
+    // For hash history, we extract the part after the `#/`
+    const hashIndex = url.indexOf("#/")
+    if (hashIndex !== -1) {
+      const hashPart = url.substring(hashIndex + 2) // Get everything after `#/`
+      const [rawPath, rawQueryParams] = hashPart.split("?")
+      url = rawPath || "/" // Default to `/` if no path
+      queryParams = rawQueryParams || ""
+    }
+  } else {
+    // For non-hash history, we extract the part before any `#` and process as a regular URL
+    const anchorIndex = url.indexOf("#")
+    const baseUrl = anchorIndex !== -1 ? url.substring(0, anchorIndex) : url // Remove the anchor if any
+    const queryIndex = baseUrl.indexOf("?")
+
+    if (queryIndex !== -1) {
+      url = baseUrl.substring(0, queryIndex).replace(window.location.origin, "") // Extract path
+      queryParams = baseUrl.substring(queryIndex + 1) // Get query parameters
+    } else {
+      url = baseUrl.replace(window.location.origin, "") // Only the path without query params
+    }
   }
-  // Extract queryParams parameters
-  if (queryIndex !== -1) {
-    const queryString = url.slice(
-      queryIndex + 1,
-      hashIndex !== -1 ? hashIndex : undefined,
-    )
-    const searchParams = new URLSearchParams(queryString)
-    searchParams.forEach((value, key) => (queryParams[key] = value))
-  }
-  // finally remove queryParams and hash from pathname
-  for (let e of ["?", "#"]) {
-    url = url.includes(e) ? url.split(e)[0] : url
-  }
-  return { queryParams, hash, urlWithoutHashAndQuery: url }
+  return { queryParams: parseQueryParams(queryParams), hash, urlWithoutHashAndQuery: url }
 }
 
 // ----------------------------------------------------------------------------- ROUTES
