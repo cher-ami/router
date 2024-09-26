@@ -9,8 +9,8 @@ import { createBrowserHistory, createHashHistory } from "history"
 const base = "/"
 type TLang = "en" | "fr" | "de"
 
-const history = createBrowserHistory()
-const isHashHistory = false
+const isHashHistory = true
+const history = isHashHistory ? createHashHistory() : createBrowserHistory()
 
 const langService = new LangService<TLang>({
   languages: [{ key: "en" }, { key: "fr" }, { key: "de" }],
@@ -19,7 +19,6 @@ const langService = new LangService<TLang>({
   isHashHistory,
 })
 
-// const history = createHashHistory()
 /**
  * Init Application
  */

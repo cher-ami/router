@@ -284,7 +284,11 @@ export function getRouteFromUrl({
   if (!pRoutes || pRoutes?.length === 0) return
 
   // extract queryParams params and hash
-  let { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(pUrl)
+  let { queryParams, hash, urlWithoutHashAndQuery } = extractQueryParamsAndHash(
+    pUrl,
+    isHashHistory,
+  )
+
   function next({
     pUrl,
     urlWithoutHashAndQuery,
@@ -401,15 +405,12 @@ export const extractQueryParamsAndHash = (
   let queryParams = {}
   let hash = null
   let newUrl = url
+
   if (isHashHistory) {
     // For hash history, we extract the part after the `#/`
-    const hashIndex = url.indexOf("#/")
-    if (hashIndex !== -1) {
-      const hashPart = url.substring(hashIndex + 2) // Get everything after `#/`
-      const [rawPath, rawQueryParams] = hashPart.split("?")
-      newUrl = rawPath || "/" // Default to `/` if no path
-      queryParams = rawQueryParams || ""
-    }
+    const [rawPath, rawQueryParams] = url.split("?")
+    newUrl = rawPath || "/" // Default to `/` if no path
+    queryParams = parseQueryParams(rawQueryParams || "")
   } else {
     // For non-hash history, we handle the path, query params, and hash separately
     const anchorIndex = url.indexOf("#")

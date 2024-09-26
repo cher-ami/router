@@ -105,4 +105,36 @@ describe("getRouteFromUrl", () => {
     expect(getRoute.queryParams).toEqual({})
     expect(getRoute.hash).toEqual(null)
   })
+
+  it("if history hash, it should get route from URL with params", () => {
+    const pRoutes = [
+      { path: "/a" },
+      {
+        path: "/b",
+        children: [{ path: "/c" }, { path: "/d" }],
+      },
+    ]
+    // only params
+    let getRoute = getRouteFromUrl({
+      pRoutes,
+      pUrl: "/b?foo=bar&lang=en",
+      isHashHistory: true,
+    })
+    expect(getRoute.queryParams).toEqual({ foo: "bar", lang: "en" })
+    expect(getRoute._fullPath).toEqual("/b")
+
+    // only hash
+    getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b/c", isHashHistory: true })
+    expect(getRoute._fullPath).toEqual("/b/c")
+    expect(getRoute.hash).toEqual(null)
+
+    // params and hash
+    getRoute = getRouteFromUrl({ pRoutes, pUrl: "/b/c?foo=bar", isHashHistory: true })
+    expect(getRoute.queryParams).toEqual({ foo: "bar" })
+
+    // not hash and params
+    getRoute = getRouteFromUrl({ pRoutes, pUrl: "/a", isHashHistory: true })
+    expect(getRoute.queryParams).toEqual({})
+    expect(getRoute.hash).toEqual(null)
+  })
 })

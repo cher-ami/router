@@ -365,7 +365,6 @@ function Router(
           log(props.id, "not firstRoute > isClient > request getStaticProps");
           await requestStaticPropsAndCacheIt()
         }
-
       }
     }
 
