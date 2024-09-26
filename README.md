@@ -426,7 +426,8 @@ Router component creates a new router instance.
   ,
   [MEMORY](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md#creatememoryhistory)
   . For more information, check
-  the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md)
+  the [history library documentation](https://github.com/ReactTraining/history/blob/master/docs/api-reference.md) \
+- **isHashHistory** `boolean` _(optional)_ default `false`. If you use `HashHistory`, you must set `isHashHistory` to `true`
 - **staticLocation** `string` _(optional)_ use static URL location matching instead of history
 - **middlewares** `[]` _(optional)_ add routes middleware function to patch each routes)
 - **id** `?number | string` _(optional)_ id of the router instance - default : `1`
@@ -713,6 +714,7 @@ Array of :
 ### LangService
 
 Manage `:lang` params from anywhere inside Router scope.
+Add `isHashHistory` to `true` if you are using `createHashHistory()` for the router.
 
 ```jsx
 import { LangService } from "@cher-ami/router"
@@ -730,9 +732,15 @@ const langService = new LangService({
   languages,
   showDefaultLangInUrl: true,
   base,
+  //isHashHistory: true // Optional, only if history is hashHistory
 })
 
-;<Router langService={langService} routes={routesList} base={base}>
+;<Router
+  langService={langService}
+  routes={routesList}
+  base={base}
+  //isHashHistory={true} // Optional, only if history is hashHistory
+>
   <App />
 </Router>
 ```
@@ -772,6 +780,7 @@ constructor object properties:
 - `languages`: list on language objects
 - `showDefaultLangInUrl`: choose if default language is visible in URL or not
 - `base`: set the same than router base
+- `isHashHistory`: set to true if hashHistory is used (optional, default false)
 
 ```jsx
 const langService = new LangService({
@@ -822,6 +831,15 @@ Return langService init state
 
 ```jsx
 const isInit = langService.isInit
+```
+
+#### isHashHistory `boolean`
+
+Return isHashHistory state.
+
+```jsx
+const isHashHistory = langService.isHashHistory
+// true | false
 ```
 
 #### setLang(toLang: TLanguage, forcePageReload = true) `void`
@@ -897,6 +915,12 @@ Final routes array used by the router be
 `HashHistory | MemoryHistory | BrowserHistory`
 
 Selected history mode. all history API is avaible from this one.
+
+#### Routers.isHashHistory
+
+`boolean`
+
+Return the value set on the Router component
 
 #### Routers.langService
 
