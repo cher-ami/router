@@ -8,6 +8,7 @@ import {
   Router,
   useRouter,
   useStack,
+  useLang,
 } from "@cher-ami/router"
 import { transitionsHelper } from "../helper/transitionsHelper"
 import { routesList } from "../routes"
@@ -16,6 +17,8 @@ const componentName: string = "AboutPage"
 
 const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null)
+  const [lang] = useLang()
+  const { currentRoute } = useRouter()
 
   useStack({
     componentName,
@@ -31,8 +34,15 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
 
   return (
     <div className={componentName} ref={rootRef}>
-      {componentName}
-
+      <h1>
+        {componentName} - {lang.key}
+      </h1>
+      Query Params :
+      <ul>
+        <li>Foo : {currentRoute.queryParams?.foo} </li>
+        <li>Zoo : {currentRoute.queryParams?.zoo} </li>
+      </ul>
+      Children :
       <Router
         id={4}
         base={getSubRouterBase(path, router.base, true)}

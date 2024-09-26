@@ -289,6 +289,8 @@ export function getRouteFromUrl({
     isHashHistory,
   )
 
+  console.log("======getRouteFromUrl  queryParams", queryParams)
+
   function next({
     pUrl,
     urlWithoutHashAndQuery,
@@ -402,6 +404,7 @@ export const extractQueryParamsAndHash = (
     return params
   }
 
+  console.log(" ===========> extractQueryParamsAndHash", url)
   let queryParams = {}
   let hash = null
   let newUrl = url

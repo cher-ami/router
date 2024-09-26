@@ -281,6 +281,8 @@ function Router(
       return
     }
 
+    console.log("========> handleHistory", url)
+
     const matchingRoute = getRouteFromUrl({
       pUrl: url,
       pRoutes: routes,
@@ -307,13 +309,17 @@ function Router(
     const newRoute: TRoute = matchingRoute || notFoundRoute
     if (!newRoute) return
 
+    console.log("===================== newRoute _fullUrl", newRoute._fullUrl)
+
     // prepare cache for new route data staticProps
     const cache = staticPropsCache()
 
     // check if new route data as been store in cache
     // the matcher will match even if the URL ends with a slash
     const fullUrl = removeLastCharFromString(newRoute._fullUrl, "/")
+    console.log("===================== newRoute fullUrl", fullUrl)
     const [urlWithoutHash] = fullUrl.split("#")
+    console.log("===================== newRoute urlWithoutHash", urlWithoutHash)
 
     /**
      * Request static props and cache it
@@ -347,6 +353,7 @@ function Router(
         if (props.initialStaticProps) {
           log(props.id, "firstRoute > isClient > assign initialStaticProps to newRoute props & set cache");
           Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
+          console.log("===================== urlWithoutHash", urlWithoutHash)
           cache.set(urlWithoutHash, newRoute.props ?? {});
         }
         else if (newRoute.getStaticProps) {
@@ -398,9 +405,10 @@ function Router(
         return
         // client
       } else if (history) {
-        let url = window.location.pathname + window.location.search + window.location.hash
+        let url =
+          history.location.pathname + history.location.search + history.location.hash
         if (props.isHashHistory) {
-          url = history.location.pathname + window.location.search
+          url = history.location.pathname + history.location.search
         }
         handleHistory(url)
 
