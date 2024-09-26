@@ -398,31 +398,39 @@ export const extractQueryParamsAndHash = (
     return params
   }
 
-  let queryParams = ""
-  let hash = ""
+  let queryParams = {}
+  let hash = null
+  let newUrl = url
   if (isHashHistory) {
     // For hash history, we extract the part after the `#/`
     const hashIndex = url.indexOf("#/")
     if (hashIndex !== -1) {
       const hashPart = url.substring(hashIndex + 2) // Get everything after `#/`
       const [rawPath, rawQueryParams] = hashPart.split("?")
-      url = rawPath || "/" // Default to `/` if no path
+      newUrl = rawPath || "/" // Default to `/` if no path
       queryParams = rawQueryParams || ""
     }
   } else {
-    // For non-hash history, we extract the part before any `#` and process as a regular URL
+    // For non-hash history, we handle the path, query params, and hash separately
     const anchorIndex = url.indexOf("#")
-    const baseUrl = anchorIndex !== -1 ? url.substring(0, anchorIndex) : url // Remove the anchor if any
+    const baseUrl = anchorIndex !== -1 ? url.substring(0, anchorIndex) : url // Extract everything before the `#`
     const queryIndex = baseUrl.indexOf("?")
 
     if (queryIndex !== -1) {
-      url = baseUrl.substring(0, queryIndex).replace(window.location.origin, "") // Extract path
-      queryParams = baseUrl.substring(queryIndex + 1) // Get query parameters
+      newUrl = baseUrl.substring(0, queryIndex).replace(window.location.origin, "") // Extract path
+      const rawQueryParams = baseUrl.substring(queryIndex + 1) // Get query string
+      queryParams = parseQueryParams(rawQueryParams) // Parse query string into object
     } else {
-      url = baseUrl.replace(window.location.origin, "") // Only the path without query params
+      newUrl = baseUrl.replace(window.location.origin, "") // Only the path if no query params
+    }
+
+    // Now extract the hash part (everything after the `#`)
+    if (anchorIndex !== -1) {
+      hash = url.substring(anchorIndex + 1) // Everything after `#`
     }
   }
-  return { queryParams: parseQueryParams(queryParams), hash, urlWithoutHashAndQuery: url }
+
+  return { queryParams, hash, urlWithoutHashAndQuery: newUrl }
 }
 
 // ----------------------------------------------------------------------------- ROUTES
