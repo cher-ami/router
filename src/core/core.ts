@@ -384,6 +384,20 @@ export function getNotFoundRoute(routes: TRoute[]): TRoute {
   )
 }
 
+/**
+ * Extract hash,path and query params from full url
+ * Ex :
+ *  url "/a/b#abc?foo=bar"
+ *  returns
+ *  {
+ *    hash : "abc"
+ *    urlWithoutHashAndQuery : "/a/b"
+ *    queryParams: {foo: "bar"}
+ *   }
+ * @param url
+ * @param isHashHistory
+ * @returns {} Query params, hash & path
+ */
 export const extractQueryParamsAndHash = (
   url: string,
   isHashHistory?: boolean,
@@ -392,24 +406,14 @@ export const extractQueryParamsAndHash = (
   hash: string
   urlWithoutHashAndQuery: string
 } => {
-  const parseQueryParams = (queryString) => {
-    const params = {}
-    const queryPairs = queryString.split("&")
-    queryPairs.forEach((pair) => {
-      const [key, value] = pair.split("=")
-      if (key) params[decodeURIComponent(key)] = decodeURIComponent(value || "")
-    })
-    return params
-  }
-
+  let path = ""
   let queryParams = {}
   let hash = null
-  let newUrl = url
 
   if (isHashHistory) {
     // For hash history, we extract the part after the `#/`
     const [rawPath, rawQueryParams] = url.split("?")
-    newUrl = rawPath || "/" // Default to `/` if no path
+    path = rawPath || "/" // Default to `/` if no path
     queryParams = parseQueryParams(rawQueryParams || "")
   } else {
     // For non-hash history, we handle the path, query params, and hash separately
@@ -418,11 +422,11 @@ export const extractQueryParamsAndHash = (
     const queryIndex = baseUrl.indexOf("?")
 
     if (queryIndex !== -1) {
-      newUrl = baseUrl.substring(0, queryIndex).replace(window.location.origin, "") // Extract path
+      path = baseUrl.substring(0, queryIndex) // Extract path
       const rawQueryParams = baseUrl.substring(queryIndex + 1) // Get query string
       queryParams = parseQueryParams(rawQueryParams) // Parse query string into object
     } else {
-      newUrl = baseUrl.replace(window.location.origin, "") // Only the path if no query params
+      path = baseUrl // Only the path if no query params
     }
 
     // Now extract the hash part (everything after the `#`)
@@ -431,7 +435,17 @@ export const extractQueryParamsAndHash = (
     }
   }
 
-  return { queryParams, hash, urlWithoutHashAndQuery: newUrl }
+  return { queryParams, hash, urlWithoutHashAndQuery: path }
+}
+
+const parseQueryParams = (queryString) => {
+  const params = {}
+  const queryPairs = queryString.split("&")
+  queryPairs.forEach((pair) => {
+    const [key, value] = pair.split("=")
+    if (key) params[decodeURIComponent(key)] = decodeURIComponent(value || "")
+  })
+  return params
 }
 
 // ----------------------------------------------------------------------------- ROUTES
