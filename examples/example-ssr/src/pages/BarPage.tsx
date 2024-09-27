@@ -1,11 +1,12 @@
 import React, { useRef } from "react"
-import { Link, useStack } from "@cher-ami/router"
+import { Link, useRouter, useStack } from "@cher-ami/router"
 import { transitionsHelper } from "~/helpers/transitionsHelper"
 import { EPages } from "~/routes"
 
 const componentName = "BarPage"
 function BarPage(props, handleRef) {
   const rootRef = useRef(null)
+  const { currentRoute } = useRouter()
 
   useStack({
     componentName,
@@ -17,7 +18,11 @@ function BarPage(props, handleRef) {
 
   return (
     <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
-      {componentName}
+      <h1>{componentName}</h1>
+      Query Params :
+      <ul>
+        <li>Hello : {currentRoute.queryParams?.hello} </li>
+      </ul>
       <br />
       <br />
       <Link to={{ name: EPages.FOO }}>link to FOO</Link>
