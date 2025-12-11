@@ -370,7 +370,23 @@ export function getRouteFromUrl({
     }
   }
 
-  return next({ pUrl, urlWithoutHashAndQuery, pRoutes, pBase, pMatcher, id })
+  let matchingRoute = next({ pUrl, urlWithoutHashAndQuery, pRoutes, pBase, pMatcher, id })
+  if (!matchingRoute) {
+    const notFoundRoute = getNotFoundRoute(pRoutes)
+    matchingRoute = {
+      ...notFoundRoute,
+      url: pUrl,
+      props: {
+        params: {},
+        queryParams,
+        hash,
+        ...(notFoundRoute?.props || {}),
+      },
+      _fullUrl: pUrl,
+    }
+  }
+
+  return matchingRoute
 }
 
 /**
@@ -380,7 +396,10 @@ export function getRouteFromUrl({
  */
 export function getNotFoundRoute(routes: TRoute[]): TRoute {
   return routes?.find(
-    (el) => el.path === "/:rest" || el.component?.displayName === "NotFoundPage",
+    (el) =>
+      el?.name?.toLowerCase() === "notfound" ||
+      el.path === "/:rest" ||
+      el.component?.displayName === "NotFoundPage",
   )
 }
 

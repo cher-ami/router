@@ -73,10 +73,20 @@ export const routes: TRoute[] = [
     path: "/contact",
     component: ContactPage,
     name: EPages.CONTACT,
+    getStaticProps: async () => {
+      const data = null
+
+      if (!data) {
+        return { notFound: true }
+      }
+    },
   },
   {
     path: "/:rest",
     component: NotFoundPage,
     name: EPages.NOT_FOUND,
+    getStaticProps: async (props) => {
+      return { notFound: true }
+    },
   },
 ]
