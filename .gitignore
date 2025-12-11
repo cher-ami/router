@@ -7,3 +7,5 @@ tsconfig.tsbuildinfo
 dist
 example-client/dist
 .parcel-cache
+.turbo
+.turbo/*

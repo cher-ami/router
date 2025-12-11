@@ -67,13 +67,14 @@ describe("getRouteFromUrl", () => {
     })
   })
 
-  it("should not get route from bad URL and return undefined", () => {
+  it("should not get route from bad URL and return not found", () => {
     const getRoute = getRouteFromUrl({
       pUrl: preventSlashes(`${base}/bar/foo/bar/`),
       pRoutes: routeList,
       pBase: base,
     })
-    expect(getRoute).toBeUndefined()
+    expect(getRoute).toBeDefined()
+    expect(getRoute.name).toBe("NotFoundPage")
   })
 
   it("should get route from URL with params and hash", () => {
