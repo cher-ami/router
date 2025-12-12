@@ -276,105 +276,109 @@ function Router(
    */
 
   const handleHistory = async (url = ""): Promise<void> => {
-    if (_paused.current) {
-      _waitingUrl.current = url
-      return
-    }
-
-    const matchingRoute = getRouteFromUrl({
-      pUrl: url,
-      pRoutes: routes,
-      pBase: props.base,
-      id: props.id,
-      isHashHistory: props.isHashHistory,
-    })
-
-    const notFoundRoute = getNotFoundRoute(props.routes)
-    if (!matchingRoute && !notFoundRoute) {
-      log(props.id, "matchingRoute not found & 'notFoundRoute' not found, return.")
-      return
-    }
-
-    const currentRouteUrl =
-      currentRouteRef.current?._context?.url ?? currentRouteRef.current?.url
-    const matchingRouteUrl = matchingRoute?._context?.url ?? matchingRoute?.url
-    if (currentRouteUrl === matchingRouteUrl) {
-      log(props.id, "this is the same route 'url', return.")
-      return
-    }
-
-    // new route
-    const newRoute: TRoute = matchingRoute || notFoundRoute
-    if (!newRoute) return
-
-    // prepare cache for new route data staticProps
-    const cache = staticPropsCache()
-
-    // check if new route data as been store in cache
-    // the matcher will match even if the URL ends with a slash
-    const fullUrl = removeLastCharFromString(newRoute._fullUrl, "/")
-    const [urlWithoutHash] = fullUrl.split("#")
-
-    /**
-     * Request static props and cache it
-     */
-    const requestStaticPropsAndCacheIt = async () => {
-      try {
-        const request = await newRoute.getStaticProps(
-          newRoute.props,
-          langService?.currentLang,
-        )
-        Object.assign(newRoute.props, request)
-        cache.set(urlWithoutHash, request)
-      } catch (e) {
-        console.error("requestStaticProps failed")
+    try {
+      if (_paused.current) {
+        _waitingUrl.current = url
+        return
       }
-    }
 
-    // SERVER (first route)
-    // prettier-ignore
-    if (IS_SERVER) {
-      if (props.initialStaticProps) {
-        log("firstRoute > isServer > assign initialStaticProps to newRoute props & set cache");
-        Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
+      const matchingRoute = getRouteFromUrl({
+        pUrl: url,
+        pRoutes: routes,
+        pBase: props.base,
+        id: props.id,
+        isHashHistory: props.isHashHistory,
+      })
+
+      const notFoundRoute = getNotFoundRoute(props.routes)
+      if (!matchingRoute && !notFoundRoute) {
+        log(props.id, "matchingRoute not found & 'notFoundRoute' not found, return.")
+        return
       }
-    }
+      const currentRouteUrl =
+        currentRouteRef.current?._context?.url ?? currentRouteRef.current?.url
+      const matchingRouteUrl = matchingRoute?._context?.url ?? matchingRoute?.url
+      if (currentRouteUrl === matchingRouteUrl) {
+        log(props.id, "this is the same route 'url', return.")
+        return
+      }
 
-    // CLIENT
-    else {
-      // CLIENT > FIRST ROUTE
-      if (Routers.isFirstRoute) {
+      // new route
+      const newRoute: TRoute = !matchingRouteUrl
+        ? notFoundRoute
+        : matchingRoute || notFoundRoute
+      if (!newRoute) return
+
+      // prepare cache for new route data staticProps
+      const cache = staticPropsCache()
+
+      // check if new route data as been store in cache
+      // the matcher will match even if the URL ends with a slash
+      const fullUrl = removeLastCharFromString(newRoute._fullUrl, "/")
+      const [urlWithoutHash] = fullUrl?.split("#")
+
+      /**
+       * Request static props and cache it
+       */
+      const requestStaticPropsAndCacheIt = async () => {
+        try {
+          const request = await newRoute.getStaticProps(
+            newRoute.props,
+            langService?.currentLang,
+          )
+          Object.assign(newRoute.props, request)
+          cache.set(urlWithoutHash, request)
+        } catch (e) {
+          console.error("requestStaticProps failed")
+        }
+      }
+
+      // SERVER (first route)
+      // prettier-ignore
+      if (IS_SERVER) {
         if (props.initialStaticProps) {
-          log(props.id, "firstRoute > isClient > assign initialStaticProps to newRoute props & set cache");
-          Object.assign(newRoute.props, props.initialStaticProps?.props ?? {});
-          cache.set(urlWithoutHash, newRoute.props ?? {});
-        }
-        else if (newRoute.getStaticProps) {
-          log(props.id, "firstRoute > isClient > request getStaticProps & set cache")
-          await requestStaticPropsAndCacheIt()
+          log("firstRoute > isServer > assign initialStaticProps to newRoute props & set cache");
+          Object.assign(newRoute?.props, props?.initialStaticProps?.props ?? {});
         }
       }
-      // CLIENT > NOT FIRST ROUTE
+      // CLIENT
       else {
-        const cacheData = cache.get(urlWithoutHash)
-        if (cacheData) {
-          log(props.id, "not firstRoute > isClient > assign dataFromCache to newRoute.props");
-          Object.assign(newRoute.props, cacheData);
+        // CLIENT > FIRST ROUTE
+        if (Routers.isFirstRoute) {
+          if (props?.initialStaticProps) {
+            log(props.id, "firstRoute > isClient > assign initialStaticProps to newRoute props & set cache");
+            Object.assign(newRoute?.props ?? {}, props?.initialStaticProps?.props ?? {});
+            cache.set(urlWithoutHash, newRoute?.props ?? {});
+          }
+          else if (newRoute?.getStaticProps) {
+            log(props.id, "firstRoute > isClient > request getStaticProps & set cache")
+            await requestStaticPropsAndCacheIt()
+          }
         }
-        else if (newRoute.getStaticProps) {
-          log(props.id, "not firstRoute > isClient > request getStaticProps");
-          await requestStaticPropsAndCacheIt()
+        // CLIENT > NOT FIRST ROUTE
+        else {
+          const cacheData = cache.get(urlWithoutHash)
+          if (cacheData) {
+            log(props.id, "not firstRoute > isClient > assign dataFromCache to newRoute.props");
+            Object.assign(newRoute?.props, cacheData);
+          }
+          else if (newRoute?.getStaticProps) {
+            log(props.id, "not firstRoute > isClient > request getStaticProps");
+            await requestStaticPropsAndCacheIt()
+          }
         }
       }
+
+      // Final process: update context currentRoute from dispatch method \o/ !
+      dispatch({ type: "update-current-route", value: newRoute })
+
+      // & register this new route as currentRoute in local and in Routers store
+      currentRouteRef.current = newRoute
+      Routers.currentRoute = newRoute
+      Routers.isFirstRoute = false
+    } catch (e) {
+      console.error("handleHistory failed", e)
     }
-
-    // Final process: update context currentRoute from dispatch method \o/ !
-    dispatch({ type: "update-current-route", value: newRoute })
-
-    // & register this new route as currentRoute in local and in Routers store
-    currentRouteRef.current = newRoute
-    Routers.currentRoute = newRoute
-    Routers.isFirstRoute = false
   }
 
   /**

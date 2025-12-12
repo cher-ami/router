@@ -38,13 +38,19 @@ const port = portFinderSync.getPort(3000)
       try {
         // Transforms the ESM source code to be usable in Node.js
         const { render } = await vite.ssrLoadModule(`src/server/index-server.tsx`)
-        // Get react-dom from the render method
 
+        // Get react-dom from the render method
         const dom = await render(req.originalUrl, devScripts, false)
+
         // Create stream to support Suspense API
         const stream = renderToPipeableStream(dom, {
           onShellReady() {
-            res.statusCode = 200
+            // If the page is a 404 page, set the status code to 404
+            if (dom?.props?.["data-is404"]) {
+              res.statusCode = 404
+            } else {
+              res.statusCode = 200
+            }
             res.setHeader("Content-type", "text/html")
             stream.pipe(res)
           },

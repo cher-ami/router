@@ -57,7 +57,7 @@ export async function render(
 
 
   return (
-    <html lang={langService.currentLang.key}>
+    <html lang={langService.currentLang.key} data-is404={ssrStaticProps?.props?.notFound ? "true" : null}>
       <head>
         <meta charSet="UTF-8" />
         <meta httpEquiv="x-ua-compatible" content="IE=Edge" />
@@ -81,7 +81,7 @@ export async function render(
             id={1}
           >
             <GlobalDataContext.Provider value={globalData}>
-            <App />
+            <App is404={ssrStaticProps?.props?.notFound}/>
             </GlobalDataContext.Provider>
           </Router>
         </div>

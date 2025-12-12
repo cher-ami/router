@@ -4,7 +4,7 @@ import { languages } from "~/languages"
 import { EPages } from "~/routes"
 import { useRouter } from "@cher-ami/router"
 
-export function App() {
+export function App({ is404 }: { is404: boolean }) {
   const { langService } = useRouter()
   const [lang, setLang] = useLang()
 
