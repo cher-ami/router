@@ -1,10 +1,13 @@
-import React, { useRef } from "react"
+import React, { ForwardedRef, useRef } from "react"
 import { useRouter, useStack } from "@cher-ami/router"
 import { transitionsHelper } from "../helpers/transitionsHelper"
 import { useLang } from "@cher-ami/router"
 
 const componentName = "FooPage"
-function FooPage(props, handleRef) {
+interface IProps {
+  todo: any
+}
+function FooPage(props: IProps, handleRef: ForwardedRef<any>) {
   const rootRef = useRef(null)
   const [lang] = useLang()
   const router = useRouter()
@@ -19,7 +22,7 @@ function FooPage(props, handleRef) {
 
   return (
     <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
-      {componentName} - langKey:{" "}
+      {componentName} - langKey: - <span>{props?.todo?.title}</span>
       {router.langService && router.langService.currentLang.key}
     </div>
   )

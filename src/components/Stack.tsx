@@ -77,6 +77,16 @@ function Stack(props: IProps): JSX.Element {
     currentRoute?._context ?? currentRoute,
   ]
 
+  // DEBUG: Log pour voir ce qui est utilisé pour rendre
+  if (CurrRoute) {
+    console.log(`[Stack] Rendering component:`, {
+      componentName: CurrRoute.component?.displayName || CurrRoute.name,
+      propsKeys: CurrRoute.props ? Object.keys(CurrRoute.props) : [],
+      hasTodo: CurrRoute.props?.todo ? "YES" : "NO",
+      todoValue: CurrRoute.props?.todo,
+    })
+  }
+
   return (
     <main className={["Stack", props.className].filter((e) => e).join(" ")}>
       {previousPageIsMount && PrevRoute?.component && (

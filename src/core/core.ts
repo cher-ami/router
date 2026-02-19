@@ -213,7 +213,13 @@ export async function requestStaticPropsFromRoute({
   langService?: LangService
   middlewares?: ((routes: TRoute[]) => TRoute[])[]
   id?: string | number
-}): Promise<{ props: any; name: string; url: string }> {
+}): Promise<{
+  props: any
+  name: string
+  url: string
+  parentProps?: any
+  parentName?: string
+}> {
   const currentRoute = getRouteFromUrl({
     pUrl: url,
     pBase: base,
@@ -235,22 +241,63 @@ export async function requestStaticPropsFromRoute({
   }
 
   // prepare returned obj
-  const SSR_STATIC_PROPS = {
+  const SSR_STATIC_PROPS: {
+    props: any
+    name: string
+    url: string
+    parentProps?: any
+    parentName?: string
+  } = {
     props: null,
     name: currentRoute.name,
     url,
   }
 
-  // await promise from getStaticProps
+  // Appeler getStaticProps du parent si il existe
+  let parentProps = null
+  if (
+    currentRoute._context &&
+    currentRoute._context !== currentRoute &&
+    currentRoute._context.getStaticProps
+  ) {
+    try {
+      console.log(
+        "================================================================",
+        "fetch parent",
+      )
+      parentProps = await currentRoute._context.getStaticProps(
+        currentRoute._context.props,
+        langService?.currentLang,
+      )
+      console.log(currentRoute._context.name.toUpperCase(), "todo", parentProps?.todo)
+      SSR_STATIC_PROPS.parentProps = parentProps
+      SSR_STATIC_PROPS.parentName =
+        currentRoute._context.name || currentRoute._context.component?.displayName
+    } catch (e) {
+      log("fetch getStatic Props data error for parent", e)
+    }
+  }
+
+  // await promise from getStaticProps de la route courante
   if (currentRoute?.getStaticProps) {
     try {
-      SSR_STATIC_PROPS.props = await currentRoute.getStaticProps(
+      console.log(
+        "================================================================",
+        "fetch children",
+      )
+      const childProps = await currentRoute.getStaticProps(
         currentRoute.props,
         langService?.currentLang,
       )
+      console.log(currentRoute.name, "todo", childProps?.todo)
+      // Fusionner les props : parent puis enfant (l'enfant écrase le parent)
+      SSR_STATIC_PROPS.props = { ...(parentProps || {}), ...(childProps || {}) }
     } catch (e) {
       log("fetch getStatic Props data error")
     }
+  } else {
+    // Si pas de getStaticProps pour l'enfant, utiliser les props du parent
+    SSR_STATIC_PROPS.props = parentProps || {}
   }
   return SSR_STATIC_PROPS
 }

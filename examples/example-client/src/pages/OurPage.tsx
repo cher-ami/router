@@ -1,12 +1,15 @@
 import React, { ForwardedRef, forwardRef, useRef } from "react"
-import { Link, useLocation, useStack } from "@cher-ami/router"
+import { Link, useLang, useLocation, useStack } from "@cher-ami/router"
 import { transitionsHelper } from "../helper/transitionsHelper"
 const componentName: string = "OurPage"
 
-interface IProps {}
+interface IProps {
+  todo: any
+}
 
 const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null)
+  const [lang] = useLang()
 
   const [location, setLocation] = useLocation()
 
@@ -20,7 +23,10 @@ const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
 
   return (
     <div className={componentName} ref={rootRef}>
-      {componentName}
+      {props.todo.title}
+      <h2>
+        {componentName} - {lang.key}
+      </h2>
       <br />
       {/* <button
         children={`navigate to FooPage`}
