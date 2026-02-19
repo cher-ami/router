@@ -253,7 +253,7 @@ export async function requestStaticPropsFromRoute({
     url,
   }
 
-  // Appeler getStaticProps du parent si il existe
+  // Call parent route's getStaticProps if exists
   let parentProps = null
   if (
     currentRoute._context &&
@@ -273,20 +273,20 @@ export async function requestStaticPropsFromRoute({
     }
   }
 
-  // await promise from getStaticProps de la route courante
+  // await promise from getStaticProps of current route
   if (currentRoute?.getStaticProps) {
     try {
       const childProps = await currentRoute.getStaticProps(
         currentRoute.props,
         langService?.currentLang,
       )
-      // Fusionner les props : parent puis enfant (l'enfant écrase le parent)
+      // Merge props: parent first, then child (child overwrites parent)
       SSR_STATIC_PROPS.props = { ...(parentProps || {}), ...(childProps || {}) }
     } catch (e) {
       log("fetch getStatic Props data error")
     }
   } else {
-    // Si pas de getStaticProps pour l'enfant, utiliser les props du parent
+    // If no getStaticProps for child, use parent props
     SSR_STATIC_PROPS.props = parentProps || {}
   }
   return SSR_STATIC_PROPS
