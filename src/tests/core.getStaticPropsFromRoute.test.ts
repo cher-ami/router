@@ -13,10 +13,31 @@ describe("getStaticPropsFromRoute", () => {
       base: "/",
       routes: routeList,
     })
+
     expect(ssrStaticProps).toEqual({
       props: { data: {} },
       name: "HelloPage",
+      parentProps: { data: {} },
+      parentName: "HelloPage",
       url: "/hello",
+    })
+  })
+})
+
+describe("getStaticPropsFromRoute", () => {
+  it("should return promise result of staticProps request", async () => {
+    const ssrStaticProps = await requestStaticPropsFromRoute({
+      url: "/hello/bar",
+      base: "/",
+      routes: routeList,
+    })
+
+    expect(ssrStaticProps).toEqual({
+      props: { data: {} },
+      name: "BarPage",
+      parentProps: { data: {} },
+      parentName: "HelloPage",
+      url: "/hello/bar",
     })
   })
 })
