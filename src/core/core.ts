@@ -261,15 +261,10 @@ export async function requestStaticPropsFromRoute({
     currentRoute._context.getStaticProps
   ) {
     try {
-      console.log(
-        "================================================================",
-        "fetch parent",
-      )
       parentProps = await currentRoute._context.getStaticProps(
         currentRoute._context.props,
         langService?.currentLang,
       )
-      console.log(currentRoute._context.name.toUpperCase(), "todo", parentProps?.todo)
       SSR_STATIC_PROPS.parentProps = parentProps
       SSR_STATIC_PROPS.parentName =
         currentRoute._context.name || currentRoute._context.component?.displayName
@@ -281,15 +276,10 @@ export async function requestStaticPropsFromRoute({
   // await promise from getStaticProps de la route courante
   if (currentRoute?.getStaticProps) {
     try {
-      console.log(
-        "================================================================",
-        "fetch children",
-      )
       const childProps = await currentRoute.getStaticProps(
         currentRoute.props,
         langService?.currentLang,
       )
-      console.log(currentRoute.name, "todo", childProps?.todo)
       // Fusionner les props : parent puis enfant (l'enfant écrase le parent)
       SSR_STATIC_PROPS.props = { ...(parentProps || {}), ...(childProps || {}) }
     } catch (e) {
