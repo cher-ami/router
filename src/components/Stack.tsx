@@ -29,6 +29,7 @@ function Stack(props: IProps): JSX.Element {
     previousRoute,
     unmountPreviousPage,
     previousPageIsMount,
+    isSubRouter,
   } = useRouter() as IRouterContext
 
   const router = useRouter()
@@ -79,8 +80,9 @@ function Stack(props: IProps): JSX.Element {
     currentRoute?._context ?? currentRoute,
   ]
 
+  const Wrapper = isSubRouter ? "div" : "main"
   return (
-    <main className={["Stack", props.className].filter((e) => e).join(" ")}>
+    <Wrapper className={["Stack", props.className].filter((e) => e).join(" ")}>
       {previousPageIsMount && PrevRoute?.component && (
         <PrevRoute.component
           ref={prevRef}
@@ -95,7 +97,7 @@ function Stack(props: IProps): JSX.Element {
           {...(CurrRoute.props || {})}
         />
       )}
-    </main>
+    </Wrapper>
   )
 }
 

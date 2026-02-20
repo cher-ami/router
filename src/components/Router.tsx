@@ -64,6 +64,8 @@ export interface IRouterContext extends IRouterContextStackStates {
   unmountPreviousPage: () => void
   getPaused: () => boolean
   setPaused: (value: boolean) => void
+  /** True when this Router is nested inside another Router (id > 1) */
+  isSubRouter?: boolean
 }
 
 // -------------------------------------------------------------------------------- PREPARE / CONTEXT
@@ -91,6 +93,7 @@ export const RouterContext = createContext<IRouterContext>({
   unmountPreviousPage: () => {},
   getPaused: () => false,
   setPaused: (value: boolean) => {},
+  isSubRouter: false,
 })
 RouterContext.displayName = "RouterContext"
 
@@ -254,8 +257,17 @@ function Router(
 
   // -------------------------------------------------------------------------------- ROUTE CHANGE
 
+  const defaultReducerState = {
+    currentRoute: undefined as TRoute,
+    previousRoute: undefined as TRoute,
+    previousPageIsMount: false,
+    routeIndex: 0,
+  }
+
   /**
-   * States list muted when history change
+   * States list muted when history change.
+   * On client with initialStaticProps (hydration), init state from SSR route so first paint
+   * matches server HTML and avoids "Did not expect server HTML to contain a <div> in <main>" hydration mismatch.
    */
   const [reducerState, dispatch] = useReducer(
     (
@@ -276,10 +288,53 @@ function Router(
       }
     },
     {
-      currentRoute: undefined,
-      previousRoute: undefined,
-      previousPageIsMount: false,
-      routeIndex: 0,
+      routes,
+      history: props.history,
+      initialStaticProps: props.initialStaticProps,
+      base: props.base ?? "/",
+      id: props.id,
+      isHashHistory: props.isHashHistory,
+    },
+    (initArg: {
+      routes: TRoute[]
+      history: BrowserHistory | HashHistory | MemoryHistory | undefined
+      initialStaticProps?: typeof props.initialStaticProps
+      base: string
+      id?: number | string
+      isHashHistory?: boolean
+    }) => {
+      if (typeof window === "undefined") return defaultReducerState
+      if (!initArg?.initialStaticProps || !initArg?.history || initArg?.id !== 1)
+        return defaultReducerState
+      let url =
+        initArg.history.location.pathname +
+        initArg.history.location.search +
+        initArg.history.location.hash
+      if (initArg.isHashHistory) {
+        url = initArg.history.location.pathname + initArg.history.location.search
+      }
+      const matchingRoute = getRouteFromUrl({
+        pUrl: url,
+        pRoutes: initArg.routes,
+        pBase: initArg.base,
+        id: initArg.id,
+      })
+      if (!matchingRoute) return defaultReducerState
+      Object.assign(matchingRoute?.props ?? {}, initArg.initialStaticProps?.props ?? {})
+      if (
+        initArg.initialStaticProps?.parentProps &&
+        matchingRoute._context &&
+        matchingRoute._context !== matchingRoute
+      ) {
+        Object.assign(
+          matchingRoute._context.props || {},
+          initArg.initialStaticProps.parentProps,
+        )
+      }
+      return {
+        ...defaultReducerState,
+        currentRoute: matchingRoute,
+      }
     },
   )
 
@@ -574,7 +629,19 @@ function Router(
         if (props.isHashHistory) {
           url = history.location.pathname + history.location.search
         }
-        handleHistory(url)
+        // When state was initialized from initialStaticProps (hydration), skip initial handleHistory to avoid duplicate dispatch and keep DOM in sync with server.
+        const hydratedWithInitialRoute =
+          typeof window !== "undefined" &&
+          props.initialStaticProps &&
+          props.id === 1 &&
+          reducerState.currentRoute
+        if (hydratedWithInitialRoute) {
+          currentRouteRef.current = reducerState.currentRoute
+          Routers.currentRoute = reducerState.currentRoute
+          Routers.isFirstRoute = false
+        } else {
+          handleHistory(url)
+        }
 
         return history?.listen(({ location }) => {
           handleHistory(location.pathname + location.search + location.hash)
@@ -696,6 +763,7 @@ function Router(
         unmountPreviousPage,
         getPaused,
         setPaused,
+        isSubRouter: props.id !== 1 && props.id !== undefined,
       }}
     />
   )
