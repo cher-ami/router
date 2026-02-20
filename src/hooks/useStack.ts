@@ -46,21 +46,17 @@ export const useStack = ({
     isReady && deferredPromise.resolve()
   }, [isReady])
 
-  useImperativeHandle(
-    handleRef,
-    () => {
-      // Objects properties will be used by Stack
-      const handleRouteCallback: IRouteStack = {
-        componentName,
-        playIn,
-        playOut,
-        isReady,
-        isReadyPromise: () => deferredPromise.promise,
-        $element: rootRef.current,
-      }
+  useImperativeHandle(handleRef, () => {
+    // Objects properties will be used by Stack
+    const handleRouteCallback: IRouteStack = {
+      componentName,
+      playIn,
+      playOut,
+      isReady,
+      isReadyPromise: () => deferredPromise.promise,
+      $element: rootRef.current,
+    }
 
-      return handleRouteCallback
-    },
-    [deferredPromise],
-  )
+    return handleRouteCallback
+  }, [deferredPromise])
 }

@@ -9,5 +9,9 @@ export const ScriptTag = ({ tag, attr }: TScript): JSX.Element => {
 }
 
 export const CherScripts = ({ scripts }: { scripts: TScript[] }): JSX.Element => (
-  <>{scripts?.map((script, i) => <ScriptTag key={i} {...script} />)}</>
+  <>
+    {scripts?.map((script, i) => (
+      <ScriptTag key={i} {...script} />
+    ))}
+  </>
 )

@@ -14,8 +14,10 @@ import { transitionsHelper } from "../helper/transitionsHelper"
 import { routesList } from "../routes"
 
 const componentName: string = "AboutPage"
-
-const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
+interface IProps {
+  todo: any
+}
+const AboutPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null)
   const [lang] = useLang()
   const { currentRoute } = useRouter()
@@ -35,7 +37,7 @@ const AboutPage = forwardRef((props, handleRef: ForwardedRef<any>) => {
   return (
     <div className={componentName} ref={rootRef}>
       <h1>
-        {componentName} - {lang.key}
+        {componentName} - {lang.key} - {props?.todo?.title}
       </h1>
       Query Params :
       <ul>

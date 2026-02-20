@@ -8,7 +8,6 @@ function HomePage(props, handleRef) {
   const rootRef = useRef(null)
   const [n, setN] = useState(0)
   const globalData = useContext(GlobalDataContext)
-  //    console.log("globalData",globalData)
   const [lang] = useLang()
 
   useEffect(() => {}, [])

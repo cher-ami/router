@@ -1,4 +1,4 @@
-import React, { useRef } from "react"
+import React, { ForwardedRef, useEffect, useRef } from "react"
 import {
   useStack,
   getSubRouterBase,
@@ -15,9 +15,11 @@ import { useLang } from "@cher-ami/router"
 import { EPages } from "../routes"
 
 const componentName = "AboutPage"
-const log = debug(`front:${componentName}`)
 
-function AboutPage(props, handleRef) {
+interface IProps {
+  todo: any
+}
+function AboutPage(props: IProps, handleRef: ForwardedRef<any>) {
   const rootRef = useRef(null)
   const [lang] = useLang()
 
@@ -37,7 +39,7 @@ function AboutPage(props, handleRef) {
 
   return (
     <div className={componentName} ref={rootRef}>
-      {componentName} {lang.key}
+      {componentName} {lang.key} - {props?.todo?.title}
       <br />
       <Link to={{ name: EPages.FOO }}>Foo</Link>
       <br />

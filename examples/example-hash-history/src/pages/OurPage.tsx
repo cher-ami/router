@@ -3,7 +3,9 @@ import { Link, useLang, useLocation, useStack } from "@cher-ami/router"
 import { transitionsHelper } from "../helper/transitionsHelper"
 const componentName: string = "OurPage"
 
-interface IProps {}
+interface IProps {
+  todo: any
+}
 
 const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
   const rootRef = useRef(null)
@@ -21,6 +23,7 @@ const OurPage = forwardRef((props: IProps, handleRef: ForwardedRef<any>) => {
 
   return (
     <div className={componentName} ref={rootRef}>
+      {props.todo.title}
       <h2>
         {componentName} - {lang.key}
       </h2>

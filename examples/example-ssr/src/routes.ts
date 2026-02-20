@@ -33,9 +33,9 @@ export const routes: TRoute[] = [
     component: AboutPage,
     name: EPages.ABOUT,
     getStaticProps: async () => {
-      const res = await fetch("https://jsonplaceholder.typicode.com/todos")
+      const res = await fetch("https://jsonplaceholder.typicode.com/todos/10")
       const todo = await res.json()
-      return { todo }
+      return { todo: todo }
     },
     children: [
       {
@@ -43,7 +43,7 @@ export const routes: TRoute[] = [
         component: FooPage,
         name: EPages.FOO,
         getStaticProps: async () => {
-          const res = await fetch("https://jsonplaceholder.typicode.com/todos/1")
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/2")
           const todo = await res.json()
           return { todo }
         },
@@ -52,6 +52,11 @@ export const routes: TRoute[] = [
         path: "/bar",
         component: BarPage,
         name: EPages.BAR,
+        getStaticProps: async () => {
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/2")
+          const todo = await res.json()
+          return { todo }
+        },
       },
     ],
   },

@@ -112,7 +112,13 @@ function Router(
     isHashHistory?: boolean
     langService?: LangService
     id?: number | string
-    initialStaticProps?: { props: any; name: string; url: string }
+    initialStaticProps?: {
+      props: any
+      name: string
+      url: string
+      parentProps?: any
+      parentName?: string
+    }
   } = {
     base: "/",
     id: 1,
@@ -319,17 +325,90 @@ function Router(
 
       /**
        * Request static props and cache it
+       * Also calls parent route's getStaticProps if exists
+       * For sub-routers, tries to get parent props from parent router's currentRoute
        */
       const requestStaticPropsAndCacheIt = async () => {
         try {
-          const request = await newRoute.getStaticProps(
-            newRoute.props,
-            langService?.currentLang,
-          )
-          Object.assign(newRoute.props, request)
-          cache.set(urlWithoutHash, request)
+          let mergedProps = {}
+
+          // For sub-routers, use Routers.currentRoute._context to get parent props
+          if (
+            !IS_CLIENT_OR_SERVER_ROOT_ROUTER &&
+            Routers.currentRoute?._context &&
+            Routers.currentRoute._context !== Routers.currentRoute
+          ) {
+            // This is a sub-router, get parent props from parent router
+            const parentRouteFromParentRouter = Routers.currentRoute._context
+
+            // If parent already has props (from initialStaticProps), use them directly
+            const parentPropsFromParentRouter = parentRouteFromParentRouter.props
+            if (parentPropsFromParentRouter) {
+              const parentPropsKeys = Object.keys(parentPropsFromParentRouter)
+              const realParentProps = {}
+              parentPropsKeys.forEach((key) => {
+                if (!["params", "queryParams", "hash"].includes(key)) {
+                  realParentProps[key] = parentPropsFromParentRouter[key]
+                }
+              })
+              if (Object.keys(realParentProps).length > 0) {
+                mergedProps = { ...mergedProps, ...realParentProps }
+              }
+            }
+
+            // Also call parent's getStaticProps if exists (to ensure we have latest data)
+            if (parentRouteFromParentRouter.getStaticProps) {
+              try {
+                const parentProps = await parentRouteFromParentRouter.getStaticProps(
+                  parentRouteFromParentRouter.props,
+                  langService?.currentLang,
+                )
+                if (parentProps) {
+                  mergedProps = { ...mergedProps, ...parentProps }
+                }
+              } catch (e) {
+                console.error(
+                  `[Router ${props.id}] requestStaticProps failed for parent`,
+                  e,
+                )
+              }
+            }
+          }
+          // For root router, use newRoute._context
+          else if (
+            newRoute._context &&
+            newRoute._context !== newRoute &&
+            newRoute._context.getStaticProps
+          ) {
+            try {
+              const parentProps = await newRoute._context.getStaticProps(
+                newRoute._context.props,
+                langService?.currentLang,
+              )
+              if (parentProps) {
+                mergedProps = { ...mergedProps, ...parentProps }
+                Object.assign(newRoute._context.props || {}, parentProps)
+              }
+            } catch (e) {
+              console.error("requestStaticProps failed for parent", e)
+            }
+          }
+
+          // Call getStaticProps of current route
+          if (newRoute.getStaticProps) {
+            const childProps = await newRoute.getStaticProps(
+              newRoute.props,
+              langService?.currentLang,
+            )
+            if (childProps) {
+              mergedProps = { ...mergedProps, ...childProps }
+            }
+          }
+
+          Object.assign(newRoute.props || {}, mergedProps)
+          cache.set(urlWithoutHash, mergedProps)
         } catch (e) {
-          console.error("requestStaticProps failed")
+          console.error("requestStaticProps failed", e)
         }
       }
 
@@ -338,7 +417,17 @@ function Router(
       if (IS_SERVER) {
         if (props.initialStaticProps) {
           log("firstRoute > isServer > assign initialStaticProps to newRoute props & set cache");
-          Object.assign(newRoute?.props, props?.initialStaticProps?.props ?? {});
+          // Assign merged props to current route
+          Object.assign(newRoute?.props || {}, props?.initialStaticProps?.props ?? {});
+          // Assign parent props to parent if they exist
+          if (props.initialStaticProps?.parentProps && newRoute._context && newRoute._context !== newRoute) {
+            Object.assign(newRoute._context.props || {}, props.initialStaticProps.parentProps);
+            log("firstRoute > isServer > assigned parent props to _context:", newRoute._context.name, props.initialStaticProps.parentProps);
+          }
+        }
+        // For sub-routers, call requestStaticPropsAndCacheIt even without initialStaticProps
+        else if (!IS_CLIENT_OR_SERVER_ROOT_ROUTER && newRoute?.getStaticProps) {
+          await requestStaticPropsAndCacheIt()
         }
       }
       // CLIENT
@@ -347,13 +436,27 @@ function Router(
         if (Routers.isFirstRoute) {
           if (props?.initialStaticProps) {
             log(props.id, "firstRoute > isClient > assign initialStaticProps to newRoute props & set cache");
+            // Assign merged props to current route
             Object.assign(newRoute?.props ?? {}, props?.initialStaticProps?.props ?? {});
+            // Assign parent props to parent if they exist
+            if (props.initialStaticProps?.parentProps && newRoute._context && newRoute._context !== newRoute) {
+              Object.assign(newRoute._context.props || {}, props.initialStaticProps.parentProps);
+              log(props.id, "firstRoute > isClient > assigned parent props to _context:", newRoute._context.name, props.initialStaticProps.parentProps);
+            }
             cache.set(urlWithoutHash, newRoute?.props ?? {});
+          }
+          // For sub-routers, call requestStaticPropsAndCacheIt even without initialStaticProps
+          else if (!IS_CLIENT_OR_SERVER_ROOT_ROUTER && newRoute?.getStaticProps) {
+            await requestStaticPropsAndCacheIt()
           }
           else if (newRoute?.getStaticProps) {
             log(props.id, "firstRoute > isClient > request getStaticProps & set cache")
             await requestStaticPropsAndCacheIt()
           }
+        }
+        // For sub-routers that are not in isFirstRoute, also call requestStaticPropsAndCacheIt
+        else if (!IS_CLIENT_OR_SERVER_ROOT_ROUTER && newRoute?.getStaticProps) {
+          await requestStaticPropsAndCacheIt()
         }
         // CLIENT > NOT FIRST ROUTE
         else {
