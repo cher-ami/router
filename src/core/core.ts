@@ -151,6 +151,66 @@ export function getSubRouterRoutes(
 }
 
 /**
+ * Get sub router static location (relative URL for SSR)
+ * Calculates the relative URL path for a sub-router based on the full URL and sub-router base
+ * Uses path-to-regexp to handle route parameters like :lang
+ * @param fullUrl The full URL from parent router's staticLocation
+ * @param subRouterBase The base URL of the sub-router (may contain params like :lang)
+ * @returns The relative URL path for the sub-router, or undefined if not applicable
+ */
+export function getSubRouterStaticLocation(
+  fullUrl: string | undefined,
+  subRouterBase: string,
+): string | undefined {
+  if (!fullUrl) return undefined
+
+  // Extract path without hash and query params for matching
+  const { urlWithoutHashAndQuery, queryParams, hash } = extractQueryParamsAndHash(fullUrl)
+
+  // Normalize the base path (remove trailing slash for matching)
+  const normalizedBase = removeLastCharFromString(subRouterBase, "/")
+
+  // Use path-to-regexp with a wildcard to capture the remaining path
+  // The pattern ":remaining*" will capture everything after the base
+  const patternWithWildcard = normalizedBase + "/:remaining*"
+  const wildcardMatcher = match(patternWithWildcard, { end: false })
+  const wildcardMatch = wildcardMatcher(urlWithoutHashAndQuery)
+
+  let remainingPath = "/"
+
+  if (wildcardMatch && wildcardMatch.params) {
+    // Reconstruct the remaining path from the captured params
+    const remaining = (wildcardMatch.params as any).remaining
+    if (Array.isArray(remaining) && remaining.length > 0) {
+      remainingPath = "/" + remaining.join("/")
+    } else if (typeof remaining === "string" && remaining) {
+      remainingPath = "/" + remaining
+    }
+  } else {
+    // Check if URL exactly matches the base (no additional path)
+    const exactMatcher = match(normalizedBase, { end: true })
+    if (exactMatcher(urlWithoutHashAndQuery)) {
+      remainingPath = "/"
+    } else {
+      // URL doesn't match the base pattern
+      return undefined
+    }
+  }
+
+  // Add query params and hash back if they exist
+  const queryString =
+    Object.keys(queryParams).length > 0
+      ? "?" +
+        Object.keys(queryParams)
+          .map((key) => `${key}=${queryParams[key]}`)
+          .join("&")
+      : ""
+  const hashString = hash ? `#${hash}` : ""
+
+  return remainingPath + queryString + hashString
+}
+
+/**
  * Get current route path by route name. (or component name)
  * (ex: "foo/bla" => if page is BlaPage, return "/bla")
  * This is just path of the route, not "fullPath" /foo/bla

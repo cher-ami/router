@@ -3,6 +3,7 @@ import {
   useStack,
   getSubRouterBase,
   getSubRouterRoutes,
+  getSubRouterStaticLocation,
   Link,
   Router,
   Stack,
@@ -37,6 +38,12 @@ function AboutPage(props: IProps, handleRef: ForwardedRef<any>) {
   const subRouterBase = getSubRouterBase(path, router.base, true)
   const surRouterRoutes = getSubRouterRoutes(path, router.routes)
 
+  // Calculate staticLocation for sub-router during SSR
+  const subRouterStaticLocation = getSubRouterStaticLocation(
+    router.staticLocation,
+    subRouterBase,
+  )
+
   return (
     <div className={componentName} ref={rootRef}>
       {componentName} {lang.key} - {props?.todo?.title}
@@ -47,7 +54,12 @@ function AboutPage(props: IProps, handleRef: ForwardedRef<any>) {
         Bar
       </Link>
       <br />
-      <Router id={2} base={subRouterBase} routes={surRouterRoutes}>
+      <Router
+        id={2}
+        base={subRouterBase}
+        routes={surRouterRoutes}
+        staticLocation={subRouterStaticLocation}
+      >
         <Stack />
       </Router>
     </div>

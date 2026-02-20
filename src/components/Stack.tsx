@@ -31,6 +31,8 @@ function Stack(props: IProps): JSX.Element {
     previousPageIsMount,
   } = useRouter() as IRouterContext
 
+  const router = useRouter()
+
   const prevRef = React.useRef<IRouteStack>(null)
   const currentRef = React.useRef<IRouteStack>(null)
 

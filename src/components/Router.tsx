@@ -126,19 +126,27 @@ function Router(
     routes: [],
   },
 ): JSX.Element {
+  // Get parent router context if this is a sub-router
+  const parentRouterContext = React.useContext(RouterContext)
   /**
    * Check if is the first router or a sub-router
    * If is the first router, reset Routers store
    */
   const IS_CLIENT_OR_SERVER_ROOT_ROUTER = useMemo(() => {
-    // base on supposition that:
-    // props.staticLocation exist on SERVER side
-    // props.history exist on CLIENT side
-    const isRootRouter = !!props.staticLocation || !!props.history
-    log(props.id, "IS_CLIENT_OR_SERVER_ROOT_ROUTER", isRootRouter)
+    // A root router is identified by id === 1 (or undefined/default)
+    // Sub-routers have id > 1
+    // Use only props.id to identify root router, not Routers.base (which can be set before this check)
+    const isRootRouter = props.id === 1 || props.id === undefined
 
-    // reset Routers store
-    if (IS_SERVER && isRootRouter) {
+    log(props.id, "IS_CLIENT_OR_SERVER_ROOT_ROUTER", isRootRouter, {
+      id: props.id,
+      hasStaticLocation: !!props.staticLocation,
+      hasHistory: !!props.history,
+      hasRoutersBase: !!Routers.base,
+    })
+
+    // reset Routers store only for the actual root router on first mount
+    if (IS_SERVER && isRootRouter && !Routers.base) {
       Routers.base = undefined
       Routers.routes = undefined
       Routers.history = undefined
@@ -216,11 +224,26 @@ function Router(
   /**
    * 4 static location
    * Is useful in SSR context
+   * For root router, store in Routers.staticLocation
+   * For sub-routers, use props.staticLocation directly (don't overwrite Routers.staticLocation)
    */
-  if (props.staticLocation) {
+  if (props.staticLocation && IS_CLIENT_OR_SERVER_ROOT_ROUTER) {
     Routers.staticLocation = props.staticLocation
   }
-  const staticLocation: string | undefined = Routers.staticLocation
+  // Use props.staticLocation for sub-routers, Routers.staticLocation for root router
+  const staticLocation: string | undefined =
+    !IS_CLIENT_OR_SERVER_ROOT_ROUTER && props.staticLocation
+      ? props.staticLocation
+      : Routers.staticLocation
+
+  // Debug log for sub-router staticLocation
+  if (!IS_CLIENT_OR_SERVER_ROOT_ROUTER && props.staticLocation) {
+    log(props.id, "Sub-router staticLocation", {
+      propsStaticLocation: props.staticLocation,
+      routersStaticLocation: Routers.staticLocation,
+      finalStaticLocation: staticLocation,
+    })
+  }
 
   /**
    * 5. reset is fist route visited
@@ -288,10 +311,16 @@ function Router(
         return
       }
 
+      // For sub-routers in SSR with staticLocation, use "/" as base for matching
+      // because staticLocation is relative to the sub-router's base
+      // In client mode, use the actual base since we have the full URL
+      const matchingBase =
+        IS_SERVER && !IS_CLIENT_OR_SERVER_ROOT_ROUTER && staticLocation ? "/" : props.base
+
       const matchingRoute = getRouteFromUrl({
         pUrl: url,
         pRoutes: routes,
-        pBase: props.base,
+        pBase: matchingBase,
         id: props.id,
         isHashHistory: props.isHashHistory,
       })
@@ -332,46 +361,67 @@ function Router(
         try {
           let mergedProps = {}
 
-          // For sub-routers, use Routers.currentRoute._context to get parent props
-          if (
-            !IS_CLIENT_OR_SERVER_ROOT_ROUTER &&
-            Routers.currentRoute?._context &&
-            Routers.currentRoute._context !== Routers.currentRoute
-          ) {
-            // This is a sub-router, get parent props from parent router
-            const parentRouteFromParentRouter = Routers.currentRoute._context
+          // For sub-routers, get parent props from parent router's currentRoute
+          if (!IS_CLIENT_OR_SERVER_ROOT_ROUTER) {
+            // Get parent route from parent router's context (most reliable for sub-routers)
+            let parentRouteFromParentRouter = null
 
-            // If parent already has props (from initialStaticProps), use them directly
-            const parentPropsFromParentRouter = parentRouteFromParentRouter.props
-            if (parentPropsFromParentRouter) {
-              const parentPropsKeys = Object.keys(parentPropsFromParentRouter)
-              const realParentProps = {}
-              parentPropsKeys.forEach((key) => {
-                if (!["params", "queryParams", "hash"].includes(key)) {
-                  realParentProps[key] = parentPropsFromParentRouter[key]
-                }
-              })
-              if (Object.keys(realParentProps).length > 0) {
-                mergedProps = { ...mergedProps, ...realParentProps }
-              }
+            // First try: get from parent router context (if available)
+            if (parentRouterContext?.currentRoute) {
+              parentRouteFromParentRouter = parentRouterContext.currentRoute
+            }
+            // Second try: get from Routers.currentRoute._context (if root router has set it)
+            else if (
+              Routers.currentRoute?._context &&
+              Routers.currentRoute._context !== Routers.currentRoute
+            ) {
+              parentRouteFromParentRouter = Routers.currentRoute._context
+            }
+            // Third try: get from newRoute._context (if it points to a parent)
+            else if (newRoute._context && newRoute._context !== newRoute) {
+              parentRouteFromParentRouter = newRoute._context
             }
 
-            // Also call parent's getStaticProps if exists (to ensure we have latest data)
-            if (parentRouteFromParentRouter.getStaticProps) {
-              try {
-                const parentProps = await parentRouteFromParentRouter.getStaticProps(
-                  parentRouteFromParentRouter.props,
-                  langService?.currentLang,
-                )
-                if (parentProps) {
-                  mergedProps = { ...mergedProps, ...parentProps }
+            if (parentRouteFromParentRouter) {
+              // If parent already has props (from initialStaticProps), use them directly
+              const parentPropsFromParentRouter = parentRouteFromParentRouter.props
+              if (parentPropsFromParentRouter) {
+                const parentPropsKeys = Object.keys(parentPropsFromParentRouter)
+                const realParentProps = {}
+                parentPropsKeys.forEach((key) => {
+                  if (!["params", "queryParams", "hash"].includes(key)) {
+                    realParentProps[key] = parentPropsFromParentRouter[key]
+                  }
+                })
+                if (Object.keys(realParentProps).length > 0) {
+                  mergedProps = { ...mergedProps, ...realParentProps }
+                  log(
+                    props.id,
+                    "Sub-router: got parent props from parent router:",
+                    Object.keys(realParentProps),
+                  )
                 }
-              } catch (e) {
-                console.error(
-                  `[Router ${props.id}] requestStaticProps failed for parent`,
-                  e,
-                )
               }
+
+              // Also call parent's getStaticProps if exists (to ensure we have latest data)
+              if (parentRouteFromParentRouter.getStaticProps) {
+                try {
+                  const parentProps = await parentRouteFromParentRouter.getStaticProps(
+                    parentRouteFromParentRouter.props,
+                    langService?.currentLang,
+                  )
+                  if (parentProps) {
+                    mergedProps = { ...mergedProps, ...parentProps }
+                  }
+                } catch (e) {
+                  console.error(
+                    `[Router ${props.id}] requestStaticProps failed for parent`,
+                    e,
+                  )
+                }
+              }
+            } else {
+              log(props.id, "Sub-router: no parent route found for getting parent props")
             }
           }
           // For root router, use newRoute._context
@@ -427,7 +477,9 @@ function Router(
         }
         // For sub-routers, call requestStaticPropsAndCacheIt even without initialStaticProps
         else if (!IS_CLIENT_OR_SERVER_ROOT_ROUTER && newRoute?.getStaticProps) {
+          log(props.id, "SSR sub-router: calling requestStaticPropsAndCacheIt for route:", newRoute.name)
           await requestStaticPropsAndCacheIt()
+          log(props.id, "SSR sub-router: requestStaticPropsAndCacheIt completed, props:", newRoute.props)
         }
       }
       // CLIENT
@@ -473,6 +525,13 @@ function Router(
       }
 
       // Final process: update context currentRoute from dispatch method \o/ !
+      log(
+        props.id,
+        "handleHistory: dispatching new route:",
+        newRoute.name,
+        "with props:",
+        Object.keys(newRoute.props || {}),
+      )
       dispatch({ type: "update-current-route", value: newRoute })
 
       // & register this new route as currentRoute in local and in Routers store
@@ -501,6 +560,11 @@ function Router(
       }
       // server
       if (staticLocation) {
+        // In SSR, we need to handle this synchronously for sub-routers
+        // For root router with initialStaticProps, handleHistory is called but props are already loaded
+        // For sub-routers, handleHistory is async and we can't wait in useMemo
+        // So we call it but the render will happen before it completes
+        // The route will be found and dispatched, but props might not be loaded yet
         handleHistory(staticLocation)
         return
         // client
@@ -522,7 +586,85 @@ function Router(
       }
     }
     return historyListener()
-  }, [routes, history, props.isHashHistory])
+  }, [routes, history, props.isHashHistory, staticLocation])
+
+  // For SSR sub-routers, initialize route synchronously before render
+  // This ensures currentRoute is set even if handleHistory hasn't completed yet
+  // But we need to preserve parent props from Routers.currentRoute._context
+  React.useMemo(() => {
+    // Only for sub-routers (id > 1), not root router
+    if (
+      IS_SERVER &&
+      props.id !== 1 &&
+      props.id !== undefined &&
+      staticLocation &&
+      !reducerState.currentRoute
+    ) {
+      // Find route synchronously without loading props
+      const matchingBase = "/"
+      const matchingRoute = getRouteFromUrl({
+        pUrl: staticLocation,
+        pRoutes: routes,
+        pBase: matchingBase,
+        id: props.id,
+        isHashHistory: props.isHashHistory,
+      })
+
+      if (matchingRoute) {
+        // Preserve parent props from parent router's currentRoute if available
+        // Use parent router context first (most reliable)
+        let parentRoute = null
+        if (parentRouterContext?.currentRoute) {
+          parentRoute = parentRouterContext.currentRoute
+        } else if (
+          Routers.currentRoute?._context &&
+          Routers.currentRoute._context !== Routers.currentRoute
+        ) {
+          parentRoute = Routers.currentRoute._context
+        } else if (matchingRoute._context && matchingRoute._context !== matchingRoute) {
+          parentRoute = matchingRoute._context
+        }
+
+        if (parentRoute) {
+          const parentProps = parentRoute.props || {}
+          // Extract real parent props (excluding route metadata)
+          const realParentProps = {}
+          Object.keys(parentProps).forEach((key) => {
+            if (!["params", "queryParams", "hash"].includes(key)) {
+              realParentProps[key] = parentProps[key]
+            }
+          })
+          // Merge parent props into matchingRoute props
+          if (Object.keys(realParentProps).length > 0) {
+            Object.assign(matchingRoute.props || {}, realParentProps)
+            log(
+              props.id,
+              "SSR sub-router: preserved parent props:",
+              Object.keys(realParentProps),
+            )
+          }
+        }
+
+        log(
+          props.id,
+          "SSR sub-router: initializing route synchronously:",
+          matchingRoute.name,
+          "with props:",
+          Object.keys(matchingRoute.props || {}),
+        )
+        dispatch({ type: "update-current-route", value: matchingRoute })
+        currentRouteRef.current = matchingRoute
+        Routers.currentRoute = matchingRoute
+      }
+    }
+  }, [
+    IS_SERVER,
+    props.id,
+    staticLocation,
+    routes,
+    props.isHashHistory,
+    reducerState.currentRoute,
+  ])
 
   // remove listener
   useEffect(() => {
