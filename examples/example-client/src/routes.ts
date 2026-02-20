@@ -49,9 +49,6 @@ export const routesList: TRoute[] = [
     path: { en: "/about", fr: "/a-propos", de: "/uber" },
     component: AboutPage,
     getStaticProps: async (props, currentLang) => {
-      console.log(
-        "================================================================ fetch parent",
-      )
       const res = await fetch("https://jsonplaceholder.typicode.com/todos/1")
       const todo = await res.json()
       return { todo }
@@ -61,9 +58,6 @@ export const routesList: TRoute[] = [
         path: "/la",
         component: LaPage,
         getStaticProps: async (props, currentLang) => {
-          console.log(
-            "================================================================ fetch children 1",
-          )
           const res = await fetch("https://jsonplaceholder.typicode.com/todos/2")
           const todo = await res.json()
           return { todo }
@@ -73,9 +67,6 @@ export const routesList: TRoute[] = [
         path: "/our",
         component: OurPage,
         getStaticProps: async (props, currentLang) => {
-          console.log(
-            "================================================================ fetch children 2",
-          )
           const res = await fetch("https://jsonplaceholder.typicode.com/todos/3")
           const todo = await res.json()
           return { todo }

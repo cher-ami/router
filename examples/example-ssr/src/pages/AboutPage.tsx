@@ -31,10 +31,6 @@ function AboutPage(props: IProps, handleRef: ForwardedRef<any>) {
     playOut: () => transitionsHelper(rootRef.current, false, { x: -0 }, { x: 50 }),
   })
 
-  useEffect(() => {
-    console.log("props.todo", props.todo)
-  }, [props.todo])
-
   // prepare routes & base for subRouter
   const router = useRouter()
   const path = getPathByRouteName(router.routes, EPages.ABOUT)
