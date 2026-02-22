@@ -279,6 +279,8 @@ export async function requestStaticPropsFromRoute({
   url: string
   parentProps?: any
   parentName?: string
+  /** Props for child route when URL matches a nested path (e.g. /about/foo → childRouteProps for Foo) */
+  childRouteProps?: { props: any; name: string }
 }> {
   const currentRoute = getRouteFromUrl({
     pUrl: url,
@@ -307,6 +309,7 @@ export async function requestStaticPropsFromRoute({
     url: string
     parentProps?: any
     parentName?: string
+    childRouteProps?: { props: any; name: string }
   } = {
     props: null,
     name: currentRoute.name,
@@ -342,6 +345,17 @@ export async function requestStaticPropsFromRoute({
       )
       // Merge props: parent first, then child (child overwrites parent)
       SSR_STATIC_PROPS.props = { ...(parentProps || {}), ...(childProps || {}) }
+      // When current route is a child (has parent with different name), expose for sub-routers
+      if (
+        currentRoute._context &&
+        currentRoute._context !== currentRoute &&
+        currentRoute._context?.name !== currentRoute?.name
+      ) {
+        SSR_STATIC_PROPS.childRouteProps = {
+          props: SSR_STATIC_PROPS.props,
+          name: currentRoute.name || currentRoute.component?.displayName,
+        }
+      }
     } catch (e) {
       log("fetch getStatic Props data error")
     }
@@ -364,6 +378,8 @@ type TGetRouteFromUrl = {
   id?: number | string
   urlWithoutHashAndQuery?: string
   isHashHistory?: boolean
+  /** When true, return parent route instead of leaf for nested routes (root renders parent, sub-router renders child) */
+  returnParentForNestedRoutes?: boolean
 }
 
 /**
@@ -377,6 +393,7 @@ export function getRouteFromUrl({
   pMatcher,
   id,
   isHashHistory,
+  returnParentForNestedRoutes = false,
 }: TGetRouteFromUrl): TRoute {
   if (!pRoutes || pRoutes?.length === 0) return
 
@@ -394,6 +411,7 @@ export function getRouteFromUrl({
     pMatcher,
     pParent,
     id,
+    returnParentForNestedRoutes: returnParent,
   }: TGetRouteFromUrl): TRoute {
     // test each routes
     for (let currentRoute of pRoutes) {
@@ -457,17 +475,60 @@ export function getRouteFromUrl({
           pParent: pParent || currentRoute,
           pBase: currentRoutePath, // parent base
           pMatcher: matcher,
+          returnParentForNestedRoutes: returnParent,
         })
 
         // only if matching, return this match, else continue to next iteration
         if (matchingChildren) {
+          // Root: return parent so it renders AboutPage; sub-router inside renders FooPage (avoids double render)
+          if (returnParent) {
+            const params = matchingChildren.params || {}
+            const formatRouteObj = (route) =>
+              route
+                ? {
+                    path: route?.path,
+                    url: compile(route.path as string)(params),
+                    base: pBase,
+                    component: route?.component,
+                    children: route?.children,
+                    parser: matchingChildren.parser,
+                    name: route?.name || route?.component?.displayName,
+                    getStaticProps: route?.getStaticProps,
+                    params,
+                    queryParams,
+                    hash,
+                    props: {
+                      params,
+                      queryParams,
+                      hash,
+                      ...(route?.props || {}),
+                    },
+                    _fullPath: currentRoutePath,
+                    _fullUrl: pUrl,
+                    _langPath: route?._langPath,
+                  }
+                : undefined
+            const formattedParent = formatRouteObj(currentRoute)
+            return {
+              ...formattedParent,
+              _context: formattedParent,
+            }
+          }
           return matchingChildren
         }
       }
     }
   }
 
-  let matchingRoute = next({ pUrl, urlWithoutHashAndQuery, pRoutes, pBase, pMatcher, id })
+  let matchingRoute = next({
+    pUrl,
+    urlWithoutHashAndQuery,
+    pRoutes,
+    pBase,
+    pMatcher,
+    id,
+    returnParentForNestedRoutes,
+  })
   if (!matchingRoute) {
     const notFoundRoute = getNotFoundRoute(pRoutes)
     matchingRoute = {

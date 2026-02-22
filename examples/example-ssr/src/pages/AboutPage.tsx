@@ -56,11 +56,13 @@ function AboutPage(props: IProps, handleRef: ForwardedRef<any>) {
       <br />
       <Router
         id={2}
+        isSubRouter
         base={subRouterBase}
         routes={surRouterRoutes}
         staticLocation={subRouterStaticLocation}
+        initialStaticProps={router.initialStaticProps}
       >
-        <Stack />
+        <Stack as="div" />
       </Router>
     </div>
   )

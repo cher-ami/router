@@ -21,7 +21,7 @@ function FooPage(props: IProps, handleRef: ForwardedRef<any>) {
   })
 
   return (
-    <div className={[componentName].filter((e) => e).join(" ")} ref={rootRef}>
+    <div className={"foo"} ref={rootRef}>
       {componentName} - langKey: - <span>{props?.todo?.title}</span>
       {router.langService && router.langService.currentLang.key}
     </div>
