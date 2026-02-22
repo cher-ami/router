@@ -14,7 +14,6 @@ export type TManageTransitions = {
 interface IProps {
   className?: string
   manageTransitions?: (T: TManageTransitions) => Promise<void>
-  /** Wrapper element: "main" (default) for root Stack, "div" for Stack inside a sub-router. */
   as?: "main" | "div"
 }
 
@@ -25,14 +24,13 @@ const log = debug(`router:${componentName}`)
  * @name Stack
  */
 function Stack(props: IProps): JSX.Element {
-  const router = useRouter() as IRouterContext
   const {
     routeIndex,
     currentRoute,
     previousRoute,
     unmountPreviousPage,
     previousPageIsMount,
-  } = router
+  } = useRouter() as IRouterContext
 
   const prevRef = React.useRef<IRouteStack>(null)
   const currentRef = React.useRef<IRouteStack>(null)
@@ -83,10 +81,7 @@ function Stack(props: IProps): JSX.Element {
   const Wrapper = props.as ?? "main"
 
   return (
-    <Wrapper
-      className={["Stack", props.className].filter((e) => e).join(" ")}
-      suppressHydrationWarning
-    >
+    <Wrapper className={["Stack", props.className].filter((e) => e).join(" ")}>
       {previousPageIsMount && PrevRoute?.component && (
         <PrevRoute.component
           ref={prevRef}
