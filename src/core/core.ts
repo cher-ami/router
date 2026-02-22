@@ -296,7 +296,6 @@ export async function requestStaticPropsFromRoute({
     return
   }
 
-  // get out
   if (!currentRoute) {
     log("No currentRoute, return")
     return
@@ -357,7 +356,7 @@ export async function requestStaticPropsFromRoute({
         }
       }
     } catch (e) {
-      log("fetch getStatic Props data error")
+      log("fetch getStatic Props data error", e)
     }
   } else {
     // If no getStaticProps for child, use parent props
@@ -421,8 +420,11 @@ export function getRouteFromUrl({
         "/",
       )
       const matcher = match(currentRoutePath)(urlWithoutHashAndQuery)
-      // prettier-ignore
-      log(id, `url "${urlWithoutHashAndQuery}" match path "${currentRoutePath}"?`, !!matcher);
+      log(
+        id,
+        `url "${urlWithoutHashAndQuery}" match path "${currentRoutePath}"?`,
+        !!matcher,
+      )
 
       // if current route path match with the param url
       if (matcher) {
@@ -459,7 +461,6 @@ export function getRouteFromUrl({
           ...formattedCurrentRoute,
           _context: pParent ? formatRouteObj(pParent) : formattedCurrentRoute,
         }
-
         log(id, "match", routeObj)
         return routeObj
       }

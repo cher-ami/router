@@ -33,8 +33,6 @@ const port = portFinderSync.getPort(3000)
     // use vite's connect instance as middleware
     app.use(vite.middlewares)
     app.use("*", async (req, res, next) => {
-      if (req.originalUrl === "/favicon.ico") return
-
       try {
         // Transforms the ESM source code to be usable in Node.js
         const { render } = await vite.ssrLoadModule(`src/server/index-server.tsx`)
@@ -51,7 +49,7 @@ const port = portFinderSync.getPort(3000)
             } else {
               res.statusCode = 200
             }
-            res.setHeader("Content-type", "text/html")
+            dom?.type === "html" && res.setHeader("Content-type", "text/html")
             stream.pipe(res)
           },
           onError(e) {
