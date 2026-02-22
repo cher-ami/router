@@ -14,6 +14,7 @@ export type TManageTransitions = {
 interface IProps {
   className?: string
   manageTransitions?: (T: TManageTransitions) => Promise<void>
+  as?: "main" | "div"
 }
 
 const componentName = "Stack"
@@ -77,8 +78,10 @@ function Stack(props: IProps): JSX.Element {
     currentRoute?._context ?? currentRoute,
   ]
 
+  const Wrapper = props.as ?? "main"
+
   return (
-    <main className={["Stack", props.className].filter((e) => e).join(" ")}>
+    <Wrapper className={["Stack", props.className].filter((e) => e).join(" ")}>
       {previousPageIsMount && PrevRoute?.component && (
         <PrevRoute.component
           ref={prevRef}
@@ -93,7 +96,7 @@ function Stack(props: IProps): JSX.Element {
           {...(CurrRoute.props || {})}
         />
       )}
-    </main>
+    </Wrapper>
   )
 }
 

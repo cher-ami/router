@@ -7,6 +7,7 @@ export {
   openRoute,
   getSubRouterBase,
   getSubRouterRoutes,
+  getSubRouterStaticLocation,
   getPathByRouteName,
   requestStaticPropsFromRoute,
 } from "./core/core"
