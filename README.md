@@ -217,7 +217,7 @@ const routesList = [
   {
     path: "/foo",
     component: FooPage,
-
+    name: "FooPage",
     // define children routes here
     children: [
       {
@@ -248,9 +248,11 @@ import {
   getPathByRouteName,
   getSubRouterBase,
   getSubRouterRoutes,
+  getSubRouterStaticLocation,
 } from "@cher-ami/router"
 
 const FooPage = forwardRef((props, handleRef) => {
+  // Get router
   const router = useRouter()
   // Parsed routes list and get path by route name -> "/foo"
   const path = getPathByRouteName(router.routes, "FooPage")
@@ -258,10 +260,23 @@ const FooPage = forwardRef((props, handleRef) => {
   const subBase = getSubRouterBase(path, router.base, true)
   // get subRoutes
   const subRoutes = getSubRouterRoutes(path, router.routes)
+  // Calculate staticLocation for sub-router during SSR
+  const subRouterStaticLocation = getSubRouterStaticLocation(
+    router.staticLocation,
+    subBase,
+  )
+
   return (
     <div>
-      <Router base={subBase} routes={subRoutes}>
-        <Stack />
+      <Router
+        id={2} // Define router ID
+        isSubRouter // Set as subrouter
+        base={subBase}
+        routes={subRoutes}
+        staticLocation={subStaticLocation} // Static location for rendering
+        initialStaticProps={router.initialStaticProps} // Parent static props
+      >
+        <Stack as="div" />
       </Router>
     </div>
   )
