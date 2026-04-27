@@ -27,11 +27,14 @@ const log = debug("router:Link")
  * @name Link
  */
 function Link(props: ILinkProps, ref: MutableRefObject<any>) {
-  const { history, staticLocation } = useRouter()
+  const { history, staticLocation, base, routes, langService } = useRouter()
   const [location] = useLocation()
 
   // Compute URL
-  const url = useMemo(() => createUrl(props.to), [props.to])
+  const url = useMemo(
+    () => createUrl(props.to, base, routes, langService),
+    [props.to, base, routes, langService],
+  )
 
   // Link is active if its URL is the current URL
   const handleClick = useCallback(

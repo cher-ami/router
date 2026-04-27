@@ -38,74 +38,82 @@ export function createUrl(
   if (!allRoutes) return
   let urlToPush: string
 
-  // STRING param
-  if (typeof openRouteParams === "string") {
-    urlToPush = openRouteParams as string
-    if (!!langService) {
-      urlToPush = addLangToUrl(urlToPush)
-    }
-    urlToPush = joinPaths([base === "/" ? "" : base, urlToPush])
-    return urlToPush
-  }
-
-  // OBJECT param, add lang to params if no exist
-  else if (typeof openRouteParams === "object" && openRouteParams?.name) {
-    if (langService && !openRouteParams.params?.lang) {
-      openRouteParams.params = {
-        ...openRouteParams.params,
-        lang: langService.currentLang.key,
+  try {
+    // STRING param
+    if (typeof openRouteParams === "string") {
+      urlToPush = openRouteParams as string
+      if (!!langService) {
+        urlToPush = addLangToUrl(urlToPush)
       }
+      urlToPush = joinPaths([base === "/" ? "" : base, urlToPush])
+      return urlToPush
     }
 
-    // add params to URL if exist
-    let queryParams = ""
-    if (openRouteParams?.queryParams) {
-      queryParams = "?"
-      queryParams += Object.keys(openRouteParams.queryParams)
-        .map((key) => `${key}=${openRouteParams?.queryParams[key]}`)
-        .join("&")
-    }
-    // add hash to URL if exist
-    let hash = ""
-    if (openRouteParams?.hash) {
-      hash = "#" + openRouteParams.hash
-    }
-
-    function getUrlByRouteName(
-      allRoutes: TRoute[],
-      args: TOpenRouteParams,
-      base = Routers.base || "/",
-      langService = Routers.langService,
-    ): string {
-      const next = (routes, args, curBase): string => {
-        for (let route of routes) {
-          const lang = args.params?.lang || langService?.currentLang.key
-          const langPath = route._langPath?.[lang]
-          const routePath = route.path
-          if (route?.name === args.name || route.component?.displayName === args.name) {
-            // prettier-ignore
-            return (curBase + compile(langPath || routePath)(args.params)).replace(/(\/)+/g, "/")
-          } else if (route.children?.length > 0) {
-            const match = next(
-              route.children,
-              args,
-              curBase + compile(langPath || routePath)(args.params),
-            )
-            if (match) return match
-          }
+    // OBJECT param, add lang to params if no exist
+    else if (typeof openRouteParams === "object" && openRouteParams?.name) {
+      if (langService && !openRouteParams.params?.lang) {
+        openRouteParams.params = {
+          ...openRouteParams.params,
+          lang: langService.currentLang.key,
         }
       }
-      return next(allRoutes, args, base)
+
+      // add params to URL if exist
+      let queryParams = ""
+      if (openRouteParams?.queryParams) {
+        queryParams = "?"
+        queryParams += Object.keys(openRouteParams.queryParams)
+          .map((key) => `${key}=${openRouteParams?.queryParams[key]}`)
+          .join("&")
+      }
+      // add hash to URL if exist
+      let hash = ""
+      if (openRouteParams?.hash) {
+        hash = "#" + openRouteParams.hash
+      }
+
+      function getUrlByRouteName(
+        allRoutes: TRoute[],
+        args: TOpenRouteParams,
+        base = Routers.base || "/",
+        langService = Routers.langService,
+      ): string {
+        const next = (routes, args, curBase): string => {
+          for (let route of routes) {
+            const lang = args.params?.lang || langService?.currentLang.key
+            const langPath = route._langPath?.[lang]
+            const routePath = route.path
+            if (route?.name === args.name || route.component?.displayName === args.name) {
+              // prettier-ignore
+              return (curBase + compile(langPath || routePath)(args.params)).replace(/(\/)+/g, "/")
+            } else if (route.children?.length > 0) {
+              const match = next(
+                route.children,
+                args,
+                curBase + compile(langPath || routePath)(args.params),
+              )
+              if (match) return match
+            }
+          }
+        }
+        return next(allRoutes, args, base)
+      }
+
+      const url = getUrlByRouteName(allRoutes, openRouteParams, base)
+
+      return url + queryParams + hash
+
+      // in other case return
+    } else {
+      console.warn(
+        "createUrl param isn't valid. to use createUrl return.",
+        openRouteParams,
+      )
+      return
     }
-
-    const url = getUrlByRouteName(allRoutes, openRouteParams, base)
-
-    return url + queryParams + hash
-
-    // in other case return
-  } else {
-    console.warn("createUrl param isn't valid. to use createUrl return.", openRouteParams)
-    return
+  } catch (e) {
+    console.error("Error in createUrl :", e.message)
+    return ""
   }
 }
 
@@ -164,50 +172,55 @@ export function getSubRouterStaticLocation(
 ): string | undefined {
   if (!fullUrl) return undefined
 
-  // Extract path without hash and query params for matching
-  const { urlWithoutHashAndQuery, queryParams, hash } = extractQueryParamsAndHash(fullUrl)
+  try {
+    // Extract path without hash and query params for matching
+    const { urlWithoutHashAndQuery, queryParams, hash } =
+      extractQueryParamsAndHash(fullUrl)
 
-  // Normalize the base path (remove trailing slash for matching)
-  const normalizedBase = removeLastCharFromString(subRouterBase, "/")
+    // Normalize the base path (remove trailing slash for matching)
+    const normalizedBase = removeLastCharFromString(subRouterBase, "/")
 
-  // Use path-to-regexp with a wildcard to capture the remaining path
-  // The pattern ":remaining*" will capture everything after the base
-  const patternWithWildcard = normalizedBase + "/:remaining*"
-  const wildcardMatcher = match(patternWithWildcard, { end: false })
-  const wildcardMatch = wildcardMatcher(urlWithoutHashAndQuery)
+    // Use path-to-regexp with a wildcard to capture the remaining path
+    // The pattern ":remaining*" will capture everything after the base
+    const patternWithWildcard = normalizedBase + "/:remaining*"
+    const wildcardMatcher = match(patternWithWildcard, { end: false })
+    const wildcardMatch = wildcardMatcher(urlWithoutHashAndQuery)
 
-  let remainingPath = "/"
+    let remainingPath = "/"
 
-  if (wildcardMatch && wildcardMatch.params) {
-    // Reconstruct the remaining path from the captured params
-    const remaining = (wildcardMatch.params as any).remaining
-    if (Array.isArray(remaining) && remaining.length > 0) {
-      remainingPath = "/" + remaining.join("/")
-    } else if (typeof remaining === "string" && remaining) {
-      remainingPath = "/" + remaining
-    }
-  } else {
-    // Check if URL exactly matches the base (no additional path)
-    const exactMatcher = match(normalizedBase, { end: true })
-    if (exactMatcher(urlWithoutHashAndQuery)) {
-      remainingPath = "/"
+    if (wildcardMatch && wildcardMatch.params) {
+      // Reconstruct the remaining path from the captured params
+      const remaining = (wildcardMatch.params as any).remaining
+      if (Array.isArray(remaining) && remaining.length > 0) {
+        remainingPath = "/" + remaining.join("/")
+      } else if (typeof remaining === "string" && remaining) {
+        remainingPath = "/" + remaining
+      }
     } else {
-      // URL doesn't match the base pattern
-      return undefined
+      // Check if URL exactly matches the base (no additional path)
+      const exactMatcher = match(normalizedBase, { end: true })
+      if (exactMatcher(urlWithoutHashAndQuery)) {
+        remainingPath = "/"
+      } else {
+        // URL doesn't match the base pattern
+        return undefined
+      }
     }
+
+    // Add query params and hash back if they exist
+    const queryString =
+      Object.keys(queryParams).length > 0
+        ? "?" +
+          Object.keys(queryParams)
+            .map((key) => `${key}=${queryParams[key]}`)
+            .join("&")
+        : ""
+    const hashString = hash ? `#${hash}` : ""
+    return remainingPath + queryString + hashString
+  } catch (e) {
+    console.error("Error in getSubRouterStaticLocation", e)
+    return undefined
   }
-
-  // Add query params and hash back if they exist
-  const queryString =
-    Object.keys(queryParams).length > 0
-      ? "?" +
-        Object.keys(queryParams)
-          .map((key) => `${key}=${queryParams[key]}`)
-          .join("&")
-      : ""
-  const hashString = hash ? `#${hash}` : ""
-
-  return remainingPath + queryString + hashString
 }
 
 /**
