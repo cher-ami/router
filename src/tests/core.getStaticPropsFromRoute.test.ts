@@ -17,8 +17,6 @@ describe("getStaticPropsFromRoute", () => {
     expect(ssrStaticProps).toEqual({
       props: { data: {} },
       name: "HelloPage",
-      parentProps: { data: {} },
-      parentName: "HelloPage",
       url: "/hello",
     })
   })

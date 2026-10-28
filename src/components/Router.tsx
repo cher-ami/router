@@ -510,8 +510,11 @@ function Router(
                 }
               }
 
-              // Also call parent's getStaticProps if exists (to ensure we have latest data)
-              if (parentRouteFromParentRouter.getStaticProps) {
+              // Call parent's getStaticProps only if parent router didn't already resolve its props
+              if (
+                parentRouteFromParentRouter.getStaticProps &&
+                Object.keys(mergedProps).length === 0
+              ) {
                 try {
                   const parentProps = await parentRouteFromParentRouter.getStaticProps(
                     parentRouteFromParentRouter.props,
@@ -535,7 +538,8 @@ function Router(
           else if (
             newRoute._context &&
             newRoute._context !== newRoute &&
-            newRoute._context.getStaticProps
+            newRoute._context?.getStaticProps &&
+            newRoute._context.getStaticProps !== newRoute.getStaticProps
           ) {
             try {
               const parentProps = await newRoute._context.getStaticProps(

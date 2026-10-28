@@ -333,7 +333,8 @@ export async function requestStaticPropsFromRoute({
   if (
     currentRoute._context &&
     currentRoute._context !== currentRoute &&
-    currentRoute._context.getStaticProps
+    currentRoute._context?.getStaticProps &&
+    currentRoute._context.getStaticProps !== currentRoute.getStaticProps
   ) {
     try {
       parentProps = await currentRoute._context.getStaticProps(

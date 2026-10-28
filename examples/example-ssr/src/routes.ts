@@ -11,6 +11,7 @@ export enum EPages {
   HOME = "home",
   ABOUT = "about",
   FOO = "foo",
+  DEFAULT_FOO = "default-foo",
   BAR = "bar",
   ARTICLE = "article",
   CONTACT = "contact",
@@ -33,6 +34,7 @@ export const routes: TRoute[] = [
     component: AboutPage,
     name: EPages.ABOUT,
     getStaticProps: async () => {
+      console.count("getStaticProps AboutPage") // 👈 This is called only once
       const res = await fetch("https://jsonplaceholder.typicode.com/todos/10")
       const todo = await res.json()
       return { todo: todo }
@@ -43,7 +45,7 @@ export const routes: TRoute[] = [
         component: FooPage,
         name: EPages.FOO,
         getStaticProps: async () => {
-          const res = await fetch("https://jsonplaceholder.typicode.com/todos/2")
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/8")
           const todo = await res.json()
           return { todo }
         },
