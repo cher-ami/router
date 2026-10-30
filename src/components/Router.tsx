@@ -1,7 +1,16 @@
 import debug from "@cher-ami/debug"
 import { BrowserHistory, HashHistory, MemoryHistory } from "history"
 import { match, Match } from "path-to-regexp"
-import React, { createContext, memo, ReactNode, useMemo, useReducer, useRef } from "react"
+import React, {
+  createContext,
+  memo,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react"
 import { formatRoutes, TParams, TQueryParams } from "../core/core"
 import {
   extractQueryParamsAndHash,
@@ -65,6 +74,8 @@ export interface IRouterContext extends IRouterContextStackStates {
   isSubRouter?: boolean
   rootBase?: string
   rootRoutes?: TRoute[]
+  subRoute?: TRoute
+  setSubRoute?: React.Dispatch<React.SetStateAction<TRoute>>
   initialStaticProps?: {
     props: any
     name: string
@@ -103,6 +114,7 @@ export const RouterContext = createContext<IRouterContext>({
   getIsLeaving: () => false,
   isSubRouter: false,
   initialStaticProps: undefined,
+  setSubRoute: () => {},
 })
 RouterContext.displayName = "RouterContext"
 
@@ -822,6 +834,17 @@ function Router(
   const rootBase = parentRouterContext.rootRoutes ? parentRouterContext.rootBase : base
   const rootRoutes = parentRouterContext.rootRoutes ?? routes
 
+  // expose this router's current route to its parent router (see useSubRoute)
+  const [subRoute, setSubRoute] = useState<TRoute>()
+  const setParentSubRoute = parentRouterContext.setSubRoute
+  useEffect(() => {
+    if (!currentRoute) return
+    setParentSubRoute(currentRoute)
+    // a page unmounting after the next one mounted must not clear the next page's sub-route
+    return () =>
+      setParentSubRoute((route) => (route === currentRoute ? undefined : route))
+  }, [currentRoute, setParentSubRoute])
+
   return (
     <RouterContext.Provider
       children={props.children}
@@ -844,6 +867,8 @@ function Router(
         initialStaticProps: props.initialStaticProps,
         rootBase,
         rootRoutes,
+        subRoute,
+        setSubRoute,
       }}
     />
   )

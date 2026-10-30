@@ -51,6 +51,7 @@ Components:
 Hooks:
 
 - [`useRouter`](#useRouter) Get current router informations like currentRoute and previousRoute
+- [`useSubRoute`](#useSubRoute) Get current route of the sub-router rendered inside the page
 - [`useLocation`](#useLocation) Get current location and set new location
 - [`useStack`](#useStack) Allow to the parent Stack to handle page transitions and refs
 - [`useRouteCounter`](#useRouteCounter) Get global history route counter
@@ -536,6 +537,22 @@ type TRoute = Partial<{
   _context: TRoute
 }>
 ```
+
+### useSubRoute
+
+Get current route of the sub-router rendered inside the page. Call it from the page that renders the sub-router, not from the sub-page:
+
+```jsx
+const subRoute = useSubRoute()
+
+useEffect(() => {
+  console.log(subRoute?.name, subRoute?.queryParams)
+}, [subRoute])
+```
+
+**Returns:**
+
+`TRoute | undefined` Updated on sub-route, query params and hash changes. `undefined` on first render and on the server.
 
 ### useLocation
 
