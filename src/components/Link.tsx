@@ -27,13 +27,13 @@ const log = debug("router:Link")
  * @name Link
  */
 function Link(props: ILinkProps, ref: MutableRefObject<any>) {
-  const { history, staticLocation, base, routes, langService } = useRouter()
+  const { history, staticLocation, rootBase, rootRoutes, langService } = useRouter()
   const [location] = useLocation()
 
-  // Compute URL
+  // Compute URL from root router, so links work the same from any (sub-)router
   const url = useMemo(
-    () => createUrl(props.to, base, routes, langService),
-    [props.to, base, routes, langService],
+    () => createUrl(props.to, rootBase, rootRoutes, langService),
+    [props.to, rootBase, rootRoutes, langService],
   )
 
   // Link is active if its URL is the current URL

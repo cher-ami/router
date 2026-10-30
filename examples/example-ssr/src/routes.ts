@@ -34,12 +34,21 @@ export const routes: TRoute[] = [
     component: AboutPage,
     name: EPages.ABOUT,
     getStaticProps: async () => {
-      console.count("getStaticProps AboutPage") // 👈 This is called only once
       const res = await fetch("https://jsonplaceholder.typicode.com/todos/10")
       const todo = await res.json()
       return { todo: todo }
     },
     children: [
+      {
+        path: "/",
+        component: FooPage,
+        name: EPages.DEFAULT_FOO,
+        getStaticProps: async () => {
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/4")
+          const todo = await res.json()
+          return { todo }
+        },
+      },
       {
         path: "/foo",
         component: FooPage,
