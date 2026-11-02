@@ -23,13 +23,14 @@ const log = debug(`router:${componentName}`)
 /**
  * @name Stack
  */
-function Stack(props: IProps): JSX.Element {
+function Stack(props: IProps): React.ReactElement {
   const {
     routeIndex,
     currentRoute,
     previousRoute,
     unmountPreviousPage,
     previousPageIsMount,
+    getIsLeaving,
   } = useRouter() as IRouterContext
 
   const prevRef = React.useRef<IRouteStack>(null)
@@ -52,7 +53,9 @@ function Stack(props: IProps): JSX.Element {
         }
         if (currentPage) {
           await currentPage.isReadyPromise()
-          if ($current) $current.style.visibility = "visible"
+          if ($current && currentRef.current?.$element === $current && !getIsLeaving()) {
+            $current.style.visibility = "visible"
+          }
           await currentPage.playIn()
         }
         resolve()
@@ -64,13 +67,21 @@ function Stack(props: IProps): JSX.Element {
   // 2. animate when route state changed
   React[isSSR() ? "useEffect" : "useLayoutEffect"](() => {
     if (!currentRoute) return
+    let isLatest = true
+    const unmountIfLatest = () => isLatest && unmountPreviousPage()
+    const currentPage = currentRef.current
     ;(props.manageTransitions || sequencialTransition)({
       previousPage: prevRef.current,
-      currentPage: currentRef.current,
-      unmountPreviousPage,
-    } as TManageTransitions).then(() => {
-      unmountPreviousPage()
-    })
+      currentPage: currentPage && {
+        ...currentPage,
+        playIn: () =>
+          isLatest && !getIsLeaving() ? currentPage.playIn() : Promise.resolve(),
+      },
+      unmountPreviousPage: unmountIfLatest,
+    } as TManageTransitions).then(unmountIfLatest)
+    return () => {
+      isLatest = false
+    }
   }, [routeIndex])
 
   const [PrevRoute, CurrRoute] = [

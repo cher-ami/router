@@ -22,7 +22,7 @@ hydrateRoot(
     id={1}
   >
     <GlobalDataContext.Provider value={window["__GLOBAL_DATA__"]}>
-      <App />
+      <App is404={false} />
     </GlobalDataContext.Provider>
   </Router>,
 )

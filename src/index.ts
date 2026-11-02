@@ -17,6 +17,7 @@ export { Stack } from "./components/Stack"
 export type { TManageTransitions } from "./components/Stack"
 
 export { useRouter } from "./hooks/useRouter"
+export { useSubRoute } from "./hooks/useSubRoute"
 export { useLocation } from "./hooks/useLocation"
 export { useHistory } from "./hooks/useHistory"
 export { useRouteCounter } from "./hooks/useRouteCounter"

@@ -11,6 +11,7 @@ export enum EPages {
   HOME = "home",
   ABOUT = "about",
   FOO = "foo",
+  DEFAULT_FOO = "default-foo",
   BAR = "bar",
   ARTICLE = "article",
   CONTACT = "contact",
@@ -39,11 +40,21 @@ export const routes: TRoute[] = [
     },
     children: [
       {
+        path: "/",
+        component: FooPage,
+        name: EPages.DEFAULT_FOO,
+        getStaticProps: async () => {
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/4")
+          const todo = await res.json()
+          return { todo }
+        },
+      },
+      {
         path: "/foo",
         component: FooPage,
         name: EPages.FOO,
         getStaticProps: async () => {
-          const res = await fetch("https://jsonplaceholder.typicode.com/todos/2")
+          const res = await fetch("https://jsonplaceholder.typicode.com/todos/8")
           const todo = await res.json()
           return { todo }
         },

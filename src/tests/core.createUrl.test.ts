@@ -62,6 +62,12 @@ describe("createUrl", () => {
         .toBe("/foo/b/c-en")
     })
 
+    it("should compile sub-router base params", () => {
+      const subRoutes = [{path: "/foo", name: "foo-page"}]
+      expect(createUrl({name: "foo-page", params: {lang: "en"}}, "/:lang/about", subRoutes))
+        .toBe("/en/about/foo")
+    })
+
     it("should create URL with params and hash", () => {
       const base = "/custom-base/"
       const routes = [

@@ -1,6 +1,6 @@
 import debug from "@cher-ami/debug"
 import { BrowserHistory, HashHistory, MemoryHistory } from "history"
-import { Match } from "path-to-regexp"
+import { match, Match } from "path-to-regexp"
 import React, {
   createContext,
   memo,
@@ -9,9 +9,11 @@ import React, {
   useMemo,
   useReducer,
   useRef,
+  useState,
 } from "react"
 import { formatRoutes, TParams, TQueryParams } from "../core/core"
 import {
+  extractQueryParamsAndHash,
   getNotFoundRoute,
   getRouteFromUrl,
   getSubRouterStaticLocation,
@@ -68,16 +70,18 @@ export interface IRouterContext extends IRouterContextStackStates {
   unmountPreviousPage: () => void
   getPaused: () => boolean
   setPaused: (value: boolean) => void
-  /** True when this Router is nested inside another Router (id > 1) */
+  getIsLeaving: () => boolean
   isSubRouter?: boolean
-  /** SSR static props from root; pass to sub-routers so they render with data on first paint */
+  rootBase?: string
+  rootRoutes?: TRoute[]
+  subRoute?: TRoute
+  setSubRoute?: React.Dispatch<React.SetStateAction<TRoute>>
   initialStaticProps?: {
     props: any
     name: string
     url: string
     parentProps?: any
     parentName?: string
-    /** Props for child route when URL matches a nested path (e.g. /about/foo) */
     childRouteProps?: { props: any; name: string }
   }
 }
@@ -107,8 +111,10 @@ export const RouterContext = createContext<IRouterContext>({
   unmountPreviousPage: () => {},
   getPaused: () => false,
   setPaused: (value: boolean) => {},
+  getIsLeaving: () => false,
   isSubRouter: false,
   initialStaticProps: undefined,
+  setSubRoute: () => {},
 })
 RouterContext.displayName = "RouterContext"
 
@@ -117,7 +123,7 @@ RouterContext.displayName = "RouterContext"
 /**
  * Router
  * @param props
- * @returns JSX.Element
+ * @returns React.ReactElement
  */
 function Router(
   props: {
@@ -130,7 +136,6 @@ function Router(
     isHashHistory?: boolean
     langService?: LangService
     id?: number | string
-    /** Set to true when this Router is nested inside another Router. Ensures correct tag (div vs main) and avoids hydration mismatch. */
     isSubRouter?: boolean
     initialStaticProps?: {
       props: any
@@ -146,7 +151,7 @@ function Router(
     children: "",
     routes: [],
   },
-): JSX.Element {
+): React.ReactElement {
   // Get parent router context if this is a sub-router
   const parentRouterContext = React.useContext(RouterContext)
   /**
@@ -222,7 +227,7 @@ function Router(
   if (!Routers.base) {
     Routers.base = props.base
   }
-  const base = Routers.base
+  const base = props.base
 
   /**
    * 3. history
@@ -290,9 +295,15 @@ function Router(
   const [reducerState, dispatch] = useReducer(
     (
       state,
-      action: { type: "update-current-route" | "unmount-previous-page"; value?: any },
+      action: {
+        type: "update-current-route" | "update-query-and-hash" | "unmount-previous-page"
+        value?: any
+      },
     ) => {
       switch (action.type) {
+        // same page: keep routeIndex so the page is not remounted (no playOut/playIn)
+        case "update-query-and-hash":
+          return { ...state, currentRoute: action.value }
         case "update-current-route":
           return {
             ...state,
@@ -327,8 +338,9 @@ function Router(
 
       // Sub-routers (id > 1): init currentRoute from staticLocation so first client render
       // matches server HTML and avoids hydration mismatch.
+      // Only on hydration: on client navigation, initialStaticProps are stale and handleHistory loads the route
       const isSub = initArg?.id !== 1 && initArg?.id !== undefined
-      if (isSub && initArg?.staticLocation && initArg?.routes) {
+      if (isSub && Routers.isFirstRoute && initArg?.staticLocation && initArg?.routes) {
         const matchingRoute = getRouteFromUrl({
           pUrl: initArg.staticLocation,
           pRoutes: initArg.routes,
@@ -354,7 +366,7 @@ function Router(
       }
 
       // Root router (id === 1): init from initialStaticProps + history
-      if (!initArg?.initialStaticProps || !initArg?.history || initArg?.id !== 1)
+      if (!initArg?.initialStaticProps || !initArg?.history || isSub)
         return defaultReducerState
       let url =
         initArg.history.location.pathname +
@@ -368,7 +380,7 @@ function Router(
         pRoutes: initArg.routes,
         pBase: initArg.base,
         id: initArg.id,
-        returnParentForNestedRoutes: initArg.id === 1,
+        returnParentForNestedRoutes: true,
       })
       if (!matchingRoute) return defaultReducerState
       Object.assign(matchingRoute?.props ?? {}, initArg.initialStaticProps?.props ?? {})
@@ -389,7 +401,7 @@ function Router(
     },
   )
 
-  const currentRouteRef = useRef<TRoute>()
+  const currentRouteRef = useRef<TRoute>(null)
 
   /**
    * Enable paused on Router instance
@@ -410,18 +422,33 @@ function Router(
    * Dispatch new routes via RouterContext
    */
 
+  const _lastRequestId = useRef(0)
+  const _isLeaving = useRef(false)
   const handleHistory = async (url = ""): Promise<void> => {
     try {
       if (_paused.current) {
         _waitingUrl.current = url
         return
       }
+      // a newer navigation may resolve first: drop this one if it is outdated after getStaticProps
+      const requestId = ++_lastRequestId.current
 
       // For sub-routers in SSR with staticLocation, use "/" as base for matching
       // because staticLocation is relative to the sub-router's base
       // In client mode, use the actual base since we have the full URL
       const matchingBase =
         IS_SERVER && !IS_CLIENT_OR_SERVER_ROOT_ROUTER && staticLocation ? "/" : props.base
+
+      // URL out of this sub-router's base: its parent page is leaving, the current sub-page leaves with it
+      _isLeaving.current =
+        !IS_CLIENT_OR_SERVER_ROOT_ROUTER &&
+        !match(matchingBase, { end: false })(
+          extractQueryParamsAndHash(url, props.isHashHistory).urlWithoutHashAndQuery,
+        )
+      if (_isLeaving.current) {
+        log(props.id, "url is out of sub-router base, return.", url)
+        return
+      }
 
       const matchingRoute = getRouteFromUrl({
         pUrl: url,
@@ -441,6 +468,27 @@ function Router(
         currentRouteRef.current?._context?.url ?? currentRouteRef.current?.url
       const matchingRouteUrl = matchingRoute?._context?.url ?? matchingRoute?.url
       if (currentRouteUrl === matchingRouteUrl) {
+        const current = currentRouteRef.current
+        const { queryParams, hash } = matchingRoute
+        if (
+          current &&
+          JSON.stringify([current.queryParams, current.hash]) !==
+            JSON.stringify([queryParams, hash])
+        ) {
+          log(props.id, "same route, query params or hash changed: update currentRoute")
+          // _fullUrl is kept: it is part of the Stack key, changing it would remount the page
+          const withQuery = (r: TRoute): TRoute =>
+            r && { ...r, queryParams, hash, props: { ...r.props, queryParams, hash } }
+          const updatedRoute = {
+            ...withQuery(current),
+            _context: withQuery(current._context),
+          }
+          dispatch({ type: "update-query-and-hash", value: updatedRoute })
+          currentRouteRef.current = updatedRoute
+          // keep the deepest router's route in the store (used by LangService.setLang)
+          if (Routers.currentRoute === current) Routers.currentRoute = updatedRoute
+          return
+        }
         log(props.id, "this is the same route 'url', return.")
         return
       }
@@ -510,8 +558,11 @@ function Router(
                 }
               }
 
-              // Also call parent's getStaticProps if exists (to ensure we have latest data)
-              if (parentRouteFromParentRouter.getStaticProps) {
+              // Parent router dispatches its currentRoute only after its getStaticProps resolved
+              if (
+                parentRouteFromParentRouter.getStaticProps &&
+                !parentRouterContext?.currentRoute
+              ) {
                 try {
                   const parentProps = await parentRouteFromParentRouter.getStaticProps(
                     parentRouteFromParentRouter.props,
@@ -535,7 +586,8 @@ function Router(
           else if (
             newRoute._context &&
             newRoute._context !== newRoute &&
-            newRoute._context.getStaticProps
+            newRoute._context?.getStaticProps &&
+            newRoute._context.getStaticProps !== newRoute.getStaticProps
           ) {
             try {
               const parentProps = await newRoute._context.getStaticProps(
@@ -621,6 +673,10 @@ function Router(
         }
       }
 
+      if (requestId !== _lastRequestId.current) {
+        log(props.id, "handleHistory: outdated navigation, skip dispatch", url)
+        return
+      }
       log(
         props.id,
         "handleHistory: dispatching new route:",
@@ -646,52 +702,48 @@ function Router(
    * - Get matching route with current URL
    * - Dispatch new routes states from RouterContext
    */
-  const historyListener = useMemo(() => {
+  // server: effects don't run, so the route must be resolved during render
+  useMemo(() => {
     if (!routes) return
-
-    const historyListener = () => {
-      if (staticLocation && history) {
-        console.error(`You can't set history and staticLocation props together, return.`)
-        return
-      }
-      // server
-      if (staticLocation) {
-        // Sub-routers: route is set synchronously by useMemo below; skip handleHistory to avoid
-        // double dispatch (previousRoute + currentRoute both set → double render of child).
-        if (!IS_CLIENT_OR_SERVER_ROOT_ROUTER) return
-        handleHistory(staticLocation)
-        return
-        // client
-      } else if (history) {
-        let url =
-          history.location.pathname + history.location.search + history.location.hash
-        if (props.isHashHistory) {
-          url = history.location.pathname + history.location.search
-        }
-        // When state was initialized from initialStaticProps (hydration), skip initial handleHistory to avoid duplicate dispatch and keep DOM in sync with server.
-        const hydratedWithInitialRoute =
-          typeof window !== "undefined" &&
-          props.initialStaticProps &&
-          props.id === 1 &&
-          reducerState.currentRoute
-        if (hydratedWithInitialRoute) {
-          currentRouteRef.current = reducerState.currentRoute
-          Routers.currentRoute = reducerState.currentRoute
-          Routers.isFirstRoute = false
-        } else {
-          handleHistory(url)
-        }
-
-        return history?.listen(({ location }) => {
-          handleHistory(location.pathname + location.search + location.hash)
-        })
-        // log error
-      } else {
-        console.error(`An history or staticLocation props is required, return.`)
-        return
-      }
+    if (staticLocation && history) {
+      console.error(`You can't set history and staticLocation props together, return.`)
+      return
     }
-    return historyListener()
+    // Sub-routers: route is set synchronously by useMemo below; skip handleHistory to avoid
+    // double dispatch (previousRoute + currentRoute both set → double render of child).
+    if (staticLocation && IS_CLIENT_OR_SERVER_ROOT_ROUTER) handleHistory(staticLocation)
+  }, [routes, history, staticLocation])
+
+  // client: listen in an effect, not during render, so a render discarded by React
+  // (ex: hydration mismatch) doesn't leave a duplicate listener and dispatch behind
+  React[isSSR() ? "useEffect" : "useLayoutEffect"](() => {
+    if (!routes || staticLocation) return
+    if (!history) {
+      console.error(`An history or staticLocation props is required, return.`)
+      return
+    }
+    let url = history.location.pathname + history.location.search + history.location.hash
+    if (props.isHashHistory) {
+      url = history.location.pathname + history.location.search
+    }
+    // When state was initialized on hydration (root and sub-routers), skip initial handleHistory:
+    // a second dispatch would remount the page with a new key and replay its playIn.
+    const hydratedWithInitialRoute = !currentRouteRef.current && reducerState.currentRoute
+    if (hydratedWithInitialRoute) {
+      currentRouteRef.current = reducerState.currentRoute
+      Routers.currentRoute = reducerState.currentRoute
+      Routers.isFirstRoute = false
+    } else {
+      handleHistory(url)
+    }
+
+    const unlisten = history.listen(({ location }) => {
+      handleHistory(location.pathname + location.search + location.hash)
+    })
+    return () => {
+      log(props.id, "Stop to listen history.")
+      unlisten()
+    }
   }, [routes, history, props.isHashHistory, staticLocation])
 
   // For SSR sub-routers, initialize route synchronously before render
@@ -771,14 +823,6 @@ function Router(
     reducerState.currentRoute,
   ])
 
-  // remove listener
-  useEffect(() => {
-    return () => {
-      log(props.id, "Stop to listen history.")
-      historyListener()
-    }
-  }, [historyListener, routes, staticLocation])
-
   // -------------------------------------------------------------------------------- RENDER
 
   const { currentRoute, previousRoute, routeIndex, previousPageIsMount } = reducerState
@@ -786,6 +830,20 @@ function Router(
 
   // Explicit prop wins; otherwise derive from id so value is always defined (avoids hydration mismatch)
   const isSubRouterValue = props.isSubRouter ?? (props.id !== 1 && props.id !== undefined)
+  // inherited from the parent router; the root router (no parent) provides its own
+  const rootBase = parentRouterContext.rootRoutes ? parentRouterContext.rootBase : base
+  const rootRoutes = parentRouterContext.rootRoutes ?? routes
+
+  // expose this router's current route to its parent router (see useSubRoute)
+  const [subRoute, setSubRoute] = useState<TRoute>()
+  const setParentSubRoute = parentRouterContext.setSubRoute
+  useEffect(() => {
+    if (!currentRoute) return
+    setParentSubRoute(currentRoute)
+    // a page unmounting after the next one mounted must not clear the next page's sub-route
+    return () =>
+      setParentSubRoute((route) => (route === currentRoute ? undefined : route))
+  }, [currentRoute, setParentSubRoute])
 
   return (
     <RouterContext.Provider
@@ -804,8 +862,13 @@ function Router(
         unmountPreviousPage,
         getPaused,
         setPaused,
+        getIsLeaving: () => _isLeaving.current,
         isSubRouter: isSubRouterValue,
         initialStaticProps: props.initialStaticProps,
+        rootBase,
+        rootRoutes,
+        subRoute,
+        setSubRoute,
       }}
     />
   )

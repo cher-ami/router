@@ -96,7 +96,7 @@ export function createUrl(
             }
           }
         }
-        return next(allRoutes, args, base)
+        return next(allRoutes, args, compile(base)(args.params))
       }
 
       const url = getUrlByRouteName(allRoutes, openRouteParams, base)
@@ -112,7 +112,7 @@ export function createUrl(
       return
     }
   } catch (e) {
-    console.error("Error in createUrl :", e.message)
+    log("Error in createUrl :", e.message, "openRouteParams", openRouteParams)
     return ""
   }
 }
@@ -333,7 +333,8 @@ export async function requestStaticPropsFromRoute({
   if (
     currentRoute._context &&
     currentRoute._context !== currentRoute &&
-    currentRoute._context.getStaticProps
+    currentRoute._context?.getStaticProps &&
+    currentRoute._context.getStaticProps !== currentRoute.getStaticProps
   ) {
     try {
       parentProps = await currentRoute._context.getStaticProps(
@@ -374,6 +375,28 @@ export async function requestStaticPropsFromRoute({
   } else {
     // If no getStaticProps for child, use parent props
     SSR_STATIC_PROPS.props = parentProps || {}
+  }
+
+  const defaultChild = currentRoute.children?.find((el) => getLangPath(el.path) === "/")
+  if (defaultChild) {
+    let childProps = null
+    try {
+      childProps = await defaultChild.getStaticProps?.(
+        {
+          params: currentRoute.params,
+          queryParams: currentRoute.queryParams,
+          hash: currentRoute.hash,
+          ...(defaultChild.props || {}),
+        },
+        langService?.currentLang,
+      )
+    } catch (e) {
+      log("fetch getStatic Props data error for default child", e)
+    }
+    SSR_STATIC_PROPS.childRouteProps = {
+      props: { ...(SSR_STATIC_PROPS.props || {}), ...(childProps || {}) },
+      name: defaultChild.name || defaultChild.component?.displayName,
+    }
   }
   return SSR_STATIC_PROPS
 }
